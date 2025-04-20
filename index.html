@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - Professional Networking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0078D4">
+    <link rel="apple-touch-icon" href="assets/icon-192x192.png">
+</head>
+<body class="bg-lightBg text-textDark min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-network-wired text-primary text-3xl mr-2"></i>
+                <h1 class="text-2xl font-bold text-primary">ProConnect</h1>
+            </div>
+            <div class="flex space-x-4">
+                <button id="profileBtn" class="text-primary">
+                    <i class="fas fa-user-circle text-2xl"></i>
+                </button>
+                <button id="messagesBtn" class="text-primary relative">
+                    <i class="fas fa-comments text-2xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-accent text-textDark text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main App Screens -->
+        <main>
+            <!-- Matching Screen (Initial screen) -->
+            <div id="matchingScreen" class="screen">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Find Connections</h2>
+                    <div class="text-sm">
+                        <span class="text-primary font-semibold">24</span> matches found
+                    </div>
+                </div>
+                
+                <!-- Swipe Cards -->
+                <div class="relative h-[500px]">
+                    <!-- Current Card -->
+                    <div id="currentCard" class="absolute w-full h-full bg-lightSecondary rounded-xl overflow-hidden shadow-lg transform transition-transform duration-300">
+                        <div class="h-1/3 bg-gradient-to-r from-primary to-primaryLight"></div>
+                        <div class="absolute top-24 left-4 w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-full h-full object-cover" alt="Profile photo">
+                        </div>
+                        <div class="p-4 pt-12">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-xl font-bold">Sarah Chen</h3>
+                                    <p class="text-textMedium">Product Manager at TechCorp</p>
+                                </div>
+                                <div class="flex space-x-1">
+                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">98% Match</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h4 class="font-semibold mb-1">Top Skills</h4>
+                                <div class="flex flex-wrap gap-1 mb-3">
+                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">Product Management</span>
+                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">User Research</span>
+                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">Agile</span>
+                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">UX Design</span>
+                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">Strategy</span>
+                                </div>
+                                
+                                <h4 class="font-semibold mb-1">Key Experiences</h4>
+                                <ul class="list-disc list-inside text-sm mb-3 text-textMedium">
+                                    <li>Led product team at Spotify for 3 years</li>
+                                    <li>Launched 4 successful mobile applications</li>
+                                    <li>MBA from Stanford University</li>
+                                </ul>
+                                
+                                <h4 class="font-semibold mb-1">Looking For</h4>
+                                <p class="text-sm mb-3 text-textMedium">Technical co-founder for a healthcare startup idea</p>
+                                
+                                <h4 class="font-semibold mb-1">Expertise Level</h4>
+                                <div class="flex flex-col">
+                                    <div class="flex items-center">
+                                        <div class="w-full bg-lightTertiary rounded-full h-2.5">
+                                            <div class="bg-primary h-2.5 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                        <span class="ml-2 text-sm">85%</span>
+                                    </div>
+                                    <div class="text-xs text-textLight mt-1">
+                                        10+ years experience • Senior Position • Director Level
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Card (partially visible) -->
+                    <div class="absolute w-full h-full bg-lightSecondary rounded-xl overflow-hidden shadow-lg transform scale-[0.98] translate-y-2 -z-10">
+                    </div>
+                </div>
+                
+                <!-- Swipe Actions -->
+                <div class="flex justify-center space-x-8 mt-6">
+                    <button id="skipBtn" class="w-14 h-14 bg-lightTertiary rounded-full flex items-center justify-center shadow-md hover:bg-gray-300 transition">
+                        <i class="fas fa-times text-danger text-xl"></i>
+                    </button>
+                    <button id="infoBtn" class="w-14 h-14 bg-lightTertiary rounded-full flex items-center justify-center shadow-md hover:bg-gray-300 transition">
+                        <i class="fas fa-info text-primary text-xl"></i>
+                    </button>
+                    <button id="connectBtn" class="w-14 h-14 bg-lightTertiary rounded-full flex items-center justify-center shadow-md hover:bg-gray-300 transition">
+                        <i class="fas fa-check text-success text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Skills Endorsement Screen -->
+            <div id="skillsScreen" class="screen hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Skills & Endorsements</h2>
+                    <button id="addSkillBtn" class="bg-primary text-white px-3 py-1 rounded-lg text-sm">
+                        <i class="fas fa-plus mr-1"></i> Add Skill
+                    </button>
+                </div>
+                
+                <!-- Expertise Score Card -->
+                <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 mb-4 text-white">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold">Your Expertise Score</h3>
+                        <span class="bg-white text-primary px-2 py-1 rounded-full font-bold">78</span>
+                    </div>
+                    <div class="w-full bg-white/30 rounded-full h-2.5 mb-2">
+                        <div class="bg-white h-2.5 rounded-full" style="width: 78%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span>Based on endorsements and verifications</span>
+                        <button class="underline">View details</button>
+                    </div>
+                </div>
+                
+                <!-- Top Skills Section -->
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Top Skills</h3>
+                    
+                    <!-- Skill Cards -->
+                    <div id="topSkillsList" class="space-y-3">
+                        <!-- Skill cards will be added here by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Other Skills Section -->
+                <div>
+                    <h3 class="font-semibold mb-2">Additional Skills</h3>
+                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
+                        <div id="additionalSkillsList" class="grid grid-cols-2 gap-2">
+                            <!-- Additional skills will be added here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skill Verification CTA -->
+                <div class="bg-accent/10 p-4 rounded-lg">
+                    <h3 class="font-semibold text-sm mb-2">Boost Your Expertise Score</h3>
+                    <p class="text-sm text-textMedium mb-3">Verify your skills with credentials or certifications to increase your expertise score and get more quality matches.</p>
+                    <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
+                        Verify Your Skills
+                    </button>
+                </div>
+            </div>
+
+            <!-- Business Opportunity Matching Screen -->
+            <div id="opportunitiesScreen" class="screen hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Business Opportunities</h2>
+                    <div class="flex space-x-2">
+                        <button id="filterOpportunities" class="text-primary">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                        <button id="createOpportunity" class="text-primary">
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- AI-Powered Match Summary -->
+                <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 mb-4 text-white">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-robot mr-2 text-lg"></i>
+                        <h3 class="text-lg font-bold">AI Match Summary</h3>
+                    </div>
+                    <p class="text-sm mb-3">Based on your profile and current network, we've identified 12 business opportunities that match your expertise and goals.</p>
+                    <div class="grid grid-cols-3 gap-2 mb-2">
+                        <div class="bg-white/20 p-2 rounded-lg text-center">
+                            <div class="text-xl font-bold">7</div>
+                            <div class="text-xs">Projects</div>
+                        </div>
+                        <div class="bg-white/20 p-2 rounded-lg text-center">
+                            <div class="text-xl font-bold">3</div>
+                            <div class="text-xs">Ventures</div>
+                        </div>
+                        <div class="bg-white/20 p-2 rounded-lg text-center">
+                            <div class="text-xl font-bold">2</div>
+                            <div class="text-xs">Jobs</div>
+                        </div>
+                    </div>
+                    <div class="text-xs">Matches updated 2 hours ago</div>
+                </div>
+                
+                <!-- Opportunity Filters (Chips) -->
+                <div class="flex space-x-2 overflow-x-auto pb-2 mb-4">
+                    <button class="whitespace-nowrap px-3 py-1 bg-primary text-white rounded-full text-sm">All Opportunities</button>
+                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Projects</button>
+                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Ventures</button>
+                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Jobs</button>
+                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Funding</button>
+                </div>
+                
+                <!-- Opportunities List -->
+                <div id="opportunitiesList" class="space-y-4">
+                    <!-- Opportunities will be added here by JavaScript -->
+                </div>
+                
+                <!-- Create Your Own Opportunity CTA -->
+                <div class="mt-6 bg-accent/10 p-4 rounded-lg">
+                    <h3 class="font-semibold text-sm mb-2">Have Your Own Opportunity?</h3>
+                    <p class="text-sm text-textMedium mb-3">Create a listing for your project, venture, or job opening to find the perfect matches from our professional network.</p>
+                    <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
+                        Create Opportunity
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analytics Dashboard Screen -->
+            <div id="analyticsScreen" class="screen hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Networking Analytics</h2>
+                    <button id="downloadReportBtn" class="text-primary text-sm">
+                        <i class="fas fa-download mr-1"></i>Report
+                    </button>
+                </div>
+
+                <!-- Overview Cards -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-sm font-medium">Network Size</h3>
+                            <span class="text-xs text-success">+12%</span>
+                        </div>
+                        <p class="text-xl font-bold">142</p>
+                        <p class="text-xs text-textMedium">Connections</p>
+                    </div>
+                    
+                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-sm font-medium">Profile Views</h3>
+                            <span class="text-xs text-success">+8%</span>
+                        </div>
+                        <p class="text-xl font-bold">38</p>
+                        <p class="text-xs text-textMedium">Last 30 days</p>
+                    </div>
+                    
+                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-sm font-medium">Messages</h3>
+                            <span class="text-xs text-success">+23%</span>
+                        </div>
+                        <p class="text-xl font-bold">27</p>
+                        <p class="text-xs text-textMedium">Last 30 days</p>
+                    </div>
+                    
+                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-sm font-medium">Response Rate</h3>
+                            <span class="text-xs text-success">+5%</span>
+                        </div>
+                        <p class="text-xl font-bold">82%</p>
+                        <p class="text-xs text-textMedium">Avg. time: 4h</p>
+                    </div>
+                </div>
+                
+                <!-- Network Growth Chart -->
+                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                    <h3 class="text-base font-medium mb-3">Network Growth</h3>
+                    <canvas id="networkGrowthChart" height="200"></canvas>
+                </div>
+                
+                <!-- Connection Distribution -->
+                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                    <h3 class="text-base font-medium mb-3">Connection Distribution</h3>
+                    <div class="flex space-x-3">
+                        <div class="w-1/2">
+                            <canvas id="industryDistributionChart" height="200"></canvas>
+                        </div>
+                        <div class="w-1/2">
+                            <div id="industryBreakdown">
+                                <!-- Industry breakdown will be added here by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Networking ROI Calculator -->
+                <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 text-white mb-4">
+                    <h3 class="text-base font-medium mb-2">Networking ROI Calculator</h3>
+                    <p class="text-sm mb-3">Track the value generated from your professional networking activities</p>
+                    
+                    <div class="bg-white/20 rounded-lg p-3 mb-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm">Opportunities Generated</span>
+                            <span class="font-semibold">12</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm">Meetings Conducted</span>
+                            <span class="font-semibold">18</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm">Projects Secured</span>
+                            <span class="font-semibold">3</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium">Estimated Value</span>
+                            <span class="font-bold">HKD 250,000</span>
+                        </div>
+                    </div>
+                    
+                    <button class="bg-white text-primary font-medium w-full py-2 rounded-lg">
+                        Update ROI Data
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
+            <button id="navMatchBtn" class="text-primary flex flex-col items-center">
+                <i class="fas fa-user-friends text-xl"></i>
+                <span class="text-xs mt-1">Match</span>
+            </button>
+            <button id="navSkillsBtn" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-certificate text-xl"></i>
+                <span class="text-xs mt-1">Skills</span>
+            </button>
+            <button id="navOpportunitiesBtn" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-briefcase text-xl"></i>
+                <span class="text-xs mt-1">Opportunities</span>
+            </button>
+            <button id="navAnalyticsBtn" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Analytics</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
