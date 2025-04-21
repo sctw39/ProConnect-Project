@@ -29,7 +29,6 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md">
@@ -432,7 +431,7 @@
                     </div>
                     
                     <div class="flex justify-center">
-                        <a href="index.html" id="gotoProfileBtn" class="bg-primary hover:bg-primaryDark text-white font-semibold py-3 px-8 rounded-lg transition w-full text-center">
+                        <a href="#" id="gotoProfileBtn" class="bg-primary hover:bg-primaryDark text-white font-semibold py-3 px-8 rounded-lg transition w-full text-center">
                             Go to My Profile
                         </a>
                     </div>
@@ -614,10 +613,57 @@
             if (gotoProfileBtn) {
                 gotoProfileBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // Normally would save user data and redirect to profile
-                    // For demo, we'll simulate creating a profile and redirect
+                    
+                    // Collect user data from form fields
+                    const userData = {
+                        fullName: document.getElementById('fullName').value || 'Alex Johnson',
+                        currentRole: document.getElementById('currentRole').value || 'Product Manager',
+                        company: document.getElementById('industry').options[document.getElementById('industry').selectedIndex].text || 'TechCorp',
+                        industry: document.getElementById('industry').value || 'Technology',
+                        skills: document.getElementById('skills').value || 'Product Management, User Research, Data Analysis, Strategic Planning, Team Leadership',
+                        about: "Professional with experience in technology companies. Passionate about creating user-centric solutions that solve real problems.",
+                        lookingFor: [
+                            "Technical co-founder for healthcare startup",
+                            "Mentorship opportunities with junior PMs",
+                            "Consulting projects in healthcare technology"
+                        ],
+                        experience: [
+                            {
+                                title: "Product Manager",
+                                company: "TechCorp",
+                                period: "2019 - Present",
+                                description: "Leading product development for healthcare AI solutions"
+                            },
+                            {
+                                title: "Senior Product Analyst",
+                                company: "Innovate Inc",
+                                period: "2016 - 2019",
+                                description: "Data-driven product strategy and roadmap development"
+                            }
+                        ],
+                        networkSize: 142,
+                        expertiseScore: 78,
+                        endorsements: 23,
+                        profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                    };
+                    
+                    // Store user data in localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    
+                    // Log for debugging
+                    console.log("User data saved, redirecting to profile page");
+                    
+                    // Get the base URL for proper path resolution
+                    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                    console.log("Base URL: " + baseUrl);
+                    
+                    // Use absolute path with base URL for GitHub Pages
+                    const profileUrl = baseUrl + "profile.html";
+                    console.log("Redirecting to: " + profileUrl);
+                    
+                    // Redirect to profile page
                     setTimeout(() => {
-                        window.location.href = "index.html";
+                        window.location.href = profileUrl;
                     }, 500);
                 });
             }
@@ -632,53 +678,3 @@
     </script>
 </body>
 </html>
-<!-- In onboarding.html, find the script section and add this code -->
-<script>
-    // Existing code...
-
-    // Connect profile page button
-    if (gotoProfileBtn) {
-        gotoProfileBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Collect user data from form fields
-            const userData = {
-                fullName: document.getElementById('fullName').value || 'Alex Johnson',
-                currentRole: document.getElementById('currentRole').value || 'Product Manager',
-                company: document.getElementById('company')?.value || 'TechCorp',
-                industry: document.getElementById('industry').value || 'Technology',
-                skills: document.getElementById('skills').value || 'Product Management, User Research, Data Analysis, Strategic Planning, Team Leadership',
-                about: "Professional with experience in technology companies. Passionate about creating user-centric solutions that solve real problems.",
-                lookingFor: [
-                    "Technical co-founder for healthcare startup",
-                    "Mentorship opportunities with junior PMs",
-                    "Consulting projects in healthcare technology"
-                ],
-                experience: [
-                    {
-                        title: "Product Manager",
-                        company: "TechCorp",
-                        period: "2019 - Present",
-                        description: "Leading product development for healthcare AI solutions"
-                    },
-                    {
-                        title: "Senior Product Analyst",
-                        company: "Innovate Inc",
-                        period: "2016 - 2019",
-                        description: "Data-driven product strategy and roadmap development"
-                    }
-                ],
-                networkSize: 142,
-                expertiseScore: 78,
-                endorsements: 23,
-                profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
-            };
-            
-            // Store user data in localStorage
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            
-            // Redirect to profile page
-            window.location.href = "profile.html";
-        });
-    }
-</script>
