@@ -41,75 +41,107 @@
             <div class="w-8"></div> <!-- Empty div for balance -->
         </header>
 
-        <!-- Profile Banner & Avatar -->
-        <div class="relative mb-20">
-            <div class="h-40 bg-gradient-to-r from-primary to-primaryLight rounded-t-lg"></div>
-            <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-16 flex flex-col items-center">
-                <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200">
-                    <img id="userImage" src="" class="w-full h-full object-cover" alt="Profile photo">
-                </div>
-                <div class="mt-2 text-center">
-                    <h2 id="userName" class="text-xl font-bold"></h2>
-                    <p id="userTitle" class="text-textMedium"></p>
-                </div>
+        <!-- Authentication Check -->
+        <div id="authCheck" class="hidden flex flex-col items-center justify-center py-8">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-lock text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Sign in to view profiles</h3>
+            <p class="text-textMedium mb-4 text-center">Please sign in or create an account to view user profiles</p>
+            <div class="flex space-x-4">
+                <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                    Sign In
+                </a>
+                <a href="onboarding.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
+                    Sign Up
+                </a>
             </div>
         </div>
 
-        <!-- Profile Content -->
-        <div class="mt-6">
-            <!-- Connection Options -->
-            <div class="flex space-x-3 mb-6 justify-center">
-                <button class="bg-primary hover:bg-primaryDark text-white py-2 px-6 rounded-lg font-semibold flex items-center">
-                    <i class="fas fa-user-plus mr-2"></i> Connect
-                </button>
-                <button class="bg-lightSecondary hover:bg-lightTertiary py-2 px-6 rounded-lg font-semibold flex items-center">
-                    <i class="fas fa-comment mr-2"></i> Message
-                </button>
+        <!-- User Not Found Message (Hidden by default) -->
+        <div id="userNotFound" class="hidden flex flex-col items-center justify-center py-8">
+            <div class="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-exclamation-triangle text-danger text-2xl"></i>
             </div>
+            <h3 class="text-lg font-semibold mb-2">User Not Found</h3>
+            <p class="text-textMedium mb-4 text-center">The user you're looking for doesn't exist or has been removed</p>
+            <a href="search.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                Back to Search
+            </a>
+        </div>
 
-            <!-- Match Score -->
-            <div class="bg-gradient-to-r from-primary to-primaryLight text-white p-4 rounded-lg mb-6">
-                <h3 class="font-semibold mb-2">Connection Match Score</h3>
-                <div class="flex items-center">
-                    <div class="w-full bg-white/30 rounded-full h-2.5 mr-3">
-                        <div id="matchScoreBar" class="bg-white h-2.5 rounded-full" style="width: 75%"></div>
+        <!-- User Profile Content (Shown only if authenticated and user exists) -->
+        <div id="userProfileContent">
+            <!-- Profile Banner & Avatar -->
+            <div class="relative mb-20">
+                <div class="h-40 bg-gradient-to-r from-primary to-primaryLight rounded-t-lg"></div>
+                <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-16 flex flex-col items-center">
+                    <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200">
+                        <img id="userImage" src="" class="w-full h-full object-cover" alt="Profile photo">
                     </div>
-                    <span id="matchScore" class="font-bold">75%</span>
-                </div>
-                <div class="mt-2 text-sm">
-                    <p>You share <span id="commonSkills">3</span> common skills and similar industry experience</p>
-                </div>
-            </div>
-
-            <!-- About Section -->
-            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <h3 class="font-semibold mb-2">About</h3>
-                <p id="userAbout" class="text-sm text-textMedium"></p>
-            </div>
-
-            <!-- Skills Section -->
-            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <h3 class="font-semibold mb-2">Skills</h3>
-                <div id="userSkills" class="flex flex-wrap gap-2">
-                    <!-- Skills will be populated here -->
+                    <div class="mt-2 text-center">
+                        <h2 id="userName" class="text-xl font-bold"></h2>
+                        <p id="userTitle" class="text-textMedium"></p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Experience Section -->
-            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <h3 class="font-semibold mb-2">Experience</h3>
-                <div id="userExperience" class="space-y-3">
-                    <!-- Experience will be populated here -->
+            <!-- Profile Content -->
+            <div class="mt-6">
+                <!-- Connection Options -->
+                <div class="flex space-x-3 mb-6 justify-center">
+                    <button id="connectBtn" class="bg-primary hover:bg-primaryDark text-white py-2 px-6 rounded-lg font-semibold flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i> Connect
+                    </button>
+                    <button id="messageBtn" class="bg-lightSecondary hover:bg-lightTertiary py-2 px-6 rounded-lg font-semibold flex items-center">
+                        <i class="fas fa-comment mr-2"></i> Message
+                    </button>
                 </div>
-            </div>
 
-            <!-- Contact Info -->
-            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <h3 class="font-semibold mb-2">Contact</h3>
-                <p class="text-sm text-textMedium mb-2">Contact information is only visible to connections</p>
-                <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
-                    Connect to View Contact Info
-                </button>
+                <!-- Match Score -->
+                <div class="bg-gradient-to-r from-primary to-primaryLight text-white p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-2">Connection Match Score</h3>
+                    <div class="flex items-center">
+                        <div class="w-full bg-white/30 rounded-full h-2.5 mr-3">
+                            <div id="matchScoreBar" class="bg-white h-2.5 rounded-full" style="width: 75%"></div>
+                        </div>
+                        <span id="matchScore" class="font-bold">75%</span>
+                    </div>
+                    <div class="mt-2 text-sm">
+                        <p>You share <span id="commonSkills">3</span> common skills and similar industry experience</p>
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-2">About</h3>
+                    <p id="userAbout" class="text-sm text-textMedium"></p>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-2">Skills</h3>
+                    <div id="userSkills" class="flex flex-wrap gap-2">
+                        <!-- Skills will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Experience Section -->
+                <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-2">Experience</h3>
+                    <div id="userExperience" class="space-y-3">
+                        <!-- Experience will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold mb-2">Contact</h3>
+                    <p class="text-sm text-textMedium mb-2">Contact information is only visible to connections</p>
+                    <button id="viewContactBtn" class="bg-primary text-white w-full py-2 rounded-lg font-medium">
+                        Connect to View Contact Info
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -136,6 +168,20 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const authCheck = document.getElementById('authCheck');
+            const userProfileContent = document.getElementById('userProfileContent');
+            const userNotFound = document.getElementById('userNotFound');
+            
+            if (!currentUser) {
+                // Show auth check message and hide profile content
+                authCheck.classList.remove('hidden');
+                userProfileContent.classList.add('hidden');
+                userNotFound.classList.add('hidden');
+                return;
+            }
+            
             // Get user ID from URL parameter
             const urlParams = new URLSearchParams(window.location.search);
             const userId = parseInt(urlParams.get('id'));
@@ -146,81 +192,117 @@
             // Find the user by ID
             const user = sampleUsers.find(u => u.id === userId);
             
-            if (user) {
-                // Populate user profile data
-                document.title = `ProConnect - ${user.name}`;
-                document.getElementById('userName').textContent = user.name;
-                document.getElementById('userTitle').textContent = `${user.title} at ${user.company}`;
-                document.getElementById('userImage').src = user.image;
-                document.getElementById('userImage').alt = user.name;
+            if (!user) {
+                // Show user not found message
+                authCheck.classList.add('hidden');
+                userProfileContent.classList.add('hidden');
+                userNotFound.classList.remove('hidden');
+                return;
+            }
+            
+            // Show user profile content
+            authCheck.classList.add('hidden');
+            userProfileContent.classList.remove('hidden');
+            userNotFound.classList.add('hidden');
+            
+            // Populate user profile data
+            document.title = `ProConnect - ${user.name}`;
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userTitle').textContent = `${user.title} at ${user.company}`;
+            document.getElementById('userImage').src = user.image;
+            document.getElementById('userImage').alt = user.name;
+            
+            // Match score
+            document.getElementById('matchScore').textContent = `${user.match}%`;
+            document.getElementById('matchScoreBar').style.width = `${user.match}%`;
+            document.getElementById('commonSkills').textContent = Math.floor(Math.random() * 5) + 1; // Random number of common skills
+            
+            // About section (generated)
+            document.getElementById('userAbout').textContent = `${user.title} with several years of experience in the ${user.industry} industry. Based in ${user.location}, specializing in ${user.skills.slice(0, 3).join(', ')}, and other areas.`;
+            
+            // Skills
+            const skillsContainer = document.getElementById('userSkills');
+            user.skills.forEach(skill => {
+                const skillSpan = document.createElement('span');
+                skillSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs';
+                skillSpan.textContent = skill;
+                skillsContainer.appendChild(skillSpan);
+            });
+            
+            // Experience (generated)
+            const experienceContainer = document.getElementById('userExperience');
+            
+            // Current role
+            const currentRole = document.createElement('div');
+            currentRole.className = 'flex';
+            currentRole.innerHTML = `
+                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <i class="fas fa-building text-primary"></i>
+                </div>
+                <div>
+                    <h4 class="font-medium">${user.title}</h4>
+                    <p class="text-sm text-textMedium">${user.company} • 2020 - Present</p>
+                    <p class="text-xs text-textMedium mt-1">Leading strategic initiatives and team management in ${user.industry}</p>
+                </div>
+            `;
+            experienceContainer.appendChild(currentRole);
+            
+            // Previous role
+            const prevRole = document.createElement('div');
+            prevRole.className = 'flex';
+            prevRole.innerHTML = `
+                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                    <i class="fas fa-building text-primary"></i>
+                </div>
+                <div>
+                    <h4 class="font-medium">${user.title.includes('Senior') ? user.title.replace('Senior ', '') : 'Associate ' + user.title}</h4>
+                    <p class="text-sm text-textMedium">${user.company === 'TechCorp' ? 'InnovateTech' : 'TechCorp'} • 2017 - 2020</p>
+                    <p class="text-xs text-textMedium mt-1">Developing core competencies in ${user.skills.slice(0, 2).join(' and ')}</p>
+                </div>
+            `;
+            experienceContainer.appendChild(prevRole);
+            
+            // Connect button
+            document.getElementById('connectBtn').addEventListener('click', function() {
+                this.classList.add('bg-success');
+                this.innerHTML = '<i class="fas fa-check mr-2"></i> Request Sent';
+                this.disabled = true;
                 
-                // Match score
-                document.getElementById('matchScore').textContent = `${user.match}%`;
-                document.getElementById('matchScoreBar').style.width = `${user.match}%`;
-                document.getElementById('commonSkills').textContent = Math.floor(Math.random() * 5) + 1; // Random number of common skills
+                // Show toast notification
+                showToast('Connection request sent to ' + user.name);
+            });
+            
+            // Message button
+            document.getElementById('messageBtn').addEventListener('click', function() {
+                // Get the base URL for proper path resolution
+                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                window.location.href = baseUrl + "chat.html";
+            });
+            
+            // View contact button
+            document.getElementById('viewContactBtn').addEventListener('click', function() {
+                showToast('Connect with ' + user.name + ' to view contact information');
+            });
+            
+            // Function to show toast notification
+            function showToast(message) {
+                // Create toast element if it doesn't exist
+                let toast = document.getElementById('toast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'toast';
+                    toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-textDark text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 max-w-xs text-center';
+                    document.body.appendChild(toast);
+                }
                 
-                // About section (generated)
-                document.getElementById('userAbout').textContent = `${user.title} with several years of experience in the ${user.industry} industry. Based in ${user.location}, specializing in ${user.skills.slice(0, 3).join(', ')}, and other areas.`;
+                // Set message and show toast
+                toast.textContent = message;
+                toast.classList.remove('opacity-0');
                 
-                // Skills
-                const skillsContainer = document.getElementById('userSkills');
-                user.skills.forEach(skill => {
-                    const skillSpan = document.createElement('span');
-                    skillSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs';
-                    skillSpan.textContent = skill;
-                    skillsContainer.appendChild(skillSpan);
-                });
-                
-                // Experience (generated)
-                const experienceContainer = document.getElementById('userExperience');
-                
-                // Current role
-                const currentRole = document.createElement('div');
-                currentRole.className = 'flex';
-                currentRole.innerHTML = `
-                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas fa-building text-primary"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">${user.title}</h4>
-                        <p class="text-sm text-textMedium">${user.company} • 2020 - Present</p>
-                        <p class="text-xs text-textMedium mt-1">Leading strategic initiatives and team management in ${user.industry}</p>
-                    </div>
-                `;
-                experienceContainer.appendChild(currentRole);
-                
-                // Previous role
-                const prevRole = document.createElement('div');
-                prevRole.className = 'flex';
-                prevRole.innerHTML = `
-                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas fa-building text-primary"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">${user.title.includes('Senior') ? user.title.replace('Senior ', '') : 'Associate ' + user.title}</h4>
-                        <p class="text-sm text-textMedium">${user.company === 'TechCorp' ? 'InnovateTech' : 'TechCorp'} • 2017 - 2020</p>
-                        <p class="text-xs text-textMedium mt-1">Developing core competencies in ${user.skills.slice(0, 2).join(' and ')}</p>
-                    </div>
-                `;
-                experienceContainer.appendChild(prevRole);
-                
-                // Connect and Message buttons
-                document.querySelector('button.bg-primary').addEventListener('click', function() {
-                    alert(`Connection request sent to ${user.name}`);
-                });
-                
-                document.querySelector('button.bg-lightSecondary').addEventListener('click', function() {
-                    window.location.href = 'chat.html';
-                });
-            } else {
-                // User not found
-                document.body.innerHTML = `
-                    <div class="container mx-auto px-4 py-8 max-w-md text-center">
-                        <h1 class="text-xl font-bold text-primary mb-4">User Not Found</h1>
-                        <p class="text-textMedium mb-6">The user you're looking for doesn't exist or has been removed.</p>
-                        <a href="search.html" class="bg-primary text-white px-6 py-2 rounded-lg">Back to Search</a>
-                    </div>
-                `;
+                // Hide toast after 3 seconds
+                setTimeout(() => {
+                    toast.classList.add('opacity-0');
+                }, 3000);
             }
         });
     </script>
