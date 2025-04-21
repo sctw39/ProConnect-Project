@@ -30,30 +30,95 @@
         }
     </script>
     <style>
-        .hidden-input {
+        /* Profile image upload styling */
+        .profile-image-wrapper {
+            position: relative;
+            width: 8rem;
+            height: 8rem;
+            border-radius: 9999px;
+            border: 4px solid white;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .profile-image-upload {
             position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 2.5rem;
             opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .profile-image-wrapper:hover .profile-image-upload {
+            opacity: 1;
+        }
+        
+        .profile-image-wrapper input[type="file"] {
+            position: absolute;
             width: 100%;
             height: 100%;
+            opacity: 0;
+            cursor: pointer;
             top: 0;
             left: 0;
-            cursor: pointer;
         }
         
-        .edit-overlay {
-            display: none;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 9999px;
+        /* Editable content styling */
+        [contenteditable="true"] {
+            border: 1px dashed rgba(0, 120, 212, 0.5);
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            min-height: 1.5rem;
+            position: relative;
         }
         
-        .profile-img-container:hover .edit-overlay {
-            display: flex;
+        [contenteditable="true"]:focus {
+            outline: none;
+            border-color: rgba(0, 120, 212, 1);
         }
         
-        [contenteditable].empty:before {
-            content: attr(placeholder);
+        [contenteditable="true"]:empty:before {
+            content: attr(data-placeholder);
             color: #6C757D;
-            display: block;
+            cursor: text;
+        }
+        
+        /* Toast notification styling */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 100px;
+        }
+        
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 100px; opacity: 1;}
+        }
+        
+        @keyframes fadeout {
+            from {bottom: 100px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
         }
     </style>
 </head>
@@ -70,32 +135,33 @@
             </a>
         </header>
 
-        <!-- Edit Mode Toggle (Save/Edit) -->
-        <div class="mb-4 flex justify-end">
-            <button id="editToggleBtn" class="text-primary font-medium flex items-center">
+        <!-- Edit Mode Toggle Button -->
+        <div class="flex justify-end mb-4">
+            <button id="editToggleBtn" class="bg-primary text-white px-3 py-1 rounded-lg text-sm flex items-center">
                 <i class="fas fa-pen mr-1"></i> Edit Profile
             </button>
-            <button id="saveBtn" class="text-success font-medium hidden flex items-center">
+            <button id="saveProfileBtn" class="bg-success text-white px-3 py-1 rounded-lg text-sm flex items-center hidden">
                 <i class="fas fa-check mr-1"></i> Save Changes
+            </button>
+            <button id="cancelEditBtn" class="bg-danger text-white px-3 py-1 rounded-lg text-sm flex items-center ml-2 hidden">
+                <i class="fas fa-times mr-1"></i> Cancel
             </button>
         </div>
 
         <!-- Profile Banner & Avatar -->
         <div class="relative mb-20">
             <div class="h-40 bg-gradient-to-r from-primary to-primaryLight rounded-t-lg"></div>
-            <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-16 flex flex-col items-center">
-                <div class="profile-img-container w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200 relative">
+            <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-16">
+                <div class="profile-image-wrapper bg-gray-200">
                     <img id="profileImage" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-full h-full object-cover" alt="Profile photo">
-                    <div class="edit-overlay absolute inset-0 justify-center items-center">
-                        <div class="text-white">
-                            <i class="fas fa-camera text-xl"></i>
-                        </div>
-                        <input type="file" id="profileUpload" accept="image/*" class="hidden-input">
+                    <div class="profile-image-upload">
+                        <i class="fas fa-camera mr-1"></i> Change Photo
+                        <input type="file" id="profileImageUpload" accept="image/*">
                     </div>
                 </div>
                 <div class="mt-2 text-center">
-                    <h2 id="fullName" class="text-xl font-bold" contenteditable="false" placeholder="Enter your name">Alex Johnson</h2>
-                    <p id="titleCompany" class="text-textMedium" contenteditable="false" placeholder="Your title & company">Product Manager at TechCorp</p>
+                    <h2 id="fullName" contenteditable="false" data-placeholder="Enter your name" class="text-xl font-bold">Alex Johnson</h2>
+                    <p id="titleCompany" contenteditable="false" data-placeholder="Your title & company" class="text-textMedium">Product Manager at TechCorp</p>
                 </div>
             </div>
         </div>
@@ -120,34 +186,28 @@
 
             <!-- About Section -->
             <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-semibold">About</h3>
-                    <button class="edit-btn text-primary text-sm hidden"><i class="fas fa-pencil-alt"></i></button>
-                </div>
-                <p id="aboutText" class="text-sm text-textMedium" contenteditable="false" placeholder="Write something about yourself...">
+                <h3 class="font-semibold mb-2">About</h3>
+                <div id="aboutText" contenteditable="false" data-placeholder="Write something about yourself..." class="text-sm text-textMedium">
                     Product manager with 8+ years of experience in technology companies. Passionate about creating user-centric solutions that solve real problems. Currently focused on AI-powered healthcare applications.
-                </p>
+                </div>
             </div>
 
             <!-- Skills Section -->
             <div class="bg-lightSecondary p-4 rounded-lg mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-semibold">Skills</h3>
-                    <div class="flex items-center">
-                        <a href="index.html#skillsScreen" class="text-primary text-sm mr-2">View All</a>
-                        <button class="edit-btn text-primary text-sm hidden"><i class="fas fa-pencil-alt"></i></button>
-                    </div>
+                    <a href="index.html#skillsScreen" class="text-primary text-sm">View All</a>
                 </div>
                 
-                <!-- Skills display (view mode) -->
-                <div id="skillsContainer" class="flex flex-wrap gap-2">
+                <!-- Skills View Mode -->
+                <div id="skillsViewContainer" class="flex flex-wrap gap-2">
                     <!-- Skills will be populated by JavaScript -->
                 </div>
                 
-                <!-- Skills edit (edit mode) -->
-                <div id="skillsEdit" class="hidden">
-                    <input type="text" id="skillsInput" class="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary mb-2" placeholder="Enter skills separated by commas">
-                    <div id="skillsPreview" class="flex flex-wrap gap-2">
+                <!-- Skills Edit Mode -->
+                <div id="skillsEditContainer" class="hidden">
+                    <input type="text" id="skillsInput" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary mb-2" placeholder="Enter skills separated by commas">
+                    <div id="skillsPreviewContainer" class="flex flex-wrap gap-2 mt-2">
                         <!-- Skills preview will be populated by JavaScript -->
                     </div>
                 </div>
@@ -157,38 +217,34 @@
             <div class="bg-lightSecondary p-4 rounded-lg mb-6">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-semibold">Experience</h3>
-                    <button class="edit-btn text-primary text-sm hidden"><i class="fas fa-pencil-alt"></i></button>
+                    <button id="addExperienceBtn" class="text-primary text-sm hidden">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
                 </div>
                 
-                <!-- Experience view mode -->
-                <div id="experienceContainer" class="space-y-3">
+                <!-- Experience View Mode -->
+                <div id="experienceViewContainer" class="space-y-3">
                     <!-- Experience will be populated by JavaScript -->
                 </div>
                 
-                <!-- Experience edit mode -->
-                <div id="experienceEdit" class="hidden space-y-4">
-                    <!-- Experience edit form will be populated by JavaScript -->
-                    <button id="addExperienceBtn" class="mt-2 text-primary text-sm flex items-center">
-                        <i class="fas fa-plus mr-1"></i> Add Experience
-                    </button>
+                <!-- Experience Edit Mode -->
+                <div id="experienceEditContainer" class="hidden space-y-4">
+                    <!-- Experience edit forms will be populated by JavaScript -->
                 </div>
             </div>
 
             <!-- Looking For Section -->
             <div class="bg-gradient-to-r from-primary to-primaryLight text-white p-4 rounded-lg mb-6">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-semibold">Looking For</h3>
-                    <button class="edit-btn text-white text-sm hidden"><i class="fas fa-pencil-alt"></i></button>
-                </div>
+                <h3 class="font-semibold mb-2">Looking For</h3>
                 
-                <!-- Looking For view mode -->
-                <div id="lookingForContainer" class="space-y-2">
+                <!-- Looking For View Mode -->
+                <div id="lookingForViewContainer" class="space-y-2">
                     <!-- Looking For items will be populated by JavaScript -->
                 </div>
                 
-                <!-- Looking For edit mode -->
-                <div id="lookingForEdit" class="hidden space-y-2">
-                    <!-- Edit form will be populated by JavaScript -->
+                <!-- Looking For Edit Mode -->
+                <div id="lookingForEditContainer" class="hidden space-y-2">
+                    <!-- Looking For edit inputs will be populated by JavaScript -->
                 </div>
             </div>
 
@@ -221,8 +277,8 @@
             </div>
         </div>
 
-        <!-- Toast notification -->
-        <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-textDark text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 max-w-xs text-center pointer-events-none"></div>
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="toast rounded-lg">This is a notification</div>
 
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
@@ -257,49 +313,65 @@
                 return;
             }
             
-            // Initialize UI elements
+            // DOM elements
             const editToggleBtn = document.getElementById('editToggleBtn');
-            const saveBtn = document.getElementById('saveBtn');
-            const editBtns = document.querySelectorAll('.edit-btn');
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const profileImageUpload = document.getElementById('profileImageUpload');
+            const profileImage = document.getElementById('profileImage');
+            const fullName = document.getElementById('fullName');
+            const titleCompany = document.getElementById('titleCompany');
+            const aboutText = document.getElementById('aboutText');
+            const addExperienceBtn = document.getElementById('addExperienceBtn');
             
-            // Populate profile data on load
-            populateProfileData();
+            // View and edit containers
+            const skillsViewContainer = document.getElementById('skillsViewContainer');
+            const skillsEditContainer = document.getElementById('skillsEditContainer');
+            const skillsInput = document.getElementById('skillsInput');
+            const skillsPreviewContainer = document.getElementById('skillsPreviewContainer');
+            const experienceViewContainer = document.getElementById('experienceViewContainer');
+            const experienceEditContainer = document.getElementById('experienceEditContainer');
+            const lookingForViewContainer = document.getElementById('lookingForViewContainer');
+            const lookingForEditContainer = document.getElementById('lookingForEditContainer');
             
-            // Set up event listeners
+            // Initialize the profile
+            initializeProfile();
+            
+            // Event listeners
             setupEventListeners();
             
-            // Function to populate profile data
-            function populateProfileData() {
-                // Set basic info
-                document.getElementById('fullName').textContent = currentUser.fullName || 'Alex Johnson';
-                document.getElementById('titleCompany').textContent = `${currentUser.currentRole || 'Product Manager'} at ${currentUser.company || 'TechCorp'}`;
-                
+            // Function to initialize the profile with user data
+            function initializeProfile() {
+                // Set profile image
                 if (currentUser.profileImage) {
-                    document.getElementById('profileImage').src = currentUser.profileImage;
+                    profileImage.src = currentUser.profileImage;
                 }
+                
+                // Set name and title
+                fullName.textContent = currentUser.fullName || 'Alex Johnson';
+                titleCompany.textContent = `${currentUser.currentRole || 'Product Manager'} at ${currentUser.company || 'TechCorp'}`;
+                
+                // Set about text
+                aboutText.textContent = currentUser.about || 'Product manager with 8+ years of experience in technology companies.';
                 
                 // Set stats
                 document.getElementById('connectionCount').textContent = currentUser.networkSize || '142';
                 document.getElementById('expertiseScore').textContent = currentUser.expertiseScore || '78';
                 document.getElementById('endorsementCount').textContent = currentUser.endorsements || '23';
                 
-                // Set about text
-                document.getElementById('aboutText').textContent = currentUser.about || 'Product manager with 8+ years of experience in technology companies.';
+                // Set skills
+                displaySkills();
                 
-                // Populate skills
-                populateSkills();
+                // Set experience
+                displayExperience();
                 
-                // Populate experience
-                populateExperience();
-                
-                // Populate looking for
-                populateLookingFor();
+                // Set looking for
+                displayLookingFor();
             }
             
-            // Function to populate skills
-            function populateSkills() {
-                const skillsContainer = document.getElementById('skillsContainer');
-                skillsContainer.innerHTML = '';
+            // Function to display skills
+            function displaySkills() {
+                skillsViewContainer.innerHTML = '';
                 
                 let skills = [];
                 
@@ -311,28 +383,39 @@
                     skills = ['Product Management', 'User Research', 'Data Analysis', 'Strategic Planning', 'Team Leadership'];
                 }
                 
-                // Populate view mode skills
+                // Display skills in view mode
                 skills.forEach(skill => {
                     const skillSpan = document.createElement('span');
                     skillSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs';
                     skillSpan.textContent = skill;
-                    skillsContainer.appendChild(skillSpan);
+                    skillsViewContainer.appendChild(skillSpan);
                 });
                 
-                // Set skills input field for edit mode
-                document.getElementById('skillsInput').value = skills.join(', ');
+                // Set skills input for edit mode
+                skillsInput.value = skills.join(', ');
                 updateSkillsPreview(skills.join(', '));
             }
             
-            // Function to populate experience
-            function populateExperience() {
-                const experienceContainer = document.getElementById('experienceContainer');
-                experienceContainer.innerHTML = '';
+            // Function to update skills preview in edit mode
+            function updateSkillsPreview(skillsString) {
+                skillsPreviewContainer.innerHTML = '';
                 
-                const experienceEdit = document.getElementById('experienceEdit');
-                experienceEdit.innerHTML = '';
+                if (!skillsString.trim()) return;
                 
-                // Get user experience or use default
+                const skills = skillsString.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
+                
+                skills.forEach(skill => {
+                    const skillSpan = document.createElement('span');
+                    skillSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs';
+                    skillSpan.textContent = skill;
+                    skillsPreviewContainer.appendChild(skillSpan);
+                });
+            }
+            
+            // Function to display experience
+            function displayExperience() {
+                experienceViewContainer.innerHTML = '';
+                
                 const experience = currentUser.experience || [
                     {
                         title: "Product Manager",
@@ -348,7 +431,7 @@
                     }
                 ];
                 
-                // Populate view mode experience
+                // Display experience in view mode
                 experience.forEach(exp => {
                     const expDiv = document.createElement('div');
                     expDiv.className = 'flex';
@@ -362,87 +445,123 @@
                             <p class="text-xs text-textMedium mt-1">${exp.description}</p>
                         </div>
                     `;
-                    experienceContainer.appendChild(expDiv);
-                });
-                
-                // Create edit forms for each experience
-                experience.forEach((exp, index) => {
-                    addExperienceForm(exp, index);
-                });
-                
-                // Add experience button
-                experienceEdit.appendChild(document.getElementById('addExperienceBtn'));
-                
-                // Add event listener for add experience button
-                document.getElementById('addExperienceBtn').addEventListener('click', function() {
-                    addExperienceForm();
+                    experienceViewContainer.appendChild(expDiv);
                 });
             }
             
-            // Function to add an experience form
-            function addExperienceForm(exp, index) {
-                const experienceEdit = document.getElementById('experienceEdit');
-                const expForm = document.createElement('div');
-                expForm.className = 'p-3 border border-white/30 rounded-lg exp-form';
-                expForm.dataset.index = index;
+            // Function to create experience editor forms
+            function createExperienceEditors() {
+                experienceEditContainer.innerHTML = '';
                 
-                const title = exp ? exp.title : '';
-                const company = exp ? exp.company : '';
-                const period = exp ? exp.period : '';
-                const description = exp ? exp.description : '';
+                const experience = currentUser.experience || [
+                    {
+                        title: "Product Manager",
+                        company: "TechCorp",
+                        period: "2019 - Present",
+                        description: "Leading product development for healthcare AI solutions"
+                    },
+                    {
+                        title: "Senior Product Analyst",
+                        company: "Innovate Inc",
+                        period: "2016 - 2019",
+                        description: "Data-driven product strategy and roadmap development"
+                    }
+                ];
                 
-                expForm.innerHTML = `
+                // Create edit forms for each experience
+                experience.forEach((exp, index) => {
+                    const expDiv = document.createElement('div');
+                    expDiv.className = 'p-3 border border-gray-200 rounded-lg exp-editor';
+                    expDiv.dataset.index = index;
+                    
+                    expDiv.innerHTML = `
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block mb-1 text-xs font-medium">Title</label>
+                                <input type="text" class="exp-title w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" value="${exp.title}" placeholder="Job Title">
+                            </div>
+                            <div>
+                                <label class="block mb-1 text-xs font-medium">Company</label>
+                                <input type="text" class="exp-company w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" value="${exp.company}" placeholder="Company Name">
+                            </div>
+                            <div>
+                                <label class="block mb-1 text-xs font-medium">Period</label>
+                                <input type="text" class="exp-period w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" value="${exp.period}" placeholder="e.g., 2019 - Present">
+                            </div>
+                            <div>
+                                <label class="block mb-1 text-xs font-medium">Description</label>
+                                <textarea class="exp-description w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Brief description of your role">${exp.description}</textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="button" class="remove-experience text-danger text-sm">
+                                    <i class="fas fa-trash-alt mr-1"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    experienceEditContainer.appendChild(expDiv);
+                    
+                    // Add event listener for remove button
+                    expDiv.querySelector('.remove-experience').addEventListener('click', function() {
+                        expDiv.remove();
+                    });
+                });
+            }
+            
+            // Function to add a new experience form
+            function addExperienceForm() {
+                const expDiv = document.createElement('div');
+                expDiv.className = 'p-3 border border-gray-200 rounded-lg exp-editor';
+                
+                expDiv.innerHTML = `
                     <div class="space-y-2">
                         <div>
-                            <label class="block mb-1 text-xs font-medium text-white">Title</label>
-                            <input type="text" class="exp-title w-full px-2 py-1 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white text-white" value="${title}" placeholder="Job Title">
+                            <label class="block mb-1 text-xs font-medium">Title</label>
+                            <input type="text" class="exp-title w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Job Title">
                         </div>
                         <div>
-                            <label class="block mb-1 text-xs font-medium text-white">Company</label>
-                            <input type="text" class="exp-company w-full px-2 py-1 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white text-white" value="${company}" placeholder="Company Name">
+                            <label class="block mb-1 text-xs font-medium">Company</label>
+                            <input type="text" class="exp-company w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Company Name">
                         </div>
                         <div>
-                            <label class="block mb-1 text-xs font-medium text-white">Period</label>
-                            <input type="text" class="exp-period w-full px-2 py-1 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white text-white" value="${period}" placeholder="e.g., 2019 - Present">
+                            <label class="block mb-1 text-xs font-medium">Period</label>
+                            <input type="text" class="exp-period w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., 2019 - Present">
                         </div>
                         <div>
-                            <label class="block mb-1 text-xs font-medium text-white">Description</label>
-                            <textarea class="exp-description w-full px-2 py-1 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white text-white" rows="2" placeholder="Brief description of your role">${description}</textarea>
+                            <label class="block mb-1 text-xs font-medium">Description</label>
+                            <textarea class="exp-description w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Brief description of your role"></textarea>
                         </div>
                         <div class="flex justify-end">
-                            <button type="button" class="delete-exp text-white/80 hover:text-danger text-xs">
-                                <i class="fas fa-trash-alt mr-1"></i> Delete
+                            <button type="button" class="remove-experience text-danger text-sm">
+                                <i class="fas fa-trash-alt mr-1"></i> Remove
                             </button>
                         </div>
                     </div>
                 `;
                 
-                // Add before the Add Experience button
-                const addBtn = document.getElementById('addExperienceBtn');
-                experienceEdit.insertBefore(expForm, addBtn);
+                experienceEditContainer.appendChild(expDiv);
                 
-                // Add event listener for delete button
-                expForm.querySelector('.delete-exp').addEventListener('click', function() {
-                    expForm.remove();
+                // Add event listener for remove button
+                expDiv.querySelector('.remove-experience').addEventListener('click', function() {
+                    expDiv.remove();
                 });
+                
+                // Focus on the title field
+                expDiv.querySelector('.exp-title').focus();
             }
             
-            // Function to populate looking for
-            function populateLookingFor() {
-                const lookingForContainer = document.getElementById('lookingForContainer');
-                lookingForContainer.innerHTML = '';
+            // Function to display looking for
+            function displayLookingFor() {
+                lookingForViewContainer.innerHTML = '';
                 
-                const lookingForEdit = document.getElementById('lookingForEdit');
-                lookingForEdit.innerHTML = '';
-                
-                // Get user looking for or use default
                 const lookingFor = currentUser.lookingFor || [
                     "Technical co-founder for healthcare startup",
                     "Mentorship opportunities with junior PMs",
                     "Consulting projects in healthcare technology"
                 ];
                 
-                // Populate view mode
+                // Display looking for in view mode
                 lookingFor.forEach(item => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'flex items-center';
@@ -450,182 +569,173 @@
                         <i class="fas fa-search mr-2"></i>
                         <span class="text-sm">${item}</span>
                     `;
-                    lookingForContainer.appendChild(itemDiv);
+                    lookingForViewContainer.appendChild(itemDiv);
                 });
+            }
+            
+            // Function to create looking for editors
+            function createLookingForEditors() {
+                lookingForEditContainer.innerHTML = '';
                 
-                // Create edit fields
-                lookingFor.forEach((item, index) => {
+                const lookingFor = currentUser.lookingFor || [
+                    "Technical co-founder for healthcare startup",
+                    "Mentorship opportunities with junior PMs",
+                    "Consulting projects in healthcare technology"
+                ];
+                
+                // Create at least 3 input fields
+                for (let i = 0; i < Math.max(3, lookingFor.length); i++) {
                     const input = document.createElement('input');
                     input.type = 'text';
-                    input.className = 'w-full px-2 py-1 mb-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white text-white lookingfor-item';
-                    input.value = item;
-                    input.placeholder = `Looking for #${index + 1}`;
-                    lookingForEdit.appendChild(input);
-                });
-                
-                // Add empty field if fewer than 3
-                if (lookingFor.length < 3) {
-                    for (let i = lookingFor.length; i < 3; i++) {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.className = 'w-full px-2 py-1 mb-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-1 focus:ring-white text-white lookingfor-item';
-                        input.placeholder = `Looking for #${i + 1}`;
-                        lookingForEdit.appendChild(input);
+                    input.className = 'looking-for-input w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white';
+                    input.placeholder = `What are you looking for? #${i + 1}`;
+                    
+                    if (i < lookingFor.length) {
+                        input.value = lookingFor[i];
                     }
+                    
+                    lookingForEditContainer.appendChild(input);
                 }
             }
             
             // Function to set up event listeners
             function setupEventListeners() {
                 // Profile image upload
-                const profileUpload = document.getElementById('profileUpload');
-                profileUpload.addEventListener('change', function(event) {
-                    const file = event.target.files[0];
-                    if (file) {
+                profileImageUpload.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
                         const reader = new FileReader();
                         
                         reader.onload = function(e) {
-                            document.getElementById('profileImage').src = e.target.result;
+                            profileImage.src = e.target.result;
+                            showToast("Profile picture updated");
                         };
                         
-                        reader.readAsDataURL(file);
+                        reader.readAsDataURL(this.files[0]);
                     }
                 });
                 
-                // Edit/Save toggle
+                // Edit mode toggle
                 editToggleBtn.addEventListener('click', function() {
-                    enterEditMode();
+                    enableEditMode();
                 });
                 
-                saveBtn.addEventListener('click', function() {
-                    saveChanges();
-                    exitEditMode();
+                // Save profile
+                saveProfileBtn.addEventListener('click', function() {
+                    saveProfile();
                 });
                 
-                // Skills input change
-                document.getElementById('skillsInput').addEventListener('input', function() {
+                // Cancel edit
+                cancelEditBtn.addEventListener('click', function() {
+                    disableEditMode();
+                    initializeProfile(); // Reset changes
+                    showToast("Changes canceled");
+                });
+                
+                // Skills input event
+                skillsInput.addEventListener('input', function() {
                     updateSkillsPreview(this.value);
                 });
-            }
-            
-            // Function to update skills preview
-            function updateSkillsPreview(skillsString) {
-                const skillsPreview = document.getElementById('skillsPreview');
-                skillsPreview.innerHTML = '';
                 
-                if (skillsString.trim() === '') return;
-                
-                const skills = skillsString.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
-                
-                skills.forEach(skill => {
-                    const skillSpan = document.createElement('span');
-                    skillSpan.className = 'bg-white/20 text-white px-2 py-1 rounded-full text-xs';
-                    skillSpan.textContent = skill;
-                    skillsPreview.appendChild(skillSpan);
+                // Add experience button
+                addExperienceBtn.addEventListener('click', function() {
+                    addExperienceForm();
                 });
             }
             
-            // Function to enter edit mode
-            function enterEditMode() {
-                // Toggle edit/save buttons
+            // Function to enable edit mode
+            function enableEditMode() {
+                // Show/hide edit buttons
                 editToggleBtn.classList.add('hidden');
-                saveBtn.classList.remove('hidden');
-                
-                // Show edit buttons
-                editBtns.forEach(btn => btn.classList.remove('hidden'));
+                saveProfileBtn.classList.remove('hidden');
+                cancelEditBtn.classList.remove('hidden');
+                addExperienceBtn.classList.remove('hidden');
                 
                 // Make content editable
-                document.getElementById('fullName').contentEditable = true;
-                document.getElementById('titleCompany').contentEditable = true;
-                document.getElementById('aboutText').contentEditable = true;
+                fullName.contentEditable = true;
+                titleCompany.contentEditable = true;
+                aboutText.contentEditable = true;
                 
-                // Toggle sections
-                document.getElementById('skillsContainer').classList.add('hidden');
-                document.getElementById('skillsEdit').classList.remove('hidden');
-                document.getElementById('experienceContainer').classList.add('hidden');
-                document.getElementById('experienceEdit').classList.remove('hidden');
-                document.getElementById('lookingForContainer').classList.add('hidden');
-                document.getElementById('lookingForEdit').classList.remove('hidden');
+                // Show edit containers, hide view containers
+                skillsViewContainer.classList.add('hidden');
+                skillsEditContainer.classList.remove('hidden');
+                experienceViewContainer.classList.add('hidden');
+                experienceEditContainer.classList.remove('hidden');
+                lookingForViewContainer.classList.add('hidden');
+                lookingForEditContainer.classList.remove('hidden');
                 
-                // Add editing classes
-                document.querySelectorAll('[contenteditable]').forEach(el => {
-                    el.classList.add('border', 'border-dashed', 'border-primary/50', 'rounded', 'p-1');
+                // Create experience editors
+                createExperienceEditors();
+                
+                // Create looking for editors
+                createLookingForEditors();
+                
+                // Add styling to editable content
+                document.querySelectorAll('[contenteditable="true"]').forEach(el => {
                     if (!el.textContent.trim()) {
                         el.classList.add('empty');
                     }
                 });
                 
-                // Show toast
-                showToast('You can now edit your profile.');
+                showToast("Edit mode enabled");
             }
             
-            // Function to exit edit mode
-            function exitEditMode() {
-                // Toggle edit/save buttons
+            // Function to disable edit mode
+            function disableEditMode() {
+                // Show/hide edit buttons
                 editToggleBtn.classList.remove('hidden');
-                saveBtn.classList.add('hidden');
-                
-                // Hide edit buttons
-                editBtns.forEach(btn => btn.classList.add('hidden'));
+                saveProfileBtn.classList.add('hidden');
+                cancelEditBtn.classList.add('hidden');
+                addExperienceBtn.classList.add('hidden');
                 
                 // Disable editing
-                document.getElementById('fullName').contentEditable = false;
-                document.getElementById('titleCompany').contentEditable = false;
-                document.getElementById('aboutText').contentEditable = false;
+                fullName.contentEditable = false;
+                titleCompany.contentEditable = false;
+                aboutText.contentEditable = false;
                 
-                // Toggle sections back
-                document.getElementById('skillsContainer').classList.remove('hidden');
-                document.getElementById('skillsEdit').classList.add('hidden');
-                document.getElementById('experienceContainer').classList.remove('hidden');
-                document.getElementById('experienceEdit').classList.add('hidden');
-                document.getElementById('lookingForContainer').classList.remove('hidden');
-                document.getElementById('lookingForEdit').classList.add('hidden');
+                // Show view containers, hide edit containers
+                skillsViewContainer.classList.remove('hidden');
+                skillsEditContainer.classList.add('hidden');
+                experienceViewContainer.classList.remove('hidden');
+                experienceEditContainer.classList.add('hidden');
+                lookingForViewContainer.classList.remove('hidden');
+                lookingForEditContainer.classList.add('hidden');
                 
-                // Remove editing classes
+                // Remove styling from editable content
                 document.querySelectorAll('[contenteditable]').forEach(el => {
-                    el.classList.remove('border', 'border-dashed', 'border-primary/50', 'rounded', 'p-1', 'empty');
+                    el.classList.remove('empty');
                 });
             }
             
-            // Function to save changes
-            function saveChanges() {
-                // Get updated values
-                const fullName = document.getElementById('fullName').textContent.trim();
+            // Function to save profile
+            function saveProfile() {
+                // Get values from editable fields
+                const nameValue = fullName.textContent.trim();
+                const titleCompanyValue = titleCompany.textContent.trim();
+                const aboutValue = aboutText.textContent.trim();
                 
-                // Split title and company
-                const titleCompanyText = document.getElementById('titleCompany').textContent.trim();
-                let currentRole = '';
+                // Parse title and company
+                let currentRole = titleCompanyValue;
                 let company = '';
                 
-                if (titleCompanyText.includes('at')) {
-                    const parts = titleCompanyText.split('at');
+                if (titleCompanyValue.includes('at')) {
+                    const parts = titleCompanyValue.split('at');
                     currentRole = parts[0].trim();
                     company = parts[1].trim();
-                } else {
-                    currentRole = titleCompanyText;
                 }
                 
-                const about = document.getElementById('aboutText').textContent.trim();
-                
                 // Get skills
-                const skillsInput = document.getElementById('skillsInput').value.trim();
-                const skills = skillsInput ? skillsInput.split(',').map(skill => skill.trim()).filter(skill => skill !== '') : [];
-                
-                // Get looking for
-                const lookingForInputs = document.querySelectorAll('.lookingfor-item');
-                const lookingFor = Array.from(lookingForInputs)
-                    .map(input => input.value.trim())
-                    .filter(item => item !== '');
+                const skillsValue = skillsInput.value;
+                const skills = skillsValue.split(',').map(skill => skill.trim()).filter(skill => skill);
                 
                 // Get experience
-                const experienceForms = document.querySelectorAll('.exp-form');
                 const experience = [];
+                const expEditors = document.querySelectorAll('.exp-editor');
                 
-                experienceForms.forEach(form => {
-                    const title = form.querySelector('.exp-title').value.trim();
-                    const company = form.querySelector('.exp-company').value.trim();
-                    const period = form.querySelector('.exp-period').value.trim();
-                    const description = form.querySelector('.exp-description').value.trim();
+                expEditors.forEach(editor => {
+                    const title = editor.querySelector('.exp-title').value.trim();
+                    const company = editor.querySelector('.exp-company').value.trim();
+                    const period = editor.querySelector('.exp-period').value.trim();
+                    const description = editor.querySelector('.exp-description').value.trim();
                     
                     if (title && company) {
                         experience.push({
@@ -637,39 +747,62 @@
                     }
                 });
                 
-                // Update current user object
-                currentUser.fullName = fullName;
+                // Get looking for
+                const lookingFor = [];
+                const lookingForInputs = document.querySelectorAll('.looking-for-input');
+                
+                lookingForInputs.forEach(input => {
+                    const value = input.value.trim();
+                    if (value) {
+                        lookingFor.push(value);
+                    }
+                });
+                
+                // Validation
+                if (!nameValue) {
+                    showToast("Please enter your name");
+                    fullName.focus();
+                    return;
+                }
+                
+                if (!currentRole) {
+                    showToast("Please enter your job title");
+                    titleCompany.focus();
+                    return;
+                }
+                
+                // Update currentUser object
+                currentUser.fullName = nameValue;
                 currentUser.currentRole = currentRole;
                 currentUser.company = company;
-                currentUser.about = about;
+                currentUser.about = aboutValue;
                 currentUser.skills = skills;
-                currentUser.lookingFor = lookingFor;
                 currentUser.experience = experience;
-                currentUser.profileImage = document.getElementById('profileImage').src;
+                currentUser.lookingFor = lookingFor;
+                currentUser.profileImage = profileImage.src;
                 
                 // Save to localStorage
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 
-                // Repopulate view mode with updated data
-                populateProfileData();
+                // Disable edit mode
+                disableEditMode();
                 
-                // Show success toast
-                showToast('Profile updated successfully!');
+                // Refresh display
+                initializeProfile();
+                
+                showToast("Profile saved successfully!");
             }
             
             // Function to show toast notification
             function showToast(message) {
-                const toast = document.getElementById('toast');
+                const toast = document.getElementById('toastNotification');
                 toast.textContent = message;
-                toast.classList.remove('opacity-0');
+                toast.className = "toast show rounded-lg";
                 
-                setTimeout(() => {
-                    toast.classList.add('opacity-0');
+                setTimeout(function() {
+                    toast.className = toast.className.replace("show", "");
                 }, 3000);
             }
-            
-            // Update back link to point to home page if user is logged in
-            document.getElementById('backLink').href = "index.html";
         });
     </script>
 </body>
