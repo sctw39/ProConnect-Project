@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0078D4',
+                        primaryLight: '#50A0E4',
+                        primaryDark: '#106EBE',
+                        secondary: '#2BC48A',
+                        accent: '#FFB900',
+                        danger: '#E74C3C',
+                        success: '#27AE60',
+                        lightBg: '#FFFFFF',
+                        lightSecondary: '#F8F9FA',
+                        lightTertiary: '#E9ECEF',
+                        textDark: '#212529',
+                        textMedium: '#495057',
+                        textLight: '#6C757D'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-lightBg text-textDark min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-6">
+            <a href="index.html" class="text-primary">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-xl font-bold text-primary">Search</h1>
+            <div class="w-6"></div> <!-- Empty div for balanced header -->
+        </header>
+
+        <!-- Search Form -->
+        <div class="mb-6">
+            <div class="relative mb-4">
+                <input type="text" id="searchInput" placeholder="Search professionals..." class="w-full px-4 py-3 pl-10 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-textLight">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            
+            <!-- Filter Options -->
+            <div class="flex space-x-2 overflow-x-auto pb-2 mb-4">
+                <button class="filter-btn whitespace-nowrap px-3 py-1 bg-primary text-white rounded-full text-sm" data-filter="all">All</button>
+                <button class="filter-btn whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="skills">Skills</button>
+                <button class="filter-btn whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="company">Company</button>
+                <button class="filter-btn whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="industry">Industry</button>
+                <button class="filter-btn whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="location">Location</button>
+            </div>
+            
+            <!-- Advanced Filters (initially hidden) -->
+            <div id="advancedFilters" class="bg-lightSecondary p-4 rounded-lg mb-4 hidden">
+                <h3 class="font-medium mb-3">Advanced Filters</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block mb-1 text-sm font-medium">Experience Level</label>
+                        <select class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="">Any</option>
+                            <option value="0-2">0-2 years</option>
+                            <option value="3-5">3-5 years</option>
+                            <option value="6-10">6-10 years</option>
+                            <option value="10+">10+ years</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm font-medium">Position Level</label>
+                        <select class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="">Any</option>
+                            <option value="Entry">Entry Level</option>
+                            <option value="Mid">Mid Level</option>
+                            <option value="Senior">Senior Level</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Director">Director</option>
+                            <option value="Executive">Executive</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end">
+                        <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm">Apply Filters</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center">
+                <button id="toggleAdvancedBtn" class="text-primary text-sm flex items-center">
+                    <i class="fas fa-sliders-h mr-1"></i> Advanced
+                </button>
+                <span class="text-sm text-textMedium" id="resultsCount">24 results</span>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="searchResults" class="space-y-3">
+            <!-- Results will be populated dynamically -->
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
+            <a href="index.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="chat.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-comments text-xl"></i>
+                <span class="text-xs mt-1">Chat</span>
+            </a>
+            <a href="search.html" class="text-primary flex flex-col items-center">
+                <i class="fas fa-search text-xl"></i>
+                <span class="text-xs mt-1">Search</span>
+            </a>
+            <a href="profile.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample user data for search results
+            const users = [
+                {
+                    id: 1,
+                    name: "Sarah Chen",
+                    title: "Product Manager",
+                    company: "TechCorp",
+                    industry: "Technology",
+                    location: "San Francisco, CA",
+                    skills: ["Product Management", "User Research", "UX Design", "Agile", "Strategy"],
+                    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    match: 98
+                },
+                {
+                    id: 2,
+                    name: "David Wong",
+                    title: "Tech Entrepreneur",
+                    company: "Innovate Inc",
+                    industry: "Technology",
+                    location: "New York, NY",
+                    skills: ["Business Strategy", "Startup", "Fundraising", "Product Development", "Marketing"],
+                    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    match: 87
+                },
+                {
+                    id: 3,
+                    name: "Aisha Johnson",
+                    title: "Senior Developer",
+                    company: "CodeTech",
+                    industry: "Technology",
+                    location: "Austin, TX",
+                    skills: ["JavaScript", "React", "Node.js", "Cloud Architecture", "Team Leadership"],
+                    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    match: 82
+                },
+                {
+                    id: 4,
+                    name: "Michael Lin",
+                    title: "Finance Director",
+                    company: "Global Banking",
+                    industry: "Finance",
+                    location: "Singapore",
+                    skills: ["Financial Strategy", "Investment", "Risk Management", "Banking", "Leadership"],
+                    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    match: 76
+                },
+                {
+                    id: 5,
+                    name: "James Wilson",
+                    title: "Marketing Director",
+                    company: "Brand Solutions",
+                    industry: "Marketing",
+                    location: "Chicago, IL",
+                    skills: ["Digital Marketing", "Brand Strategy", "Content Creation", "Analytics", "Team Management"],
+                    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    match: 73
+                },
+                {
+                    id: 6,
+                    name: "Emily Rodriguez",
+                    title: "Healthcare Consultant",
+                    company: "Health Innovations",
+                    industry: "Healthcare",
+                    location: "Boston, MA",
+                    skills: ["Healthcare Strategy", "Medical Devices", "Regulatory Affairs", "Clinical Trials", "Market Analysis"],
+                    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80",
+                    match: 68
+                }
+            ];
+            
+            // Store users in localStorage for profile viewing
+            localStorage.setItem('sampleUsers', JSON.stringify(users));
+            
+            // Populate search results initially
+            populateSearchResults(users);
+            
+            // Search input functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', performSearch);
+            
+            // Filter buttons functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('bg-primary', 'text-white');
+                        btn.classList.add('bg-lightTertiary', 'text-textDark');
+                    });
+                    this.classList.remove('bg-lightTertiary', 'text-textDark');
+                    this.classList.add('bg-primary', 'text-white');
+                    
+                    // Filter results based on button
+                    performSearch();
+                });
+            });
+            
+            // Toggle advanced filters
+            document.getElementById('toggleAdvancedBtn').addEventListener('click', function() {
+                const advancedFilters = document.getElementById('advancedFilters');
+                advancedFilters.classList.toggle('hidden');
+            });
+            
+            // Search function
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const activeFilter = document.querySelector('.filter-btn.bg-primary').getAttribute('data-filter');
+                
+                let filteredUsers = users;
+                
+                // Filter based on search term
+                if (searchTerm) {
+                    filteredUsers = users.filter(user => {
+                        if (activeFilter === 'all') {
+                            return user.name.toLowerCase().includes(searchTerm) || 
+                                   user.title.toLowerCase().includes(searchTerm) ||
+                                   user.company.toLowerCase().includes(searchTerm) ||
+                                   user.skills.some(skill => skill.toLowerCase().includes(searchTerm)) ||
+                                   user.industry.toLowerCase().includes(searchTerm) ||
+                                   user.location.toLowerCase().includes(searchTerm);
+                        } else if (activeFilter === 'skills') {
+                            return user.skills.some(skill => skill.toLowerCase().includes(searchTerm));
+                        } else if (activeFilter === 'company') {
+                            return user.company.toLowerCase().includes(searchTerm);
+                        } else if (activeFilter === 'industry') {
+                            return user.industry.toLowerCase().includes(searchTerm);
+                        } else if (activeFilter === 'location') {
+                            return user.location.toLowerCase().includes(searchTerm);
+                        }
+                        return false;
+                    });
+                }
+                
+                // Update search results
+                populateSearchResults(filteredUsers);
+                document.getElementById('resultsCount').textContent = `${filteredUsers.length} results`;
+            }
+            
+            // Populate search results
+            function populateSearchResults(users) {
+                const resultsContainer = document.getElementById('searchResults');
+                resultsContainer.innerHTML = '';
+                
+                users.forEach(user => {
+                    const userCard = document.createElement('div');
+                    userCard.className = 'bg-lightSecondary rounded-lg p-3 shadow-sm';
+                    userCard.innerHTML = `
+                        <div class="flex items-start">
+                            <img src="${user.image}" class="w-12 h-12 rounded-full object-cover mr-3" alt="${user.name}">
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <a href="user-profile.html?id=${user.id}" class="font-medium hover:text-primary">${user.name}</a>
+                                    <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">${user.match}% Match</span>
+                                </div>
+                                <p class="text-sm text-textMedium">${user.title} at ${user.company}</p>
+                                <p class="text-xs text-textMedium">${user.location}</p>
+                                <div class="flex flex-wrap gap-1 mt-2">
+                                    ${user.skills.slice(0, 3).map(skill => 
+                                        `<span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">${skill}</span>`
+                                    ).join('')}
+                                    ${user.skills.length > 3 ? `<span class="text-xs text-textMedium">+${user.skills.length - 3} more</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    resultsContainer.appendChild(userCard);
+                });
+                
+                // If no results
+                if (users.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-search text-4xl text-textLight mb-3"></i>
+                            <p class="text-textMedium">No results found</p>
+                            <p class="text-sm text-textLight">Try adjusting your search or filters</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
