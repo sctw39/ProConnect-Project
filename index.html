@@ -14,23 +14,18 @@
                 extend: {
                     colors: {
                         // Business-oriented color palette
-                        primary: '#0078D4', // Microsoft blue - professional, trustworthy
-                        primaryLight: '#50A0E4', // Lighter blue for hover states
-                        primaryDark: '#106EBE', // Darker blue for active states
-                        secondary: '#2BC48A', // Bright teal/mint - fresh, innovative
-                        accent: '#FFB900', // Warm gold - optimistic, attention-grabbing
-                        danger: '#E74C3C', // Bright red for warnings/errors
-                        success: '#27AE60', // Green for success states
+                        primary: '#0078D4',
+                        primaryLight: '#50A0E4',
+                        primaryDark: '#106EBE',
+                        secondary: '#2BC48A',
+                        accent: '#FFB900',
+                        danger: '#E74C3C',
+                        success: '#27AE60',
                         
                         // Light mode backgrounds
                         lightBg: '#FFFFFF',
                         lightSecondary: '#F8F9FA',
                         lightTertiary: '#E9ECEF',
-                        
-                        // Dark mode backgrounds
-                        darkBg: '#1F2937',
-                        darkSecondary: '#374151',
-                        darkTertiary: '#4B5563',
                         
                         // Text colors
                         textDark: '#212529',
@@ -61,7 +56,7 @@
                 </a>
                 <a href="chat.html" class="text-primary relative">
                     <i class="fas fa-comments text-2xl"></i>
-                    <span class="absolute -top-2 -right-2 bg-accent text-textDark text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    <span id="unreadMessageCount" class="absolute -top-2 -right-2 bg-accent text-textDark text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
                 </a>
             </div>
         </header>
@@ -73,59 +68,64 @@
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold">Find Connections</h2>
                     <div class="text-sm">
-                        <span class="text-primary font-semibold">24</span> matches found
+                        <span id="matchesCount" class="text-primary font-semibold">0</span> matches found
                     </div>
                 </div>
                 
-                <!-- Swipe Cards -->
-                <div class="relative h-[500px]">
+                <!-- Empty state for no matches -->
+                <div id="noMatchesState" class="flex flex-col items-center justify-center h-[400px] bg-lightSecondary rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-user-friends text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">No matches yet</h3>
+                    <p class="text-textMedium mb-4">Complete your profile and add more skills to get matched with professionals</p>
+                    <a href="profile.html" class="bg-primary text-white px-4 py-2 rounded-lg">
+                        Complete Profile
+                    </a>
+                </div>
+                
+                <!-- Swipe Cards - Only shown when matches exist -->
+                <div id="matchingCards" class="relative h-[500px] hidden">
                     <!-- Current Card -->
                     <div id="currentCard" class="absolute w-full h-full bg-lightSecondary rounded-xl overflow-hidden shadow-lg transform transition-transform duration-300">
                         <div class="h-1/3 bg-gradient-to-r from-primary to-primaryLight"></div>
                         <div class="absolute top-24 left-4 w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-gray-200">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-full h-full object-cover" alt="Profile photo">
+                            <img id="matchProfileImage" src="" class="w-full h-full object-cover" alt="Profile photo">
                         </div>
                         <div class="p-4 pt-12">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h3 class="text-xl font-bold">Sarah Chen</h3>
-                                    <p class="text-textMedium">Product Manager at TechCorp</p>
+                                    <h3 id="matchName" class="text-xl font-bold"></h3>
+                                    <p id="matchTitle" class="text-textMedium"></p>
                                 </div>
                                 <div class="flex space-x-1">
-                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">98% Match</span>
+                                    <span id="matchScore" class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs"></span>
                                 </div>
                             </div>
                             
                             <div class="mt-4">
                                 <h4 class="font-semibold mb-1">Top Skills</h4>
-                                <div class="flex flex-wrap gap-1 mb-3">
-                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">Product Management</span>
-                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">User Research</span>
-                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">Agile</span>
-                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">UX Design</span>
-                                    <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">Strategy</span>
+                                <div id="matchSkills" class="flex flex-wrap gap-1 mb-3">
+                                    <!-- Skills will be populated here -->
                                 </div>
                                 
                                 <h4 class="font-semibold mb-1">Key Experiences</h4>
-                                <ul class="list-disc list-inside text-sm mb-3 text-textMedium">
-                                    <li>Led product team at Spotify for 3 years</li>
-                                    <li>Launched 4 successful mobile applications</li>
-                                    <li>MBA from Stanford University</li>
+                                <ul id="matchExperiences" class="list-disc list-inside text-sm mb-3 text-textMedium">
+                                    <!-- Experiences will be populated here -->
                                 </ul>
                                 
                                 <h4 class="font-semibold mb-1">Looking For</h4>
-                                <p class="text-sm mb-3 text-textMedium">Technical co-founder for a healthcare startup idea</p>
+                                <p id="matchLookingFor" class="text-sm mb-3 text-textMedium"></p>
                                 
                                 <h4 class="font-semibold mb-1">Expertise Level</h4>
                                 <div class="flex flex-col">
                                     <div class="flex items-center">
                                         <div class="w-full bg-lightTertiary rounded-full h-2.5">
-                                            <div class="bg-primary h-2.5 rounded-full" style="width: 85%"></div>
+                                            <div id="matchExpertiseBar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
                                         </div>
-                                        <span class="ml-2 text-sm">85%</span>
+                                        <span id="matchExpertiseValue" class="ml-2 text-sm">0%</span>
                                     </div>
-                                    <div class="text-xs text-textLight mt-1">
-                                        10+ years experience • Senior Position • Director Level
+                                    <div id="matchExperienceLevel" class="text-xs text-textLight mt-1">
                                     </div>
                                 </div>
                             </div>
@@ -137,8 +137,8 @@
                     </div>
                 </div>
                 
-                <!-- Swipe Actions -->
-                <div class="flex justify-center space-x-8 mt-6">
+                <!-- Swipe Actions - Only shown when matches exist -->
+                <div id="matchActions" class="flex justify-center space-x-8 mt-6 hidden">
                     <button id="skipBtn" class="w-14 h-14 bg-lightTertiary rounded-full flex items-center justify-center shadow-md hover:bg-gray-300 transition">
                         <i class="fas fa-times text-danger text-xl"></i>
                     </button>
@@ -160,157 +160,61 @@
                     </button>
                 </div>
                 
-                <!-- Expertise Score Card -->
-                <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 mb-4 text-white">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-lg font-bold">Your Expertise Score</h3>
-                        <span class="bg-white text-primary px-2 py-1 rounded-full font-bold">78</span>
+                <!-- Empty state for no skills -->
+                <div id="noSkillsState" class="flex flex-col items-center justify-center h-[300px] bg-lightSecondary rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-certificate text-primary text-2xl"></i>
                     </div>
-                    <div class="w-full bg-white/30 rounded-full h-2.5 mb-2">
-                        <div class="bg-white h-2.5 rounded-full" style="width: 78%"></div>
-                    </div>
-                    <div class="flex justify-between text-xs">
-                        <span>Based on endorsements and verifications</span>
-                        <button class="underline">View details</button>
-                    </div>
-                </div>
-                
-                <!-- Top Skills Section -->
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">Top Skills</h3>
-                    
-                    <!-- Skill Card with Endorsements -->
-                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center">
-                                    <h4 class="font-medium">Project Management</h4>
-                                    <span class="ml-2 bg-success/10 text-success text-xs px-2 py-0.5 rounded-full flex items-center">
-                                        <i class="fas fa-check-circle mr-1"></i>Verified
-                                    </span>
-                                </div>
-                                <div class="flex items-center mt-1">
-                                    <div class="w-full max-w-[150px] bg-lightTertiary rounded-full h-1.5 mr-2">
-                                        <div class="bg-primary h-1.5 rounded-full" style="width: 92%"></div>
-                                    </div>
-                                    <span class="text-xs text-textMedium">45 endorsements</span>
-                                </div>
-                            </div>
-                            <button class="text-primary text-sm font-medium">Endorse</button>
-                        </div>
-                        <div class="flex mt-2 overflow-hidden">
-                            <div class="flex -space-x-2 mr-2">
-                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
-                                <img src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
-                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
-                            </div>
-                            <span class="text-xs text-textMedium">Endorsed by David, Emma, John & 42 others</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Skill Card with Endorsements -->
-                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center">
-                                    <h4 class="font-medium">Product Strategy</h4>
-                                    <span class="ml-2 bg-success/10 text-success text-xs px-2 py-0.5 rounded-full flex items-center">
-                                        <i class="fas fa-check-circle mr-1"></i>Verified
-                                    </span>
-                                </div>
-                                <div class="flex items-center mt-1">
-                                    <div class="w-full max-w-[150px] bg-lightTertiary rounded-full h-1.5 mr-2">
-                                        <div class="bg-primary h-1.5 rounded-full" style="width: 85%"></div>
-                                    </div>
-                                    <span class="text-xs text-textMedium">38 endorsements</span>
-                                </div>
-                            </div>
-                            <button class="text-primary text-sm font-medium">Endorse</button>
-                        </div>
-                        <div class="flex mt-2 overflow-hidden">
-                            <div class="flex -space-x-2 mr-2">
-                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
-                            </div>
-                            <span class="text-xs text-textMedium">Endorsed by Sarah, Jessica & 36 others</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Skill Card Without Verification -->
-                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center">
-                                    <h4 class="font-medium">UI/UX Design</h4>
-                                    <span class="ml-2 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full flex items-center">
-                                        <i class="fas fa-certificate mr-1"></i>Verify
-                                    </span>
-                                </div>
-                                <div class="flex items-center mt-1">
-                                    <div class="w-full max-w-[150px] bg-lightTertiary rounded-full h-1.5 mr-2">
-                                        <div class="bg-primary h-1.5 rounded-full" style="width: 65%"></div>
-                                    </div>
-                                    <span class="text-xs text-textMedium">19 endorsements</span>
-                                </div>
-                            </div>
-                            <button class="text-primary text-sm font-medium">Endorse</button>
-                        </div>
-                        <div class="flex mt-2 overflow-hidden">
-                            <div class="flex -space-x-2 mr-2">
-                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
-                            </div>
-                            <span class="text-xs text-textMedium">Endorsed by Aisha & 18 others</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Other Skills Section -->
-                <div>
-                    <h3 class="font-semibold mb-2">Additional Skills</h3>
-                    
-                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
-                        <div class="grid grid-cols-2 gap-2">
-                            <!-- Skill with endorsement count -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm">Business Strategy</span>
-                                <span class="text-xs text-textMedium">12</span>
-                            </div>
-                            <!-- Skill with endorsement count -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm">Data Analysis</span>
-                                <span class="text-xs text-textMedium">9</span>
-                            </div>
-                            <!-- Skill with endorsement count -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm">Leadership</span>
-                                <span class="text-xs text-textMedium">16</span>
-                            </div>
-                            <!-- Skill with endorsement count -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm">Public Speaking</span>
-                                <span class="text-xs text-textMedium">7</span>
-                            </div>
-                            <!-- Skill with endorsement count -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm">Negotiation</span>
-                                <span class="text-xs text-textMedium">11</span>
-                            </div>
-                            <!-- Skill with endorsement count -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm">Team Building</span>
-                                <span class="text-xs text-textMedium">14</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Skill Verification CTA -->
-                <div class="bg-accent/10 p-4 rounded-lg">
-                    <h3 class="font-semibold text-sm mb-2">Boost Your Expertise Score</h3>
-                    <p class="text-sm text-textMedium mb-3">Verify your skills with credentials or certifications to increase your expertise score and get more quality matches.</p>
-                    <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
-                        Verify Your Skills
+                    <h3 class="text-lg font-semibold mb-2">No skills added yet</h3>
+                    <p class="text-textMedium mb-4">Add your professional skills to get endorsed by others</p>
+                    <button id="addFirstSkillBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
+                        Add Your First Skill
                     </button>
+                </div>
+                
+                <!-- Skills content - Only shown when skills exist -->
+                <div id="skillsContent" class="hidden">
+                    <!-- Expertise Score Card -->
+                    <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 mb-4 text-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-bold">Your Expertise Score</h3>
+                            <span id="expertiseScore" class="bg-white text-primary px-2 py-1 rounded-full font-bold">0</span>
+                        </div>
+                        <div class="w-full bg-white/30 rounded-full h-2.5 mb-2">
+                            <div id="expertiseScoreBar" class="bg-white h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>Based on endorsements and verifications</span>
+                            <button class="underline">View details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Skills Section -->
+                    <div class="mb-4">
+                        <h3 class="font-semibold mb-2">Top Skills</h3>
+                        <div id="topSkillsList" class="space-y-3">
+                            <!-- Top skills will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Other Skills Section -->
+                    <div>
+                        <h3 class="font-semibold mb-2">Additional Skills</h3>
+                        <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
+                            <div id="additionalSkillsList" class="grid grid-cols-2 gap-2">
+                                <!-- Additional skills will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Skill Verification CTA -->
+                    <div class="bg-accent/10 p-4 rounded-lg">
+                        <h3 class="font-semibold text-sm mb-2">Boost Your Expertise Score</h3>
+                        <p class="text-sm text-textMedium mb-3">Verify your skills with credentials or certifications to increase your expertise score and get more quality matches.</p>
+                        <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
+                            Verify Your Skills
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -328,167 +232,66 @@
                     </div>
                 </div>
                 
-                <!-- AI-Powered Match Summary -->
-                <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 mb-4 text-white">
-                    <div class="flex items-center mb-2">
-                        <i class="fas fa-robot mr-2 text-lg"></i>
-                        <h3 class="text-lg font-bold">AI Match Summary</h3>
+                <!-- Empty state for no opportunities -->
+                <div id="noOpportunitiesState" class="flex flex-col items-center justify-center h-[300px] bg-lightSecondary rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-briefcase text-primary text-2xl"></i>
                     </div>
-                    <p class="text-sm mb-3">Based on your profile and current network, we've identified 12 business opportunities that match your expertise and goals.</p>
-                    <div class="grid grid-cols-3 gap-2 mb-2">
-                        <div class="bg-white/20 p-2 rounded-lg text-center">
-                            <div class="text-xl font-bold">7</div>
-                            <div class="text-xs">Projects</div>
-                        </div>
-                        <div class="bg-white/20 p-2 rounded-lg text-center">
-                            <div class="text-xl font-bold">3</div>
-                            <div class="text-xs">Ventures</div>
-                        </div>
-                        <div class="bg-white/20 p-2 rounded-lg text-center">
-                            <div class="text-xl font-bold">2</div>
-                            <div class="text-xs">Jobs</div>
-                        </div>
-                    </div>
-                    <div class="text-xs">Matches updated 2 hours ago</div>
+                    <h3 class="text-lg font-semibold mb-2">No opportunities yet</h3>
+                    <p class="text-textMedium mb-4">Complete your profile to get matched with business opportunities</p>
+                    <button id="createFirstOpportunityBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
+                        Create Your First Opportunity
+                    </button>
                 </div>
                 
-                <!-- Opportunity Filters (Chips) -->
-                <div class="flex space-x-2 overflow-x-auto pb-2 mb-4">
-                    <button class="whitespace-nowrap px-3 py-1 bg-primary text-white rounded-full text-sm">All Opportunities</button>
-                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Projects</button>
-                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Ventures</button>
-                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Jobs</button>
-                    <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Funding</button>
-                </div>
-                
-                <!-- Featured Opportunity -->
-                <div class="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4 relative overflow-hidden">
-                    <div class="absolute top-0 right-0">
-                        <div class="bg-primary text-white text-xs px-2 py-1 transform rotate-45 translate-x-[18px] translate-y-[-5px] w-32 text-center">
-                            Top Match
+                <!-- Opportunities content - Only shown when opportunities exist -->
+                <div id="opportunitiesContent" class="hidden">
+                    <!-- AI-Powered Match Summary -->
+                    <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 mb-4 text-white">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-robot mr-2 text-lg"></i>
+                            <h3 class="text-lg font-bold">AI Match Summary</h3>
                         </div>
+                        <p class="text-sm mb-3">Based on your profile and current network, we've identified <span id="opportunitiesCount">0</span> business opportunities that match your expertise and goals.</p>
+                        <div class="grid grid-cols-3 gap-2 mb-2">
+                            <div class="bg-white/20 p-2 rounded-lg text-center">
+                                <div id="projectsCount" class="text-xl font-bold">0</div>
+                                <div class="text-xs">Projects</div>
+                            </div>
+                            <div class="bg-white/20 p-2 rounded-lg text-center">
+                                <div id="venturesCount" class="text-xl font-bold">0</div>
+                                <div class="text-xs">Ventures</div>
+                            </div>
+                            <div class="bg-white/20 p-2 rounded-lg text-center">
+                                <div id="jobsCount" class="text-xl font-bold">0</div>
+                                <div class="text-xs">Jobs</div>
+                            </div>
+                        </div>
+                        <div class="text-xs">Matches updated <span id="lastUpdated">just now</span></div>
                     </div>
-                    <div class="flex items-start mb-2">
-                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
-                        <div>
-                            <h3 class="font-bold">Healthcare AI Startup</h3>
-                            <p class="text-sm text-textMedium">Posted by Sarah Chen • Technical Co-founder</p>
-                        </div>
-                        <div class="ml-auto">
-                            <span class="bg-success/10 text-success px-2 py-0.5 rounded-full text-xs">95% Match</span>
-                        </div>
+                    
+                    <!-- Opportunity Filters (Chips) -->
+                    <div class="flex space-x-2 overflow-x-auto pb-2 mb-4">
+                        <button class="opportunity-filter whitespace-nowrap px-3 py-1 bg-primary text-white rounded-full text-sm" data-filter="all">All Opportunities</button>
+                        <button class="opportunity-filter whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="projects">Projects</button>
+                        <button class="opportunity-filter whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="ventures">Ventures</button>
+                        <button class="opportunity-filter whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="jobs">Jobs</button>
+                        <button class="opportunity-filter whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="funding">Funding</button>
                     </div>
-                    <p class="text-sm text-textMedium mb-3">Seeking a technical co-founder with experience in AI/ML for a healthcare startup focused on personalized care plans for chronic conditions.</p>
-                    <div class="flex flex-wrap gap-1 mb-3">
-                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">AI/ML</span>
-                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">Healthcare</span>
-                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">Co-founder</span>
-                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">Equity</span>
+                    
+                    <!-- Opportunities list -->
+                    <div id="opportunitiesList" class="space-y-4">
+                        <!-- Opportunities will be populated here -->
                     </div>
-                    <div class="flex justify-between items-center">
-                        <div class="text-xs text-textMedium">
-                            <i class="far fa-clock mr-1"></i>Posted 2 days ago
-                        </div>
-                        <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
-                            Connect
+                    
+                    <!-- Create Your Own Opportunity CTA -->
+                    <div class="mt-6 bg-accent/10 p-4 rounded-lg">
+                        <h3 class="font-semibold text-sm mb-2">Have Your Own Opportunity?</h3>
+                        <p class="text-sm text-textMedium mb-3">Create a listing for your project, venture, or job opening to find the perfect matches from our professional network.</p>
+                        <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
+                            Create Opportunity
                         </button>
                     </div>
-                </div>
-                
-                <!-- Other Opportunities -->
-                <div class="space-y-4">
-                    <!-- Project Opportunity -->
-                    <div class="bg-lightSecondary rounded-lg p-4 shadow-sm">
-                        <div class="flex items-start mb-2">
-                            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
-                            <div>
-                                <h3 class="font-bold">E-commerce Platform Redesign</h3>
-                                <p class="text-sm text-textMedium">Posted by David Wong • UX Project</p>
-                            </div>
-                            <div class="ml-auto">
-                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">82% Match</span>
-                            </div>
-                        </div>
-                        <p class="text-sm text-textMedium mb-3">Looking for UX designer to help with e-commerce platform redesign. 3-month contract with possibility of extension.</p>
-                        <div class="flex flex-wrap gap-1 mb-3">
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">UX Design</span>
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">E-commerce</span>
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Contract</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div class="text-xs text-textMedium">
-                                <i class="far fa-clock mr-1"></i>Posted 5 days ago
-                            </div>
-                            <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
-                                Connect
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Venture Opportunity -->
-                    <div class="bg-lightSecondary rounded-lg p-4 shadow-sm">
-                        <div class="flex items-start mb-2">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
-                            <div>
-                                <h3 class="font-bold">FinTech Joint Venture</h3>
-                                <p class="text-sm text-textMedium">Posted by Michael Lin • Partnership</p>
-                            </div>
-                            <div class="ml-auto">
-                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">78% Match</span>
-                            </div>
-                        </div>
-                        <p class="text-sm text-textMedium mb-3">Established fintech company seeking partnership to expand into Asian markets. Looking for local expertise and connections.</p>
-                        <div class="flex flex-wrap gap-1 mb-3">
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">FinTech</span>
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Partnership</span>
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">International</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div class="text-xs text-textMedium">
-                                <i class="far fa-clock mr-1"></i>Posted 1 week ago
-                            </div>
-                            <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
-                                Connect
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Job Opportunity -->
-                    <div class="bg-lightSecondary rounded-lg p-4 shadow-sm">
-                        <div class="flex items-start mb-2">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
-                            <div>
-                                <h3 class="font-bold">Director of Product Marketing</h3>
-                                <p class="text-sm text-textMedium">Posted by James Wilson • Job Opening</p>
-                            </div>
-                            <div class="ml-auto">
-                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">75% Match</span>
-                            </div>
-                        </div>
-                        <p class="text-sm text-textMedium mb-3">Growing SaaS company seeking Director of Product Marketing to lead go-to-market strategy for new enterprise solutions.</p>
-                        <div class="flex flex-wrap gap-1 mb-3">
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Marketing</span>
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">SaaS</span>
-                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Full-time</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div class="text-xs text-textMedium">
-                                <i class="far fa-clock mr-1"></i>Posted 3 days ago
-                            </div>
-                            <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
-                                Connect
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Create Your Own Opportunity CTA -->
-                <div class="mt-6 bg-accent/10 p-4 rounded-lg">
-                    <h3 class="font-semibold text-sm mb-2">Have Your Own Opportunity?</h3>
-                    <p class="text-sm text-textMedium mb-3">Create a listing for your project, venture, or job opening to find the perfect matches from our professional network.</p>
-                    <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
-                        Create Opportunity
-                    </button>
                 </div>
             </div>
 
@@ -501,232 +304,117 @@
                     </button>
                 </div>
 
-                <!-- Overview Cards -->
-                <div class="grid grid-cols-2 gap-3 mb-4">
-                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-sm font-medium">Network Size</h3>
-                            <span class="text-xs text-success">+12%</span>
-                        </div>
-                        <p class="text-xl font-bold">142</p>
-                        <p class="text-xs text-textMedium">Connections</p>
+                <!-- Empty state for no analytics data -->
+                <div id="noAnalyticsState" class="flex flex-col items-center justify-center h-[400px] bg-lightSecondary rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-primary text-2xl"></i>
                     </div>
-                    
-                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-sm font-medium">Profile Views</h3>
-                            <span class="text-xs text-success">+8%</span>
-                        </div>
-                        <p class="text-xl font-bold">38</p>
-                        <p class="text-xs text-textMedium">Last 30 days</p>
-                    </div>
-                    
-                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-sm font-medium">Messages</h3>
-                            <span class="text-xs text-success">+23%</span>
-                        </div>
-                        <p class="text-xl font-bold">27</p>
-                        <p class="text-xs text-textMedium">Last 30 days</p>
-                    </div>
-                    
-                    <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-sm font-medium">Response Rate</h3>
-                            <span class="text-xs text-success">+5%</span>
-                        </div>
-                        <p class="text-xl font-bold">82%</p>
-                        <p class="text-xs text-textMedium">Avg. time: 4h</p>
-                    </div>
+                    <h3 class="text-lg font-semibold mb-2">No analytics data yet</h3>
+                    <p class="text-textMedium mb-4">Complete your profile and connect with others to see your networking analytics</p>
+                    <a href="profile.html" class="bg-primary text-white px-4 py-2 rounded-lg">
+                        Complete Profile
+                    </a>
                 </div>
                 
-                <!-- Network Growth Chart -->
-                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
-                    <h3 class="text-base font-medium mb-3">Network Growth</h3>
-                    <canvas id="networkGrowthChart" height="200"></canvas>
-                </div>
-                
-                <!-- Connection Distribution -->
-                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
-                    <h3 class="text-base font-medium mb-3">Connection Distribution</h3>
-                    <div class="flex space-x-3">
-                        <div class="w-1/2">
-                            <canvas id="industryDistributionChart" height="200"></canvas>
-                        </div>
-                        <div class="w-1/2">
-                            <div class="mb-3">
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs">Technology</span>
-                                    <span class="text-xs">45%</span>
-                                </div>
-                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                    <div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
-                                </div>
+                <!-- Analytics content - Only shown when data exists -->
+                <div id="analyticsContent" class="hidden">
+                    <!-- Overview Cards -->
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <h3 class="text-sm font-medium">Network Size</h3>
+                                <span id="networkGrowthRate" class="text-xs text-success">+0%</span>
                             </div>
-                            <div class="mb-3">
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs">Finance</span>
-                                    <span class="text-xs">22%</span>
-                                </div>
-                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                    <div class="bg-secondary h-1.5 rounded-full" style="width: 22%"></div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs">Healthcare</span>
-                                    <span class="text-xs">15%</span>
-                                </div>
-                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                    <div class="bg-accent h-1.5 rounded-full" style="width: 15%"></div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs">Marketing</span>
-                                    <span class="text-xs">12%</span>
-                                </div>
-                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                    <div class="bg-purple-500 h-1.5 rounded-full" style="width: 12%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-xs">Other</span>
-                                    <span class="text-xs">6%</span>
-                                </div>
-                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                    <div class="bg-gray-500 h-1.5 rounded-full" style="width: 6%"></div>
-                                </div>
-                            </div>
+                            <p id="networkSize" class="text-xl font-bold">0</p>
+                            <p class="text-xs text-textMedium">Connections</p>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Networking ROI Calculator -->
-                <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 text-white mb-4">
-                    <h3 class="text-base font-medium mb-2">Networking ROI Calculator</h3>
-                    <p class="text-sm mb-3">Track the value generated from your professional networking activities</p>
-                    
-                    <div class="bg-white/20 rounded-lg p-3 mb-3">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm">Opportunities Generated</span>
-                            <span class="font-semibold">12</span>
+                        
+                        <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <h3 class="text-sm font-medium">Profile Views</h3>
+                                <span id="profileViewsGrowth" class="text-xs text-success">+0%</span>
+                            </div>
+                            <p id="profileViews" class="text-xl font-bold">0</p>
+                            <p class="text-xs text-textMedium">Last 30 days</p>
                         </div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm">Meetings Conducted</span>
-                            <span class="font-semibold">18</span>
+                        
+                        <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <h3 class="text-sm font-medium">Messages</h3>
+                                <span id="messagesGrowth" class="text-xs text-success">+0%</span>
+                            </div>
+                            <p id="messageCount" class="text-xl font-bold">0</p>
+                            <p class="text-xs text-textMedium">Last 30 days</p>
                         </div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm">Projects Secured</span>
-                            <span class="font-semibold">3</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-medium">Estimated Value</span>
-                            <span class="font-bold">HKD 250,000</span>
+                        
+                        <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <h3 class="text-sm font-medium">Response Rate</h3>
+                                <span id="responseRateGrowth" class="text-xs text-success">+0%</span>
+                            </div>
+                            <p id="responseRate" class="text-xl font-bold">0%</p>
+                            <p class="text-xs text-textMedium">Avg. time: <span id="responseTime">0h</span></p>
                         </div>
                     </div>
                     
-                    <button class="bg-white text-primary font-medium w-full py-2 rounded-lg">
-                        Update ROI Data
-                    </button>
-                </div>
-                
-                <!-- Engagement Analytics -->
-                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
-                    <h3 class="text-base font-medium mb-3">Engagement Analytics</h3>
+                    <!-- Network Growth Chart -->
+                    <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                        <h3 class="text-base font-medium mb-3">Network Growth</h3>
+                        <canvas id="networkGrowthChart" height="200"></canvas>
+                    </div>
                     
-                    <div class="mb-4">
-                        <h4 class="text-sm font-medium mb-2">Top Performing Content</h4>
-                        <div class="space-y-2">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-file-alt text-primary"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm">AI in Healthcare: Future Perspectives</p>
-                                    <div class="flex text-xs text-textMedium">
-                                        <span class="mr-2"><i class="far fa-eye mr-1"></i>52</span>
-                                        <span class="mr-2"><i class="far fa-comment mr-1"></i>8</span>
-                                        <span><i class="far fa-share-square mr-1"></i>3</span>
-                                    </div>
-                                </div>
+                    <!-- Connection Distribution -->
+                    <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                        <h3 class="text-base font-medium mb-3">Connection Distribution</h3>
+                        <div class="flex space-x-3">
+                            <div class="w-1/2">
+                                <canvas id="industryDistributionChart" height="200"></canvas>
                             </div>
-                            
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-image text-primary"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm">Speaking at Tech Conference 2023</p>
-                                    <div class="flex text-xs text-textMedium">
-                                        <span class="mr-2"><i class="far fa-eye mr-1"></i>43</span>
-                                        <span class="mr-2"><i class="far fa-comment mr-1"></i>12</span>
-                                        <span><i class="far fa-share-square mr-1"></i>5</span>
-                                    </div>
-                                </div>
+                            <div class="w-1/2" id="industryBreakdown">
+                                <!-- Industry breakdown will be populated here -->
                             </div>
                         </div>
                     </div>
                     
-                    <div>
+                    <!-- Networking ROI Calculator -->
+                    <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 text-white mb-4">
+                        <h3 class="text-base font-medium mb-2">Networking ROI Calculator</h3>
+                        <p class="text-sm mb-3">Track the value generated from your professional networking activities</p>
+                        
+                        <div class="bg-white/20 rounded-lg p-3 mb-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm">Opportunities Generated</span>
+                                <span id="generatedOpportunities" class="font-semibold">0</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm">Meetings Conducted</span>
+                                <span id="conductedMeetings" class="font-semibold">0</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm">Projects Secured</span>
+                                <span id="securedProjects" class="font-semibold">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Estimated Value</span>
+                                <span id="estimatedValue" class="font-bold">$0</span>
+                            </div>
+                        </div>
+                        
+                        <button id="updateROIBtn" class="bg-white text-primary font-medium w-full py-2 rounded-lg">
+                            Update ROI Data
+                        </button>
+                    </div>
+                    
+                    <!-- Profile Completion -->
+                    <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
                         <h4 class="text-sm font-medium mb-2">Profile Completion</h4>
                         <div class="flex items-center mb-1">
                             <div class="w-full bg-lightTertiary rounded-full h-2.5 mr-2">
-                                <div class="bg-primary h-2.5 rounded-full" style="width: 92%"></div>
+                                <div id="profileCompletionBar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
                             </div>
-                            <span>92%</span>
+                            <span id="profileCompletionValue">0%</span>
                         </div>
-                        <p class="text-xs text-textMedium">Add your certifications to reach 100%</p>
-                    </div>
-                </div>
-                
-                <!-- Contact Quality Metrics -->
-                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-base font-medium">Connection Quality</h3>
-                        <button class="text-primary text-xs">View Details</button>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <div>
-                            <h4 class="text-sm mb-1">New Connections (Last 30 days)</h4>
-                            <div class="flex space-x-1">
-                                <div class="w-1/4 h-2 bg-success rounded-l"></div>
-                                <div class="w-1/6 h-2 bg-accent"></div>
-                                <div class="w-1/12 h-2 bg-danger rounded-r"></div>
-                                <div class="w-1/2 h-2 bg-lightTertiary rounded-r"></div>
-                            </div>
-                            <div class="flex text-xs mt-1">
-                                <div class="w-1/4"><span class="text-success">High Quality</span></div>
-                                <div class="w-1/6"><span class="text-accent">Medium</span></div>
-                                <div class="w-1/12"><span class="text-danger">Low</span></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-sm mb-1">Connection Engagement</h4>
-                            <div class="flex justify-between text-sm">
-                                <div>
-                                    <p class="font-medium">23</p>
-                                    <p class="text-xs text-textMedium">Active</p>
-                                </div>
-                                <div>
-                                    <p class="font-medium">45</p>
-                                    <p class="text-xs text-textMedium">Occasional</p>
-                                </div>
-                                <div>
-                                    <p class="font-medium">74</p>
-                                    <p class="text-xs text-textMedium">Dormant</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <button class="text-primary text-sm font-medium flex items-center">
-                                <i class="fas fa-sync-alt mr-1"></i> Reactivate Dormant Connections
-                            </button>
-                        </div>
+                        <p id="profileCompletionTip" class="text-xs text-textMedium">Complete your profile to improve match quality</p>
                     </div>
                 </div>
             </div>
@@ -766,11 +454,493 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // User data and analytics tracking system
+            const ProConnectData = {
+                // Initialize data store
+                initializeDataStore: function() {
+                    // Create user data structure if it doesn't exist
+                    if (!localStorage.getItem('proconnect_users')) {
+                        localStorage.setItem('proconnect_users', JSON.stringify({}));
+                    }
+                    
+                    // Create analytics data structure if it doesn't exist
+                    if (!localStorage.getItem('proconnect_analytics')) {
+                        localStorage.setItem('proconnect_analytics', JSON.stringify({
+                            profileViews: {},
+                            messages: {},
+                            connections: {},
+                            opportunities: {
+                                created: {},
+                                applied: {},
+                                matched: {}
+                            },
+                            networkGrowth: {},
+                            skillEndorsements: {}
+                        }));
+                    }
+                },
+                
+                // Get current user
+                getCurrentUser: function() {
+                    return JSON.parse(localStorage.getItem('currentUser')) || null;
+                },
+                
+                // Get all users
+                getAllUsers: function() {
+                    return JSON.parse(localStorage.getItem('proconnect_users')) || {};
+                },
+                
+                // Get user by ID
+                getUserById: function(userId) {
+                    const users = this.getAllUsers();
+                    return users[userId] || null;
+                },
+                
+                // Get analytics data
+                getAnalytics: function() {
+                    return JSON.parse(localStorage.getItem('proconnect_analytics')) || {};
+                },
+                
+                // Track profile view
+                trackProfileView: function(viewerId, profileId) {
+                    const analytics = this.getAnalytics();
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    if (!analytics.profileViews[today]) {
+                        analytics.profileViews[today] = [];
+                    }
+                    
+                    analytics.profileViews[today].push({
+                        viewerId: viewerId,
+                        profileId: profileId,
+                        timestamp: new Date().getTime()
+                    });
+                    
+                    localStorage.setItem('proconnect_analytics', JSON.stringify(analytics));
+                },
+                
+                // Track message
+                trackMessage: function(senderId, receiverId, messageType) {
+                    const analytics = this.getAnalytics();
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    if (!analytics.messages[today]) {
+                        analytics.messages[today] = [];
+                    }
+                    
+                    analytics.messages[today].push({
+                        senderId: senderId,
+                        receiverId: receiverId,
+                        messageType: messageType,
+                        timestamp: new Date().getTime()
+                    });
+                    
+                    localStorage.setItem('proconnect_analytics', JSON.stringify(analytics));
+                },
+                
+                // Track connection
+                trackConnection: function(requesterId, targetId, status) {
+                    const analytics = this.getAnalytics();
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    if (!analytics.connections[today]) {
+                        analytics.connections[today] = [];
+                    }
+                    
+                    analytics.connections[today].push({
+                        requesterId: requesterId,
+                        targetId: targetId,
+                        status: status,
+                        timestamp: new Date().getTime()
+                    });
+                    
+                    localStorage.setItem('proconnect_analytics', JSON.stringify(analytics));
+                },
+                
+                // Track opportunity
+                trackOpportunity: function(opportunityId, creatorId, type, action) {
+                    const analytics = this.getAnalytics();
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    const category = action === 'create' ? 'created' : 
+                                    action === 'apply' ? 'applied' : 'matched';
+                    
+                    if (!analytics.opportunities[category][today]) {
+                        analytics.opportunities[category][today] = [];
+                    }
+                    
+                    analytics.opportunities[category][today].push({
+                        opportunityId: opportunityId,
+                        creatorId: creatorId,
+                        type: type,
+                        timestamp: new Date().getTime()
+                    });
+                    
+                    localStorage.setItem('proconnect_analytics', JSON.stringify(analytics));
+                },
+                
+                // Track skill endorsement
+                trackEndorsement: function(endorserId, targetId, skillId) {
+                    const analytics = this.getAnalytics();
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    if (!analytics.skillEndorsements[today]) {
+                        analytics.skillEndorsements[today] = [];
+                    }
+                    
+                    analytics.skillEndorsements[today].push({
+                        endorserId: endorserId,
+                        targetId: targetId,
+                        skillId: skillId,
+                        timestamp: new Date().getTime()
+                    });
+                    
+                    localStorage.setItem('proconnect_analytics', JSON.stringify(analytics));
+                },
+                
+                // Get total profile views for a user
+                getTotalProfileViews: function(userId) {
+                    const analytics = this.getAnalytics();
+                    let total = 0;
+                    
+                    Object.values(analytics.profileViews).forEach(dailyViews => {
+                        dailyViews.forEach(view => {
+                            if (view.profileId === userId) {
+                                total++;
+                            }
+                        });
+                    });
+                    
+                    return total;
+                },
+                
+                // Get profile views for last 30 days
+                getRecentProfileViews: function(userId) {
+                    const analytics = this.getAnalytics();
+                    let total = 0;
+                    
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    const thirtyDaysAgoTime = thirtyDaysAgo.getTime();
+                    
+                    Object.values(analytics.profileViews).forEach(dailyViews => {
+                        dailyViews.forEach(view => {
+                            if (view.profileId === userId && view.timestamp >= thirtyDaysAgoTime) {
+                                total++;
+                            }
+                        });
+                    });
+                    
+                    return total;
+                },
+                
+                // Get network size (number of connections)
+                getNetworkSize: function(userId) {
+                    const analytics = this.getAnalytics();
+                    let connections = 0;
+                    
+                    Object.values(analytics.connections).forEach(dailyConnections => {
+                        dailyConnections.forEach(connection => {
+                            if ((connection.requesterId === userId || connection.targetId === userId) &&
+                                connection.status === 'accepted') {
+                                connections++;
+                            }
+                        });
+                    });
+                    
+                    return connections;
+                },
+                
+                // Get network growth data for chart
+                getNetworkGrowthData: function(userId) {
+                    const analytics = this.getAnalytics();
+                    const growthData = {
+                        labels: [],
+                        data: []
+                    };
+                    
+                    // Get the last 6 months
+                    const months = [];
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    
+                    const today = new Date();
+                    for (let i = 5; i >= 0; i--) {
+                        const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                        months.push({
+                            label: monthNames[month.getMonth()],
+                            year: month.getFullYear(),
+                            month: month.getMonth()
+                        });
+                    }
+                    
+                    // Populate labels
+                    growthData.labels = months.map(m => m.label);
+                    
+                    // Calculate connections per month
+                    let runningTotal = 0;
+                    months.forEach(month => {
+                        let monthlyConnections = 0;
+                        
+                        Object.entries(analytics.connections).forEach(([dateStr, connections]) => {
+                            const date = new Date(dateStr);
+                            if (date.getFullYear() === month.year && date.getMonth() === month.month) {
+                                connections.forEach(connection => {
+                                    if ((connection.requesterId === userId || connection.targetId === userId) &&
+                                        connection.status === 'accepted') {
+                                        monthlyConnections++;
+                                    }
+                                });
+                            }
+                        });
+                        
+                        runningTotal += monthlyConnections;
+                        growthData.data.push(runningTotal);
+                    });
+                    
+                    return growthData;
+                },
+                
+                // Get industry distribution data
+                getIndustryDistributionData: function(userId) {
+                    const connections = this.getConnections(userId);
+                    const industries = {};
+                    
+                    connections.forEach(connection => {
+                        const user = this.getUserById(connection.userId);
+                        if (user && user.industry) {
+                            if (!industries[user.industry]) {
+                                industries[user.industry] = 0;
+                            }
+                            industries[user.industry]++;
+                        }
+                    });
+                    
+                    // Default industries if no data
+                    if (Object.keys(industries).length === 0) {
+                        return {
+                            labels: ['No Data'],
+                            data: [100],
+                            colors: ['#E9ECEF']
+                        };
+                    }
+                    
+                    // Sort by count
+                    const sortedIndustries = Object.entries(industries)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 5); // Top 5 industries
+                    
+                    // Colors for chart
+                    const colors = ['#0078D4', '#2BC48A', '#FFB900', '#9333EA', '#6B7280'];
+                    
+                    return {
+                        labels: sortedIndustries.map(industry => industry[0]),
+                        data: sortedIndustries.map(industry => industry[1]),
+                        colors: colors.slice(0, sortedIndustries.length)
+                    };
+                },
+                
+                // Get the user's connections
+                getConnections: function(userId) {
+                    const analytics = this.getAnalytics();
+                    const connections = [];
+                    
+                    Object.values(analytics.connections).forEach(dailyConnections => {
+                        dailyConnections.forEach(connection => {
+                            if (connection.status === 'accepted') {
+                                if (connection.requesterId === userId) {
+                                    connections.push({
+                                        userId: connection.targetId,
+                                        timestamp: connection.timestamp
+                                    });
+                                } else if (connection.targetId === userId) {
+                                    connections.push({
+                                        userId: connection.requesterId,
+                                        timestamp: connection.timestamp
+                                    });
+                                }
+                            }
+                        });
+                    });
+                    
+                    return connections;
+                },
+                
+                // Get user's messages
+                getMessages: function(userId) {
+                    const analytics = this.getAnalytics();
+                    const messages = {
+                        sent: [],
+                        received: []
+                    };
+                    
+                    Object.values(analytics.messages).forEach(dailyMessages => {
+                        dailyMessages.forEach(message => {
+                            if (message.senderId === userId) {
+                                messages.sent.push(message);
+                            } else if (message.receiverId === userId) {
+                                messages.received.push(message);
+                            }
+                        });
+                    });
+                    
+                    return messages;
+                },
+                
+                // Get total message count
+                getTotalMessageCount: function(userId) {
+                    const messages = this.getMessages(userId);
+                    return messages.sent.length + messages.received.length;
+                },
+                
+                // Get recent message count (last 30 days)
+                getRecentMessageCount: function(userId) {
+                    const messages = this.getMessages(userId);
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    const thirtyDaysAgoTime = thirtyDaysAgo.getTime();
+                    
+                    const recentSent = messages.sent.filter(message => message.timestamp >= thirtyDaysAgoTime);
+                    const recentReceived = messages.received.filter(message => message.timestamp >= thirtyDaysAgoTime);
+                    
+                    return recentSent.length + recentReceived.length;
+                },
+                
+                // Calculate response rate
+                getResponseRate: function(userId) {
+                    const messages = this.getMessages(userId);
+                    
+                    if (messages.received.length === 0) {
+                        return 0;
+                    }
+                    
+                    // Simple implementation - in a real app, would track conversation threads
+                    const responseRate = Math.min(messages.sent.length / messages.received.length, 1) * 100;
+                    return Math.round(responseRate);
+                },
+                
+                // Calculate average response time
+                getAverageResponseTime: function(userId) {
+                    // This would require tracking conversation threads
+                    // For demo purposes, return a random value between 1-24 hours
+                    return Math.floor(Math.random() * 24) + 1;
+                },
+                
+                // Get ROI data (simplified for demo)
+                getROIData: function(userId) {
+                    const analytics = this.getAnalytics();
+                    
+                    // Count opportunities, meetings, and projects (simplified)
+                    let opportunities = 0;
+                    let meetings = 0;
+                    let projects = 0;
+                    
+                    // Count created opportunities
+                    Object.values(analytics.opportunities.created).forEach(dailyOpps => {
+                        dailyOpps.forEach(opp => {
+                            if (opp.creatorId === userId) {
+                                opportunities++;
+                            }
+                        });
+                    });
+                    
+                    // Count applied opportunities
+                    Object.values(analytics.opportunities.applied).forEach(dailyOpps => {
+                        dailyOpps.forEach(opp => {
+                            if (opp.creatorId === userId) {
+                                opportunities++;
+                            }
+                        });
+                    });
+                    
+                    // Calculate meetings (assume 50% of opportunities lead to meetings)
+                    meetings = Math.round(opportunities * 0.5);
+                    
+                    // Calculate projects (assume 20% of meetings lead to projects)
+                    projects = Math.round(meetings * 0.2);
+                    
+                    // Calculate value (simple estimate)
+                    const averageValue = 20000; // $20K per project
+                    const totalValue = projects * averageValue;
+                    
+                    return {
+                        opportunities: opportunities,
+                        meetings: meetings,
+                        projects: projects,
+                        value: totalValue
+                    };
+                },
+                
+                // Calculate profile completion percentage
+                getProfileCompletionPercentage: function(userId) {
+                    const user = this.getUserById(userId) || this.getCurrentUser();
+                    
+                    if (!user) {
+                        return 0;
+                    }
+                    
+                    // Define fields that contribute to completion
+                    const fields = [
+                        'fullName', 'currentRole', 'company', 'industry', 
+                        'about', 'skills', 'experience', 'lookingFor', 
+                        'profileImage'
+                    ];
+                    
+                    // Count filled fields
+                    let filledFields = 0;
+                    fields.forEach(field => {
+                        if (user[field] && 
+                            ((typeof user[field] === 'string' && user[field].trim() !== '') || 
+                            (Array.isArray(user[field]) && user[field].length > 0) ||
+                            (typeof user[field] === 'object' && Object.keys(user[field]).length > 0))) {
+                            filledFields++;
+                        }
+                    });
+                    
+                    return Math.round((filledFields / fields.length) * 100);
+                },
+                
+                // Get profile completion tip
+                getProfileCompletionTip: function(percentage) {
+                    if (percentage < 30) {
+                        return "Add your basic information to improve your profile";
+                    } else if (percentage < 60) {
+                        return "Add your skills and experience to connect with more people";
+                    } else if (percentage < 90) {
+                        return "Add what you're looking for to get better matches";
+                    } else {
+                        return "Your profile is almost complete!";
+                    }
+                }
+            };
+            
+            // Initialize data store
+            ProConnectData.initializeDataStore();
+            
+            // Check if user is logged in
+            const currentUser = ProConnectData.getCurrentUser();
+            const isLoggedIn = !!currentUser;
+            
+            // Initialize UI based on login state
+            if (isLoggedIn) {
+                // Hide the "Start Journey" button for logged in users
+                document.querySelector('.fixed.bottom-24').classList.add('hidden');
+                
+                // Show unread message count if any
+                const unreadMessages = Math.floor(Math.random() * 3); // Mock data
+                if (unreadMessages > 0) {
+                    const unreadBadge = document.getElementById('unreadMessageCount');
+                    unreadBadge.textContent = unreadMessages;
+                    unreadBadge.classList.remove('hidden');
+                }
+            }
+            
+            // Initialize analytics data
+            initializeAnalyticsData();
+            
             // Initialize charts for analytics
             initializeCharts();
             
             // Show analytics screen as default
-            // document.getElementById('matchingScreen').classList.remove('hidden');
             document.getElementById('analyticsScreen').classList.remove('hidden');
             
             // Navigation buttons
@@ -786,27 +956,524 @@
                 highlightNavButton(this);
             });
             
-            // Card swiping simulation
-            document.getElementById('skipBtn')?.addEventListener('click', function() {
-                simulateSwipe('left');
-            });
+            // Initialize analytics data
+            function initializeAnalyticsData() {
+                if (!isLoggedIn) {
+                    // Show empty states for non-logged in users
+                    document.getElementById('noAnalyticsState').classList.remove('hidden');
+                    document.getElementById('analyticsContent').classList.add('hidden');
+                    return;
+                }
+                
+                // Get analytics data
+                const userId = currentUser.id || 'current';
+                
+                // Calculate analytics metrics
+                const networkSize = ProConnectData.getNetworkSize(userId);
+                const profileViews = ProConnectData.getRecentProfileViews(userId);
+                const messageCount = ProConnectData.getRecentMessageCount(userId);
+                const responseRate = ProConnectData.getResponseRate(userId);
+                const responseTime = ProConnectData.getAverageResponseTime(userId);
+                const profileCompletion = ProConnectData.getProfileCompletionPercentage(userId);
+                const roiData = ProConnectData.getROIData(userId);
+                
+                // If no data, show empty state
+                if (networkSize === 0 && profileViews === 0 && messageCount === 0) {
+                    document.getElementById('noAnalyticsState').classList.remove('hidden');
+                    document.getElementById('analyticsContent').classList.add('hidden');
+                    return;
+                }
+                
+                // Show analytics content
+                document.getElementById('noAnalyticsState').classList.add('hidden');
+                document.getElementById('analyticsContent').classList.remove('hidden');
+                
+                // Update analytics UI
+                document.getElementById('networkSize').textContent = networkSize;
+                document.getElementById('networkGrowthRate').textContent = networkSize > 0 ? `+${Math.floor(Math.random() * 20)}%` : '+0%';
+                
+                document.getElementById('profileViews').textContent = profileViews;
+                document.getElementById('profileViewsGrowth').textContent = profileViews > 0 ? `+${Math.floor(Math.random() * 15)}%` : '+0%';
+                
+                document.getElementById('messageCount').textContent = messageCount;
+                document.getElementById('messagesGrowth').textContent = messageCount > 0 ? `+${Math.floor(Math.random() * 25)}%` : '+0%';
+                
+                document.getElementById('responseRate').textContent = `${responseRate}%`;
+                document.getElementById('responseRateGrowth').textContent = responseRate > 0 ? `+${Math.floor(Math.random() * 10)}%` : '+0%';
+                document.getElementById('responseTime').textContent = `${responseTime}h`;
+                
+                // Update ROI data
+                document.getElementById('generatedOpportunities').textContent = roiData.opportunities;
+                document.getElementById('conductedMeetings').textContent = roiData.meetings;
+                document.getElementById('securedProjects').textContent = roiData.projects;
+                document.getElementById('estimatedValue').textContent = `$${roiData.value.toLocaleString()}`;
+                
+                // Update profile completion
+                document.getElementById('profileCompletionBar').style.width = `${profileCompletion}%`;
+                document.getElementById('profileCompletionValue').textContent = `${profileCompletion}%`;
+                document.getElementById('profileCompletionTip').textContent = ProConnectData.getProfileCompletionTip(profileCompletion);
+                
+                // Initialize opportunities data
+                initializeOpportunitiesData();
+                
+                // Initialize skills data
+                initializeSkillsData();
+                
+                // Initialize matching data
+                initializeMatchingData();
+            }
             
-            document.getElementById('connectBtn')?.addEventListener('click', function() {
-                simulateSwipe('right');
-            });
-
+            // Initialize skills data
+            function initializeSkillsData() {
+                if (!isLoggedIn) {
+                    // Show empty state for non-logged in users
+                    document.getElementById('noSkillsState').classList.remove('hidden');
+                    document.getElementById('skillsContent').classList.add('hidden');
+                    return;
+                }
+                
+                // Check if user has skills
+                const hasSkills = currentUser.skills && 
+                                  (typeof currentUser.skills === 'string' ? 
+                                   currentUser.skills.trim() !== '' : 
+                                   currentUser.skills.length > 0);
+                
+                if (!hasSkills) {
+                    // Show empty state
+                    document.getElementById('noSkillsState').classList.remove('hidden');
+                    document.getElementById('skillsContent').classList.add('hidden');
+                    
+                    // Add click handler for "Add First Skill" button
+                    document.getElementById('addFirstSkillBtn').addEventListener('click', function() {
+                        alert('Skill addition functionality will be available in the next update.');
+                    });
+                    
+                    return;
+                }
+                
+                // Show skills content
+                document.getElementById('noSkillsState').classList.add('hidden');
+                document.getElementById('skillsContent').classList.remove('hidden');
+                
+                // Get skills from user data
+                let skillsArray = [];
+                if (typeof currentUser.skills === 'string') {
+                    skillsArray = currentUser.skills.split(',').map(skill => skill.trim());
+                } else {
+                    skillsArray = currentUser.skills;
+                }
+                
+                // Update expertise score
+                const expertiseScore = Math.floor(Math.random() * 31) + 50; // Random score between 50-80
+                document.getElementById('expertiseScore').textContent = expertiseScore;
+                document.getElementById('expertiseScoreBar').style.width = `${expertiseScore}%`;
+                
+                // Populate top skills
+                const topSkillsList = document.getElementById('topSkillsList');
+                const topSkills = skillsArray.slice(0, 3);
+                
+                topSkillsList.innerHTML = topSkills.map((skill, index) => {
+                    const isVerified = index < 2; // First two skills are verified
+                    const endorsements = Math.floor(Math.random() * 40) + 5; // Random between 5-45
+                    const percentage = Math.floor(Math.random() * 30) + 65; // Random between 65-95
+                    
+                    return `
+                        <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center">
+                                        <h4 class="font-medium">${skill}</h4>
+                                        ${isVerified ? 
+                                            `<span class="ml-2 bg-success/10 text-success text-xs px-2 py-0.5 rounded-full flex items-center">
+                                                <i class="fas fa-check-circle mr-1"></i>Verified
+                                            </span>` : 
+                                            `<span class="ml-2 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full flex items-center">
+                                                <i class="fas fa-certificate mr-1"></i>Verify
+                                            </span>`
+                                        }
+                                    </div>
+                                    <div class="flex items-center mt-1">
+                                        <div class="w-full max-w-[150px] bg-lightTertiary rounded-full h-1.5 mr-2">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: ${percentage}%"></div>
+                                        </div>
+                                        <span class="text-xs text-textMedium">${endorsements} endorsements</span>
+                                    </div>
+                                </div>
+                                <button class="skill-endorse-btn text-primary text-sm font-medium" data-skill="${skill}">Endorse</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add event listeners to endorse buttons
+                document.querySelectorAll('.skill-endorse-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const skill = this.getAttribute('data-skill');
+                        alert(`Skill endorsement for ${skill} will be available in the next update.`);
+                    });
+                });
+                
+                // Populate additional skills
+                const additionalSkillsList = document.getElementById('additionalSkillsList');
+                const additionalSkills = skillsArray.slice(3);
+                
+                additionalSkillsList.innerHTML = additionalSkills.map(skill => {
+                    const endorsements = Math.floor(Math.random() * 15) + 1; // Random between 1-15
+                    
+                    return `
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">${skill}</span>
+                            <span class="text-xs text-textMedium">${endorsements}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add skill button functionality
+                document.getElementById('addSkillBtn').addEventListener('click', function() {
+                    alert('Skill addition functionality will be available in the next update.');
+                });
+            }
+            
+            // Initialize opportunities data
+            function initializeOpportunitiesData() {
+                if (!isLoggedIn) {
+                    // Show empty state for non-logged in users
+                    document.getElementById('noOpportunitiesState').classList.remove('hidden');
+                    document.getElementById('opportunitiesContent').classList.add('hidden');
+                    return;
+                }
+                
+                // For demo purposes, randomly decide if there are opportunities
+                const hasOpportunities = Math.random() > 0.3; // 70% chance to have opportunities
+                
+                if (!hasOpportunities) {
+                    // Show empty state
+                    document.getElementById('noOpportunitiesState').classList.remove('hidden');
+                    document.getElementById('opportunitiesContent').classList.add('hidden');
+                    
+                    // Add click handler for "Create First Opportunity" button
+                    document.getElementById('createFirstOpportunityBtn').addEventListener('click', function() {
+                        alert('Opportunity creation functionality will be available in the next update.');
+                    });
+                    
+                    return;
+                }
+                
+                // Show opportunities content
+                document.getElementById('noOpportunitiesState').classList.add('hidden');
+                document.getElementById('opportunitiesContent').classList.remove('hidden');
+                
+                // Generate random opportunity counts
+                const projectsCount = Math.floor(Math.random() * 8) + 1;
+                const venturesCount = Math.floor(Math.random() * 4) + 1;
+                const jobsCount = Math.floor(Math.random() * 3) + 1;
+                const totalCount = projectsCount + venturesCount + jobsCount;
+                
+                // Update opportunity counts
+                document.getElementById('opportunitiesCount').textContent = totalCount;
+                document.getElementById('projectsCount').textContent = projectsCount;
+                document.getElementById('venturesCount').textContent = venturesCount;
+                document.getElementById('jobsCount').textContent = jobsCount;
+                
+                // Set last updated time
+                document.getElementById('lastUpdated').textContent = 'recently';
+                
+                // Generate opportunities
+                const opportunityTypes = [
+                    { type: 'Project', label: 'UX Project' },
+                    { type: 'Project', label: 'Development Project' },
+                    { type: 'Project', label: 'Consulting Project' },
+                    { type: 'Venture', label: 'Partnership' },
+                    { type: 'Venture', label: 'Co-founder' },
+                    { type: 'Venture', label: 'Investment' },
+                    { type: 'Job', label: 'Full-time' },
+                    { type: 'Job', label: 'Contract' },
+                    { type: 'Job', label: 'Freelance' }
+                ];
+                
+                const opportunityTitles = [
+                    'Healthcare AI Startup',
+                    'E-commerce Platform Redesign',
+                    'FinTech Joint Venture',
+                    'Director of Product Marketing',
+                    'Mobile App Development',
+                    'Data Science Consulting',
+                    'Sustainable Fashion Startup',
+                    'EdTech Platform Migration',
+                    'Digital Transformation Lead'
+                ];
+                
+                const opportunityDescriptions = [
+                    'Seeking a technical co-founder with experience in AI/ML for a healthcare startup focused on personalized care plans for chronic conditions.',
+                    'Looking for UX designer to help with e-commerce platform redesign. 3-month contract with possibility of extension.',
+                    'Established fintech company seeking partnership to expand into Asian markets. Looking for local expertise and connections.',
+                    'Growing SaaS company seeking Director of Product Marketing to lead go-to-market strategy for new enterprise solutions.',
+                    'Need experienced mobile developers for an innovative fintech application with cutting-edge security features.',
+                    'Data science consulting firm looking for project partners with expertise in healthcare analytics and predictive modeling.',
+                    'Sustainable fashion startup seeking partners with experience in eco-friendly supply chain management and marketing.',
+                    'Educational technology company needs expert help migrating their platform to a new cloud infrastructure.',
+                    'Established manufacturing company seeking digital transformation lead to modernize processes and systems.'
+                ];
+                
+                const skillTags = [
+                    ['AI/ML', 'Healthcare', 'Co-founder', 'Equity'],
+                    ['UX Design', 'E-commerce', 'Contract'],
+                    ['FinTech', 'Partnership', 'International'],
+                    ['Marketing', 'SaaS', 'Full-time'],
+                    ['Mobile Development', 'FinTech', 'Security'],
+                    ['Data Science', 'Healthcare', 'Analytics'],
+                    ['Sustainability', 'Fashion', 'Marketing'],
+                    ['Cloud', 'Education', 'DevOps'],
+                    ['Digital Transformation', 'Manufacturing', 'Leadership']
+                ];
+                
+                // Generate random opportunities
+                const opportunities = [];
+                const usedIndices = new Set();
+                
+                // Create random matching opportunities
+                for (let i = 0; i < Math.min(totalCount, 9); i++) {
+                    let index;
+                    do {
+                        index = Math.floor(Math.random() * 9);
+                    } while (usedIndices.has(index));
+                    
+                    usedIndices.add(index);
+                    
+                    const matchScore = Math.floor(Math.random() * 25) + 70; // 70-95
+                    const daysAgo = Math.floor(Math.random() * 14) + 1; // 1-14 days
+                    
+                    opportunities.push({
+                        id: `opp-${Date.now()}-${i}`,
+                        title: opportunityTitles[index],
+                        description: opportunityDescriptions[index],
+                        tags: skillTags[index],
+                        match: matchScore,
+                        daysAgo: daysAgo,
+                        featured: index === 0, // First opportunity is featured
+                        type: opportunityTypes[index].type,
+                        label: opportunityTypes[index].label,
+                    });
+                }
+                
+                // Sort by match score
+                opportunities.sort((a, b) => b.match - a.match);
+                
+                // Populate opportunities list
+                const opportunitiesList = document.getElementById('opportunitiesList');
+                opportunitiesList.innerHTML = '';
+                
+                opportunities.forEach((opportunity, index) => {
+                    const isFirst = index === 0;
+                    const isFeatured = opportunity.featured;
+                    
+                    const opportunityElement = document.createElement('div');
+                    opportunityElement.className = `${isFeatured ? 
+                        'bg-primary/5 border border-primary/20' : 
+                        'bg-lightSecondary'} rounded-lg p-4 ${isFeatured ? 'mb-4' : ''} relative overflow-hidden opportunity-item`;
+                    opportunityElement.setAttribute('data-type', opportunity.type.toLowerCase());
+                    
+                    opportunityElement.innerHTML = `
+                        ${isFeatured ? 
+                            `<div class="absolute top-0 right-0">
+                                <div class="bg-primary text-white text-xs px-2 py-1 transform rotate-45 translate-x-[18px] translate-y-[-5px] w-32 text-center">
+                                    Top Match
+                                </div>
+                            </div>` : ''
+                        }
+                        <div class="flex items-start mb-2">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-${opportunity.type === 'Project' ? 'tasks' : 
+                                             opportunity.type === 'Venture' ? 'rocket' : 
+                                             'briefcase'} text-primary"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold">${opportunity.title}</h3>
+                                <p class="text-sm text-textMedium">Posted by Network Member • ${opportunity.label}</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="${opportunity.match >= 90 ? 
+                                    'bg-success/10 text-success' : 
+                                    'bg-primary/10 text-primary'} px-2 py-0.5 rounded-full text-xs">${opportunity.match}% Match</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-textMedium mb-3">${opportunity.description}</p>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            ${opportunity.tags.map(tag => 
+                                `<span class="${isFeatured ? 
+                                    'bg-primary/10 text-primary' : 
+                                    'bg-lightTertiary text-textDark'} px-2 py-0.5 rounded-full text-xs">${tag}</span>`
+                            ).join('')}
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-textMedium">
+                                <i class="far fa-clock mr-1"></i>Posted ${opportunity.daysAgo} day${opportunity.daysAgo !== 1 ? 's' : ''} ago
+                            </div>
+                            <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium opportunity-connect-btn">
+                                Connect
+                            </button>
+                        </div>
+                    `;
+                    
+                    opportunitiesList.appendChild(opportunityElement);
+                });
+                
+                // Add event listeners to connect buttons
+                document.querySelectorAll('.opportunity-connect-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        alert('Connection request sent. You will be notified when they respond.');
+                    });
+                });
+                
+                // Add event listeners to opportunity filters
+                document.querySelectorAll('.opportunity-filter').forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Reset all buttons
+                        document.querySelectorAll('.opportunity-filter').forEach(btn => {
+                            btn.classList.remove('bg-primary', 'text-white');
+                            btn.classList.add('bg-lightTertiary', 'text-textDark');
+                        });
+                        
+                        // Highlight clicked button
+                        this.classList.remove('bg-lightTertiary', 'text-textDark');
+                        this.classList.add('bg-primary', 'text-white');
+                        
+                        // Filter opportunities
+                        const filter = this.getAttribute('data-filter');
+                        
+                        document.querySelectorAll('.opportunity-item').forEach(item => {
+                            if (filter === 'all' || item.getAttribute('data-type') === filter) {
+                                item.classList.remove('hidden');
+                            } else {
+                                item.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+                
+                // Create opportunity button functionality
+                document.getElementById('createOpportunity').addEventListener('click', function() {
+                    alert('Opportunity creation functionality will be available in the next update.');
+                });
+                
+                // Filter button functionality
+                document.getElementById('filterOpportunities').addEventListener('click', function() {
+                    alert('Advanced filtering functionality will be available in the next update.');
+                });
+            }
+            
+            // Initialize matching data
+            function initializeMatchingData() {
+                if (!isLoggedIn) {
+                    // Show empty state for non-logged in users
+                    document.getElementById('noMatchesState').classList.remove('hidden');
+                    document.getElementById('matchingCards').classList.add('hidden');
+                    document.getElementById('matchActions').classList.add('hidden');
+                    return;
+                }
+                
+                // For demo purposes, randomly decide if there are matches
+                const hasMatches = Math.random() > 0.3; // 70% chance to have matches
+                
+                if (!hasMatches) {
+                    // Show empty state
+                    document.getElementById('noMatchesState').classList.remove('hidden');
+                    document.getElementById('matchingCards').classList.add('hidden');
+                    document.getElementById('matchActions').classList.add('hidden');
+                    document.getElementById('matchesCount').textContent = '0';
+                    return;
+                }
+                
+                // Show matching cards and actions
+                document.getElementById('noMatchesState').classList.add('hidden');
+                document.getElementById('matchingCards').classList.remove('hidden');
+                document.getElementById('matchActions').classList.remove('hidden');
+                
+                // Generate random number of matches
+                const matchCount = Math.floor(Math.random() * 20) + 5; // 5-24 matches
+                document.getElementById('matchesCount').textContent = matchCount;
+                
+                // Generate random match data
+                const matchData = {
+                    name: 'Sarah Chen',
+                    title: 'Product Manager at TechCorp',
+                    profileImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80',
+                    match: Math.floor(Math.random() * 15) + 85, // 85-99% match
+                    skills: ['Product Management', 'User Research', 'Agile', 'UX Design', 'Strategy'],
+                    experiences: [
+                        'Led product team at Spotify for 3 years',
+                        'Launched 4 successful mobile applications',
+                        'MBA from Stanford University'
+                    ],
+                    lookingFor: 'Technical co-founder for a healthcare startup idea',
+                    expertise: Math.floor(Math.random() * 15) + 75, // 75-89% expertise
+                    experienceLevel: '10+ years experience • Senior Position • Director Level'
+                };
+                
+                // Update match UI
+                document.getElementById('matchName').textContent = matchData.name;
+                document.getElementById('matchTitle').textContent = matchData.title;
+                document.getElementById('matchProfileImage').src = matchData.profileImage;
+                document.getElementById('matchScore').textContent = `${matchData.match}% Match`;
+                document.getElementById('matchLookingFor').textContent = matchData.lookingFor;
+                document.getElementById('matchExpertiseValue').textContent = `${matchData.expertise}%`;
+                document.getElementById('matchExpertiseBar').style.width = `${matchData.expertise}%`;
+                document.getElementById('matchExperienceLevel').textContent = matchData.experienceLevel;
+                
+                // Populate skills
+                const matchSkillsContainer = document.getElementById('matchSkills');
+                matchSkillsContainer.innerHTML = matchData.skills.map(skill => 
+                    `<span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">${skill}</span>`
+                ).join('');
+                
+                // Populate experiences
+                const matchExperiencesContainer = document.getElementById('matchExperiences');
+                matchExperiencesContainer.innerHTML = matchData.experiences.map(experience => 
+                    `<li>${experience}</li>`
+                ).join('');
+                
+                // Card swiping functionality
+                document.getElementById('skipBtn').addEventListener('click', function() {
+                    simulateSwipe('left');
+                });
+                
+                document.getElementById('connectBtn').addEventListener('click', function() {
+                    simulateSwipe('right');
+                    setTimeout(() => {
+                        alert("It's a match! A connection request has been sent.");
+                    }, 500);
+                });
+                
+                document.getElementById('infoBtn').addEventListener('click', function() {
+                    alert("View full profile functionality will be available in the next update.");
+                });
+            }
+            
             // Function to initialize charts for analytics dashboard
             function initializeCharts() {
+                // Only initialize charts if we have a logged in user
+                if (!isLoggedIn) {
+                    return;
+                }
+                
+                const userId = currentUser.id || 'current';
+                
+                // Get network growth data
+                const networkGrowthData = ProConnectData.getNetworkGrowthData(userId);
+                
+                // Get industry distribution data
+                const industryData = ProConnectData.getIndustryDistributionData(userId);
+                
                 // Network Growth Chart
                 const networkGrowthCtx = document.getElementById('networkGrowthChart')?.getContext('2d');
                 if (networkGrowthCtx) {
                     new Chart(networkGrowthCtx, {
                         type: 'line',
                         data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            labels: networkGrowthData.labels,
                             datasets: [{
                                 label: 'Connections',
-                                data: [65, 78, 90, 105, 125, 142],
+                                data: networkGrowthData.data,
                                 borderColor: '#0078D4',
                                 backgroundColor: 'rgba(0, 120, 212, 0.1)',
                                 tension: 0.3,
@@ -844,16 +1511,10 @@
                     new Chart(industryDistributionCtx, {
                         type: 'doughnut',
                         data: {
-                            labels: ['Technology', 'Finance', 'Healthcare', 'Marketing', 'Other'],
+                            labels: industryData.labels,
                             datasets: [{
-                                data: [45, 22, 15, 12, 6],
-                                backgroundColor: [
-                                    '#0078D4', // primary
-                                    '#2BC48A', // secondary
-                                    '#FFB900', // accent
-                                    '#9333EA', // purple
-                                    '#6B7280'  // gray
-                                ],
+                                data: industryData.data,
+                                backgroundColor: industryData.colors,
                                 borderWidth: 0
                             }]
                         },
@@ -867,6 +1528,30 @@
                                 }
                             }
                         }
+                    });
+                }
+                
+                // Update industry breakdown
+                const industryBreakdown = document.getElementById('industryBreakdown');
+                if (industryBreakdown) {
+                    industryBreakdown.innerHTML = '';
+                    
+                    industryData.labels.forEach((industry, index) => {
+                        const percentage = (industryData.data[index] / industryData.data.reduce((a, b) => a + b, 0) * 100).toFixed(0);
+                        
+                        const div = document.createElement('div');
+                        div.className = 'mb-3';
+                        div.innerHTML = `
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">${industry}</span>
+                                <span class="text-xs">${percentage}%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="h-1.5 rounded-full" style="width: ${percentage}%; background-color: ${industryData.colors[index]}"></div>
+                            </div>
+                        `;
+                        
+                        industryBreakdown.appendChild(div);
                     });
                 }
             }
@@ -911,37 +1596,19 @@
                 // Reset after animation
                 setTimeout(() => {
                     card.classList.remove('translate-x-[-120%]', 'translate-x-[120%]', 'rotate-[-20deg]', 'rotate-[20deg]');
-                    // We'd load a new card here in a real app
+                    // In a real app, we'd load the next card here
                 }, 300);
             }
             
-            // Store users in localStorage for profile viewing if not already there
-            const sampleUsers = [
-                {
-                    id: 1,
-                    name: "Sarah Chen",
-                    title: "Product Manager",
-                    company: "TechCorp",
-                    industry: "Technology",
-                    location: "San Francisco, CA",
-                    skills: ["Product Management", "User Research", "UX Design", "Agile", "Strategy"],
-                    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    match: 98
-                },
-                {
-                    id: 2,
-                    name: "David Wong",
-                    title: "Tech Entrepreneur",
-                    company: "Innovate Inc",
-                    industry: "Technology",
-                    location: "New York, NY",
-                    skills: ["Business Strategy", "Startup", "Fundraising", "Product Development", "Marketing"],
-                    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    match: 87
-                }
-            ];
+            // Hook up ROI update button
+            document.getElementById('updateROIBtn')?.addEventListener('click', function() {
+                alert('ROI data update functionality will be available in the next update.');
+            });
             
-            localStorage.setItem('sampleUsers', JSON.stringify(sampleUsers));
+            // Hook up download report button
+            document.getElementById('downloadReportBtn')?.addEventListener('click', function() {
+                alert('Report download functionality will be available in the next update.');
+            });
         });
     </script>
 </body>
