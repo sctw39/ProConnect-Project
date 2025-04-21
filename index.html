@@ -7,10 +7,41 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0078D4">
-    <link rel="apple-touch-icon" href="assets/icon-192x192.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Business-oriented color palette
+                        primary: '#0078D4', // Microsoft blue - professional, trustworthy
+                        primaryLight: '#50A0E4', // Lighter blue for hover states
+                        primaryDark: '#106EBE', // Darker blue for active states
+                        secondary: '#2BC48A', // Bright teal/mint - fresh, innovative
+                        accent: '#FFB900', // Warm gold - optimistic, attention-grabbing
+                        danger: '#E74C3C', // Bright red for warnings/errors
+                        success: '#27AE60', // Green for success states
+                        
+                        // Light mode backgrounds
+                        lightBg: '#FFFFFF',
+                        lightSecondary: '#F8F9FA',
+                        lightTertiary: '#E9ECEF',
+                        
+                        // Dark mode backgrounds
+                        darkBg: '#1F2937',
+                        darkSecondary: '#374151',
+                        darkTertiary: '#4B5563',
+                        
+                        // Text colors
+                        textDark: '#212529',
+                        textMedium: '#495057',
+                        textLight: '#6C757D',
+                        textWhite: '#F8F9FA'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md pb-20">
@@ -21,6 +52,10 @@
                 <h1 class="text-2xl font-bold text-primary">ProConnect</h1>
             </div>
             <div class="flex space-x-4">
+                <!-- Onboarding Link in Header -->
+                <a href="onboarding.html" class="bg-primary text-white px-3 py-1 rounded-lg text-sm font-medium flex items-center">
+                    <i class="fas fa-user-plus mr-1"></i> Join
+                </a>
                 <button id="profileBtn" class="text-primary">
                     <i class="fas fa-user-circle text-2xl"></i>
                 </button>
@@ -33,8 +68,8 @@
 
         <!-- Main App Screens -->
         <main>
-            <!-- Matching Screen (Initial screen) -->
-            <div id="matchingScreen" class="screen">
+            <!-- Matching Screen (Swipe Interface) -->
+            <div id="matchingScreen" class="hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold">Find Connections</h2>
                     <div class="text-sm">
@@ -117,7 +152,7 @@
             </div>
 
             <!-- Skills Endorsement Screen -->
-            <div id="skillsScreen" class="screen hidden">
+            <div id="skillsScreen" class="hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold">Skills & Endorsements</h2>
                     <button id="addSkillBtn" class="bg-primary text-white px-3 py-1 rounded-lg text-sm">
@@ -144,18 +179,127 @@
                 <div class="mb-4">
                     <h3 class="font-semibold mb-2">Top Skills</h3>
                     
-                    <!-- Skill Cards -->
-                    <div id="topSkillsList" class="space-y-3">
-                        <!-- Skill cards will be added here by JavaScript -->
+                    <!-- Skill Card with Endorsements -->
+                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center">
+                                    <h4 class="font-medium">Project Management</h4>
+                                    <span class="ml-2 bg-success/10 text-success text-xs px-2 py-0.5 rounded-full flex items-center">
+                                        <i class="fas fa-check-circle mr-1"></i>Verified
+                                    </span>
+                                </div>
+                                <div class="flex items-center mt-1">
+                                    <div class="w-full max-w-[150px] bg-lightTertiary rounded-full h-1.5 mr-2">
+                                        <div class="bg-primary h-1.5 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                    <span class="text-xs text-textMedium">45 endorsements</span>
+                                </div>
+                            </div>
+                            <button class="text-primary text-sm font-medium">Endorse</button>
+                        </div>
+                        <div class="flex mt-2 overflow-hidden">
+                            <div class="flex -space-x-2 mr-2">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
+                                <img src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
+                            </div>
+                            <span class="text-xs text-textMedium">Endorsed by David, Emma, John & 42 others</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Skill Card with Endorsements -->
+                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center">
+                                    <h4 class="font-medium">Product Strategy</h4>
+                                    <span class="ml-2 bg-success/10 text-success text-xs px-2 py-0.5 rounded-full flex items-center">
+                                        <i class="fas fa-check-circle mr-1"></i>Verified
+                                    </span>
+                                </div>
+                                <div class="flex items-center mt-1">
+                                    <div class="w-full max-w-[150px] bg-lightTertiary rounded-full h-1.5 mr-2">
+                                        <div class="bg-primary h-1.5 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <span class="text-xs text-textMedium">38 endorsements</span>
+                                </div>
+                            </div>
+                            <button class="text-primary text-sm font-medium">Endorse</button>
+                        </div>
+                        <div class="flex mt-2 overflow-hidden">
+                            <div class="flex -space-x-2 mr-2">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
+                            </div>
+                            <span class="text-xs text-textMedium">Endorsed by Sarah, Jessica & 36 others</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Skill Card Without Verification -->
+                    <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center">
+                                    <h4 class="font-medium">UI/UX Design</h4>
+                                    <span class="ml-2 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full flex items-center">
+                                        <i class="fas fa-certificate mr-1"></i>Verify
+                                    </span>
+                                </div>
+                                <div class="flex items-center mt-1">
+                                    <div class="w-full max-w-[150px] bg-lightTertiary rounded-full h-1.5 mr-2">
+                                        <div class="bg-primary h-1.5 rounded-full" style="width: 65%"></div>
+                                    </div>
+                                    <span class="text-xs text-textMedium">19 endorsements</span>
+                                </div>
+                            </div>
+                            <button class="text-primary text-sm font-medium">Endorse</button>
+                        </div>
+                        <div class="flex mt-2 overflow-hidden">
+                            <div class="flex -space-x-2 mr-2">
+                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80" alt="Person who endorsed" class="w-6 h-6 rounded-full border border-white">
+                            </div>
+                            <span class="text-xs text-textMedium">Endorsed by Aisha & 18 others</span>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Other Skills Section -->
                 <div>
                     <h3 class="font-semibold mb-2">Additional Skills</h3>
+                    
                     <div class="bg-lightSecondary p-3 rounded-lg mb-3 shadow-sm">
-                        <div id="additionalSkillsList" class="grid grid-cols-2 gap-2">
-                            <!-- Additional skills will be added here by JavaScript -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <!-- Skill with endorsement count -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Business Strategy</span>
+                                <span class="text-xs text-textMedium">12</span>
+                            </div>
+                            <!-- Skill with endorsement count -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Data Analysis</span>
+                                <span class="text-xs text-textMedium">9</span>
+                            </div>
+                            <!-- Skill with endorsement count -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Leadership</span>
+                                <span class="text-xs text-textMedium">16</span>
+                            </div>
+                            <!-- Skill with endorsement count -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Public Speaking</span>
+                                <span class="text-xs text-textMedium">7</span>
+                            </div>
+                            <!-- Skill with endorsement count -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Negotiation</span>
+                                <span class="text-xs text-textMedium">11</span>
+                            </div>
+                            <!-- Skill with endorsement count -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Team Building</span>
+                                <span class="text-xs text-textMedium">14</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -171,7 +315,7 @@
             </div>
 
             <!-- Business Opportunity Matching Screen -->
-            <div id="opportunitiesScreen" class="screen hidden">
+            <div id="opportunitiesScreen" class="hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold">Business Opportunities</h2>
                     <div class="flex space-x-2">
@@ -217,9 +361,125 @@
                     <button class="whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm">Funding</button>
                 </div>
                 
-                <!-- Opportunities List -->
-                <div id="opportunitiesList" class="space-y-4">
-                    <!-- Opportunities will be added here by JavaScript -->
+                <!-- Featured Opportunity -->
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4 relative overflow-hidden">
+                    <div class="absolute top-0 right-0">
+                        <div class="bg-primary text-white text-xs px-2 py-1 transform rotate-45 translate-x-[18px] translate-y-[-5px] w-32 text-center">
+                            Top Match
+                        </div>
+                    </div>
+                    <div class="flex items-start mb-2">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
+                        <div>
+                            <h3 class="font-bold">Healthcare AI Startup</h3>
+                            <p class="text-sm text-textMedium">Posted by Sarah Chen • Technical Co-founder</p>
+                        </div>
+                        <div class="ml-auto">
+                            <span class="bg-success/10 text-success px-2 py-0.5 rounded-full text-xs">95% Match</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-textMedium mb-3">Seeking a technical co-founder with experience in AI/ML for a healthcare startup focused on personalized care plans for chronic conditions.</p>
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">AI/ML</span>
+                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">Healthcare</span>
+                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">Co-founder</span>
+                        <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">Equity</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-xs text-textMedium">
+                            <i class="far fa-clock mr-1"></i>Posted 2 days ago
+                        </div>
+                        <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
+                            Connect
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Other Opportunities -->
+                <div class="space-y-4">
+                    <!-- Project Opportunity -->
+                    <div class="bg-lightSecondary rounded-lg p-4 shadow-sm">
+                        <div class="flex items-start mb-2">
+                            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
+                            <div>
+                                <h3 class="font-bold">E-commerce Platform Redesign</h3>
+                                <p class="text-sm text-textMedium">Posted by David Wong • UX Project</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">82% Match</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-textMedium mb-3">Looking for UX designer to help with e-commerce platform redesign. 3-month contract with possibility of extension.</p>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">UX Design</span>
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">E-commerce</span>
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Contract</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-textMedium">
+                                <i class="far fa-clock mr-1"></i>Posted 5 days ago
+                            </div>
+                            <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Venture Opportunity -->
+                    <div class="bg-lightSecondary rounded-lg p-4 shadow-sm">
+                        <div class="flex items-start mb-2">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
+                            <div>
+                                <h3 class="font-bold">FinTech Joint Venture</h3>
+                                <p class="text-sm text-textMedium">Posted by Michael Lin • Partnership</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">78% Match</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-textMedium mb-3">Established fintech company seeking partnership to expand into Asian markets. Looking for local expertise and connections.</p>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">FinTech</span>
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Partnership</span>
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">International</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-textMedium">
+                                <i class="far fa-clock mr-1"></i>Posted 1 week ago
+                            </div>
+                            <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Job Opportunity -->
+                    <div class="bg-lightSecondary rounded-lg p-4 shadow-sm">
+                        <div class="flex items-start mb-2">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full mr-3" alt="Profile photo">
+                            <div>
+                                <h3 class="font-bold">Director of Product Marketing</h3>
+                                <p class="text-sm text-textMedium">Posted by James Wilson • Job Opening</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">75% Match</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-textMedium mb-3">Growing SaaS company seeking Director of Product Marketing to lead go-to-market strategy for new enterprise solutions.</p>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Marketing</span>
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">SaaS</span>
+                            <span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">Full-time</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-textMedium">
+                                <i class="far fa-clock mr-1"></i>Posted 3 days ago
+                            </div>
+                            <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm font-medium">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Create Your Own Opportunity CTA -->
@@ -233,7 +493,7 @@
             </div>
 
             <!-- Analytics Dashboard Screen -->
-            <div id="analyticsScreen" class="screen hidden">
+            <div id="analyticsScreen" class="">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold">Networking Analytics</h2>
                     <button id="downloadReportBtn" class="text-primary text-sm">
@@ -294,8 +554,50 @@
                             <canvas id="industryDistributionChart" height="200"></canvas>
                         </div>
                         <div class="w-1/2">
-                            <div id="industryBreakdown">
-                                <!-- Industry breakdown will be added here by JavaScript -->
+                            <div class="mb-3">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs">Technology</span>
+                                    <span class="text-xs">45%</span>
+                                </div>
+                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                    <div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs">Finance</span>
+                                    <span class="text-xs">22%</span>
+                                </div>
+                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                    <div class="bg-secondary h-1.5 rounded-full" style="width: 22%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs">Healthcare</span>
+                                    <span class="text-xs">15%</span>
+                                </div>
+                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                    <div class="bg-accent h-1.5 rounded-full" style="width: 15%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs">Marketing</span>
+                                    <span class="text-xs">12%</span>
+                                </div>
+                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                    <div class="bg-purple-500 h-1.5 rounded-full" style="width: 12%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs">Other</span>
+                                    <span class="text-xs">6%</span>
+                                </div>
+                                <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                    <div class="bg-gray-500 h-1.5 rounded-full" style="width: 6%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -329,12 +631,117 @@
                         Update ROI Data
                     </button>
                 </div>
+                
+                <!-- Engagement Analytics -->
+                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                    <h3 class="text-base font-medium mb-3">Engagement Analytics</h3>
+                    
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium mb-2">Top Performing Content</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-file-alt text-primary"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm">AI in Healthcare: Future Perspectives</p>
+                                    <div class="flex text-xs text-textMedium">
+                                        <span class="mr-2"><i class="far fa-eye mr-1"></i>52</span>
+                                        <span class="mr-2"><i class="far fa-comment mr-1"></i>8</span>
+                                        <span><i class="far fa-share-square mr-1"></i>3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-image text-primary"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm">Speaking at Tech Conference 2023</p>
+                                    <div class="flex text-xs text-textMedium">
+                                        <span class="mr-2"><i class="far fa-eye mr-1"></i>43</span>
+                                        <span class="mr-2"><i class="far fa-comment mr-1"></i>12</span>
+                                        <span><i class="far fa-share-square mr-1"></i>5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-sm font-medium mb-2">Profile Completion</h4>
+                        <div class="flex items-center mb-1">
+                            <div class="w-full bg-lightTertiary rounded-full h-2.5 mr-2">
+                                <div class="bg-primary h-2.5 rounded-full" style="width: 92%"></div>
+                            </div>
+                            <span>92%</span>
+                        </div>
+                        <p class="text-xs text-textMedium">Add your certifications to reach 100%</p>
+                    </div>
+                </div>
+                
+                <!-- Contact Quality Metrics -->
+                <div class="bg-lightSecondary p-4 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-base font-medium">Connection Quality</h3>
+                        <button class="text-primary text-xs">View Details</button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <h4 class="text-sm mb-1">New Connections (Last 30 days)</h4>
+                            <div class="flex space-x-1">
+                                <div class="w-1/4 h-2 bg-success rounded-l"></div>
+                                <div class="w-1/6 h-2 bg-accent"></div>
+                                <div class="w-1/12 h-2 bg-danger rounded-r"></div>
+                                <div class="w-1/2 h-2 bg-lightTertiary rounded-r"></div>
+                            </div>
+                            <div class="flex text-xs mt-1">
+                                <div class="w-1/4"><span class="text-success">High Quality</span></div>
+                                <div class="w-1/6"><span class="text-accent">Medium</span></div>
+                                <div class="w-1/12"><span class="text-danger">Low</span></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm mb-1">Connection Engagement</h4>
+                            <div class="flex justify-between text-sm">
+                                <div>
+                                    <p class="font-medium">23</p>
+                                    <p class="text-xs text-textMedium">Active</p>
+                                </div>
+                                <div>
+                                    <p class="font-medium">45</p>
+                                    <p class="text-xs text-textMedium">Occasional</p>
+                                </div>
+                                <div>
+                                    <p class="font-medium">74</p>
+                                    <p class="text-xs text-textMedium">Dormant</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <button class="text-primary text-sm font-medium flex items-center">
+                                <i class="fas fa-sync-alt mr-1"></i> Reactivate Dormant Connections
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
+        <!-- Prominent Start Journey Button -->
+        <div class="fixed bottom-24 left-0 right-0 flex justify-center z-10">
+            <a href="onboarding.html" class="bg-primary hover:bg-primaryDark text-white font-bold py-3 px-8 rounded-full shadow-lg transition animate-pulse">
+                Start Your Professional Journey
+            </a>
+        </div>
+
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
-            <button id="navMatchBtn" class="text-primary flex flex-col items-center">
+            <button id="navMatchBtn" class="text-textLight flex flex-col items-center">
                 <i class="fas fa-user-friends text-xl"></i>
                 <span class="text-xs mt-1">Match</span>
             </button>
@@ -346,13 +753,169 @@
                 <i class="fas fa-briefcase text-xl"></i>
                 <span class="text-xs mt-1">Opportunities</span>
             </button>
-            <button id="navAnalyticsBtn" class="text-textLight flex flex-col items-center">
+            <button id="navAnalyticsBtn" class="text-primary flex flex-col items-center">
                 <i class="fas fa-chart-line text-xl"></i>
                 <span class="text-xs mt-1">Analytics</span>
             </button>
         </nav>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts for analytics
+            initializeCharts();
+            
+            // Show analytics screen as default
+            // document.getElementById('matchingScreen').classList.remove('hidden');
+            document.getElementById('analyticsScreen').classList.remove('hidden');
+            
+            // Navigation buttons
+            document.getElementById('navMatchBtn').addEventListener('click', function() {
+                hideAllScreens();
+                document.getElementById('matchingScreen').classList.remove('hidden');
+                highlightNavButton(this);
+            });
+            
+            document.getElementById('navSkillsBtn').addEventListener('click', function() {
+                hideAllScreens();
+                document.getElementById('skillsScreen').classList.remove('hidden');
+                highlightNavButton(this);
+            });
+            
+            document.getElementById('navOpportunitiesBtn').addEventListener('click', function() {
+                hideAllScreens();
+                document.getElementById('opportunitiesScreen').classList.remove('hidden');
+                highlightNavButton(this);
+            });
+            
+            document.getElementById('navAnalyticsBtn').addEventListener('click', function() {
+                hideAllScreens();
+                document.getElementById('analyticsScreen').classList.remove('hidden');
+                highlightNavButton(this);
+            });
+            
+            // Card swiping simulation
+            document.getElementById('skipBtn')?.addEventListener('click', function() {
+                simulateSwipe('left');
+            });
+            
+            document.getElementById('connectBtn')?.addEventListener('click', function() {
+                simulateSwipe('right');
+            });
+
+            // Function to initialize charts for analytics dashboard
+            function initializeCharts() {
+                // Network Growth Chart
+                const networkGrowthCtx = document.getElementById('networkGrowthChart')?.getContext('2d');
+                if (networkGrowthCtx) {
+                    new Chart(networkGrowthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Connections',
+                                data: [65, 78, 90, 105, 125, 142],
+                                borderColor: '#0078D4',
+                                backgroundColor: 'rgba(0, 120, 212, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Industry Distribution Chart
+                const industryDistributionCtx = document.getElementById('industryDistributionChart')?.getContext('2d');
+                if (industryDistributionCtx) {
+                    new Chart(industryDistributionCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Technology', 'Finance', 'Healthcare', 'Marketing', 'Other'],
+                            datasets: [{
+                                data: [45, 22, 15, 12, 6],
+                                backgroundColor: [
+                                    '#0078D4', // primary
+                                    '#2BC48A', // secondary
+                                    '#FFB900', // accent
+                                    '#9333EA', // purple
+                                    '#6B7280'  // gray
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Function to hide all screens
+            function hideAllScreens() {
+                const screens = ['matchingScreen', 'skillsScreen', 'opportunitiesScreen', 'analyticsScreen'];
+                screens.forEach(screen => {
+                    document.getElementById(screen).classList.add('hidden');
+                });
+            }
+            
+            // Function to highlight active nav button
+            function highlightNavButton(button) {
+                const navButtons = document.querySelectorAll('nav button');
+                navButtons.forEach(btn => {
+                    btn.classList.remove('text-primary');
+                    btn.classList.add('text-textLight');
+                });
+                button.classList.remove('text-textLight');
+                button.classList.add('text-primary');
+            }
+            
+            // Function to simulate card swipe in matching screen
+            function simulateSwipe(direction) {
+                const card = document.getElementById('currentCard');
+                if (!card) return;
+                
+                if (direction === 'left') {
+                    card.classList.add('translate-x-[-120%]', 'rotate-[-20deg]');
+                } else {
+                    card.classList.add('translate-x-[120%]', 'rotate-[20deg]');
+                }
+                
+                // Reset after animation
+                setTimeout(() => {
+                    card.classList.remove('translate-x-[-120%]', 'translate-x-[120%]', 'rotate-[-20deg]', 'rotate-[20deg]');
+                    // We'd load a new card here in a real app
+                }, 300);
+            }
+        });
+    </script>
 </body>
 </html>
