@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - User Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0078D4',
+                        primaryLight: '#50A0E4',
+                        primaryDark: '#106EBE',
+                        secondary: '#2BC48A',
+                        accent: '#FFB900',
+                        danger: '#E74C3C',
+                        success: '#27AE60',
+                        lightBg: '#FFFFFF',
+                        lightSecondary: '#F8F9FA',
+                        lightTertiary: '#E9ECEF',
+                        textDark: '#212529',
+                        textMedium: '#495057',
+                        textLight: '#6C757D'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-lightBg text-textDark min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-6">
+            <a href="search.html" class="text-primary">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-xl font-bold text-primary">Profile</h1>
+            <div class="w-8"></div> <!-- Empty div for balance -->
+        </header>
+
+        <!-- Profile Banner & Avatar -->
+        <div class="relative mb-20">
+            <div class="h-40 bg-gradient-to-r from-primary to-primaryLight rounded-t-lg"></div>
+            <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-16 flex flex-col items-center">
+                <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200">
+                    <img id="userImage" src="" class="w-full h-full object-cover" alt="Profile photo">
+                </div>
+                <div class="mt-2 text-center">
+                    <h2 id="userName" class="text-xl font-bold"></h2>
+                    <p id="userTitle" class="text-textMedium"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="mt-6">
+            <!-- Connection Options -->
+            <div class="flex space-x-3 mb-6 justify-center">
+                <button class="bg-primary hover:bg-primaryDark text-white py-2 px-6 rounded-lg font-semibold flex items-center">
+                    <i class="fas fa-user-plus mr-2"></i> Connect
+                </button>
+                <button class="bg-lightSecondary hover:bg-lightTertiary py-2 px-6 rounded-lg font-semibold flex items-center">
+                    <i class="fas fa-comment mr-2"></i> Message
+                </button>
+            </div>
+
+            <!-- Match Score -->
+            <div class="bg-gradient-to-r from-primary to-primaryLight text-white p-4 rounded-lg mb-6">
+                <h3 class="font-semibold mb-2">Connection Match Score</h3>
+                <div class="flex items-center">
+                    <div class="w-full bg-white/30 rounded-full h-2.5 mr-3">
+                        <div id="matchScoreBar" class="bg-white h-2.5 rounded-full" style="width: 75%"></div>
+                    </div>
+                    <span id="matchScore" class="font-bold">75%</span>
+                </div>
+                <div class="mt-2 text-sm">
+                    <p>You share <span id="commonSkills">3</span> common skills and similar industry experience</p>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                <h3 class="font-semibold mb-2">About</h3>
+                <p id="userAbout" class="text-sm text-textMedium"></p>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                <h3 class="font-semibold mb-2">Skills</h3>
+                <div id="userSkills" class="flex flex-wrap gap-2">
+                    <!-- Skills will be populated here -->
+                </div>
+            </div>
+
+            <!-- Experience Section -->
+            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                <h3 class="font-semibold mb-2">Experience</h3>
+                <div id="userExperience" class="space-y-3">
+                    <!-- Experience will be populated here -->
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
+                <h3 class="font-semibold mb-2">Contact</h3>
+                <p class="text-sm text-textMedium mb-2">Contact information is only visible to connections</p>
+                <button class="bg-primary text-white w-full py-2 rounded-lg font-medium">
+                    Connect to View Contact Info
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
+            <a href="index.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="chat.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-comments text-xl"></i>
+                <span class="text-xs mt-1">Chat</span>
+            </a>
+            <a href="search.html" class="text-primary flex flex-col items-center">
+                <i class="fas fa-search text-xl"></i>
+                <span class="text-xs mt-1">Search</span>
+            </a>
+            <a href="profile.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get user ID from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = parseInt(urlParams.get('id'));
+            
+            // Get sample users from localStorage
+            const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
+            
+            // Find the user by ID
+            const user = sampleUsers.find(u => u.id === userId);
+            
+            if (user) {
+                // Populate user profile data
+                document.title = `ProConnect - ${user.name}`;
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userTitle').textContent = `${user.title} at ${user.company}`;
+                document.getElementById('userImage').src = user.image;
+                document.getElementById('userImage').alt = user.name;
+                
+                // Match score
+                document.getElementById('matchScore').textContent = `${user.match}%`;
+                document.getElementById('matchScoreBar').style.width = `${user.match}%`;
+                document.getElementById('commonSkills').textContent = Math.floor(Math.random() * 5) + 1; // Random number of common skills
+                
+                // About section (generated)
+                document.getElementById('userAbout').textContent = `${user.title} with several years of experience in the ${user.industry} industry. Based in ${user.location}, specializing in ${user.skills.slice(0, 3).join(', ')}, and other areas.`;
+                
+                // Skills
+                const skillsContainer = document.getElementById('userSkills');
+                user.skills.forEach(skill => {
+                    const skillSpan = document.createElement('span');
+                    skillSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs';
+                    skillSpan.textContent = skill;
+                    skillsContainer.appendChild(skillSpan);
+                });
+                
+                // Experience (generated)
+                const experienceContainer = document.getElementById('userExperience');
+                
+                // Current role
+                const currentRole = document.createElement('div');
+                currentRole.className = 'flex';
+                currentRole.innerHTML = `
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                        <i class="fas fa-building text-primary"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium">${user.title}</h4>
+                        <p class="text-sm text-textMedium">${user.company} • 2020 - Present</p>
+                        <p class="text-xs text-textMedium mt-1">Leading strategic initiatives and team management in ${user.industry}</p>
+                    </div>
+                `;
+                experienceContainer.appendChild(currentRole);
+                
+                // Previous role
+                const prevRole = document.createElement('div');
+                prevRole.className = 'flex';
+                prevRole.innerHTML = `
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                        <i class="fas fa-building text-primary"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium">${user.title.includes('Senior') ? user.title.replace('Senior ', '') : 'Associate ' + user.title}</h4>
+                        <p class="text-sm text-textMedium">${user.company === 'TechCorp' ? 'InnovateTech' : 'TechCorp'} • 2017 - 2020</p>
+                        <p class="text-xs text-textMedium mt-1">Developing core competencies in ${user.skills.slice(0, 2).join(' and ')}</p>
+                    </div>
+                `;
+                experienceContainer.appendChild(prevRole);
+                
+                // Connect and Message buttons
+                document.querySelector('button.bg-primary').addEventListener('click', function() {
+                    alert(`Connection request sent to ${user.name}`);
+                });
+                
+                document.querySelector('button.bg-lightSecondary').addEventListener('click', function() {
+                    window.location.href = 'chat.html';
+                });
+            } else {
+                // User not found
+                document.body.innerHTML = `
+                    <div class="container mx-auto px-4 py-8 max-w-md text-center">
+                        <h1 class="text-xl font-bold text-primary mb-4">User Not Found</h1>
+                        <p class="text-textMedium mb-6">The user you're looking for doesn't exist or has been removed.</p>
+                        <a href="search.html" class="bg-primary text-white px-6 py-2 rounded-lg">Back to Search</a>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
