@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0078D4',
+                        primaryLight: '#50A0E4',
+                        primaryDark: '#106EBE',
+                        secondary: '#2BC48A',
+                        accent: '#FFB900',
+                        danger: '#E74C3C',
+                        success: '#27AE60',
+                        lightBg: '#FFFFFF',
+                        lightSecondary: '#F8F9FA',
+                        lightTertiary: '#E9ECEF',
+                        textDark: '#212529',
+                        textMedium: '#495057',
+                        textLight: '#6C757D'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-lightBg text-textDark min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-6">
+            <a href="index.html" class="text-primary">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-xl font-bold text-primary">Networking Analytics</h1>
+            <button id="downloadReportBtn" class="text-primary text-sm">
+                <i class="fas fa-download mr-1"></i>Report
+            </button>
+        </header>
+
+        <!-- Authentication Check -->
+        <div id="authCheck" class="hidden flex flex-col items-center justify-center py-8">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-lock text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Sign in to view analytics</h3>
+            <p class="text-textMedium mb-4 text-center">Please sign in or create an account to access your analytics</p>
+            <div class="flex space-x-4">
+                <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                    Sign In
+                </a>
+                <a href="onboarding.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
+                    Sign Up
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Analytics Content -->
+        <div id="analyticsContent">
+            <!-- Time Range Selector -->
+            <div class="bg-lightSecondary p-3 rounded-lg mb-4 flex justify-between items-center">
+                <button class="text-primary font-medium px-3 py-1 bg-primary/10 rounded-full text-sm">30 Days</button>
+                <button class="text-textMedium font-medium px-3 py-1 rounded-full text-sm">3 Months</button>
+                <button class="text-textMedium font-medium px-3 py-1 rounded-full text-sm">6 Months</button>
+                <button class="text-textMedium font-medium px-3 py-1 rounded-full text-sm">1 Year</button>
+            </div>
+
+            <!-- Overview Cards -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Network Size</h3>
+                        <span id="networkGrowthRate" class="text-xs text-success">+12%</span>
+                    </div>
+                    <p id="networkSize" class="text-xl font-bold">142</p>
+                    <p class="text-xs text-textMedium">Connections</p>
+                </div>
+                
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Profile Views</h3>
+                        <span id="profileViewsGrowth" class="text-xs text-success">+8%</span>
+                    </div>
+                    <p id="profileViews" class="text-xl font-bold">38</p>
+                    <p class="text-xs text-textMedium">Last 30 days</p>
+                </div>
+                
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Messages</h3>
+                        <span id="messagesGrowth" class="text-xs text-success">+23%</span>
+                    </div>
+                    <p id="messageCount" class="text-xl font-bold">27</p>
+                    <p class="text-xs text-textMedium">Last 30 days</p>
+                </div>
+                
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Response Rate</h3>
+                        <span id="responseRateGrowth" class="text-xs text-success">+5%</span>
+                    </div>
+                    <p id="responseRate" class="text-xl font-bold">82%</p>
+                    <p class="text-xs text-textMedium">Avg. time: 4h</p>
+                </div>
+            </div>
+            
+            <!-- Network Growth Chart -->
+            <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                <h3 class="text-base font-medium mb-3">Network Growth</h3>
+                <canvas id="networkGrowthChart" height="200"></canvas>
+            </div>
+            
+            <!-- Connection Distribution -->
+            <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                <h3 class="text-base font-medium mb-3">Connection Distribution</h3>
+                <div class="flex space-x-3">
+                    <div class="w-1/2">
+                        <canvas id="industryDistributionChart" height="200"></canvas>
+                    </div>
+                    <div class="w-1/2">
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Technology</span>
+                                <span class="text-xs">45%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Finance</span>
+                                <span class="text-xs">22%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-secondary h-1.5 rounded-full" style="width: 22%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Healthcare</span>
+                                <span class="text-xs">15%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-accent h-1.5 rounded-full" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Marketing</span>
+                                <span class="text-xs">12%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 12%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Other</span>
+                                <span class="text-xs">6%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-gray-500 h-1.5 rounded-full" style="width: 6%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Networking ROI Calculator -->
+            <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 text-white mb-4">
+                <h3 class="text-base font-medium mb-2">Networking ROI Calculator</h3>
+                <p class="text-sm mb-3">Track the value generated from your professional networking activities</p>
+                
+                <div class="bg-white/20 rounded-lg p-3 mb-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">Opportunities Generated</span>
+                        <span class="font-semibold">12</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">Meetings Conducted</span>
+                        <span class="font-semibold">18</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">Projects Secured</span>
+                        <span class="font-semibold">3</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium">Estimated Value</span>
+                        <span class="font-bold">$250,000</span>
+                    </div>
+                </div>
+                
+                <button class="bg-white text-primary font-medium w-full py-2 rounded-lg">
+                    Update ROI Data
+                </button>
+            </div>
+            
+            <!-- Engagement Analytics -->
+            <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                <h3 class="text-base font-medium mb-3">Engagement Analytics</h3>
+                
+                <div class="mb-4">
+                    <h4 class="text-sm font-medium mb-2">Top Performing Content</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-file-alt text-primary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm">AI in Healthcare: Future Perspectives</p>
+                                <div class="flex text-xs text-textMedium">
+                                    <span class="mr-2"><i class="far fa-eye mr-1"></i>52</span>
+                                    <span class="mr-2"><i class="far fa-comment mr-1"></i>8</span>
+                                    <span><i class="far fa-share-square mr-1"></i>3</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-image text-primary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm">Speaking at Tech Conference 2023</p>
+                                <div class="flex text-xs text-textMedium">
+                                    <span class="mr-2"><i class="far fa-eye mr-1"></i>43</span>
+                                    <span class="mr-2"><i class="far fa-comment mr-1"></i>12</span>
+                                    <span><i class="far fa-share-square mr-1"></i>5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-sm font-medium mb-2">Profile Completion</h4>
+                    <div class="flex items-center mb-1">
+                        <div class="w-full bg-lightTertiary rounded-full h-2.5 mr-2">
+                            <div class="bg-primary h-2.5 rounded-full" style="width: 92%"></div>
+                        </div>
+                        <span>92%</span>
+                    </div>
+                    <p class="text-xs text-textMedium">Add your certifications to reach 100%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
+            <a href="index.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="chat.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-comments text-xl"></i>
+                <span class="text-xs mt-1">Chat</span>
+            </a>
+            <a href="analytics.html" class="text-primary flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Analytics</span>
+            </a>
+            <a href="profile.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const authCheck = document.getElementById('authCheck');
+            const analyticsContent = document.getElementById('analyticsContent');
+            
+            if (!currentUser) {
+                // Show auth check message and hide analytics content
+                authCheck.classList.remove('hidden');
+                analyticsContent.classList.add('hidden');
+                return;
+            } else {
+                // Hide auth check message and show analytics content
+                authCheck.classList.add('hidden');
+                analyticsContent.classList.remove('hidden');
+            }
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Download report button
+            document.getElementById('downloadReportBtn').addEventListener('click', function() {
+                alert('Report download functionality will be available in the next update.');
+            });
+            
+            // Function to initialize charts
+            function initializeCharts() {
+                // Network Growth Chart
+                const networkGrowthCtx = document.getElementById('networkGrowthChart')?.getContext('2d');
+                if (networkGrowthCtx) {
+                    new Chart(networkGrowthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Connections',
+                                data: [65, 78, 90, 105, 125, 142],
+                                borderColor: '#0078D4',
+                                backgroundColor: 'rgba(0, 120, 212, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Industry Distribution Chart
+                const industryDistributionCtx = document.getElementById('industryDistributionChart')?.getContext('2d');
+                if (industryDistributionCtx) {
+                    new Chart(industryDistributionCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Technology', 'Finance', 'Healthcare', 'Marketing', 'Other'],
+                            datasets: [{
+                                data: [45, 22, 15, 12, 6],
+                                backgroundColor: [
+                                    '#0078D4', // primary
+                                    '#2BC48A', // secondary
+                                    '#FFB900', // accent
+                                    '#9333EA', // purple
+                                    '#6B7280'  // gray
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
