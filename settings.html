@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0078D4',
+                        primaryLight: '#50A0E4',
+                        primaryDark: '#106EBE',
+                        secondary: '#2BC48A',
+                        accent: '#FFB900',
+                        danger: '#E74C3C',
+                        success: '#27AE60',
+                        lightBg: '#FFFFFF',
+                        lightSecondary: '#F8F9FA',
+                        lightTertiary: '#E9ECEF',
+                        textDark: '#212529',
+                        textMedium: '#495057',
+                        textLight: '#6C757D'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-lightBg text-textDark min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-6">
+            <a href="profile.html" class="text-primary">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-xl font-bold text-primary">Settings</h1>
+            <div class="w-6"></div> <!-- Empty div for balanced header -->
+        </header>
+
+        <!-- Authentication Check -->
+        <div id="authCheck" class="hidden flex flex-col items-center justify-center py-8">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-lock text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Sign in to access settings</h3>
+            <p class="text-textMedium mb-4 text-center">Please sign in or create an account to manage your settings</p>
+            <div class="flex space-x-4">
+                <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                    Sign In
+                </a>
+                <a href="onboarding.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
+                    Sign Up
+                </a>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div id="settingsContent">
+            <!-- Account Settings -->
+            <div class="bg-lightSecondary rounded-lg overflow-hidden mb-6">
+                <div class="bg-primary/5 p-4 border-b border-gray-200">
+                    <h2 class="font-semibold">Account Settings</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Email Address</h3>
+                            <p id="userEmail" class="text-sm text-textMedium">user@example.com</p>
+                        </div>
+                        <button class="text-primary text-sm">Change</button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Password</h3>
+                            <p class="text-sm text-textMedium">Last changed 30 days ago</p>
+                        </div>
+                        <button class="text-primary text-sm">Update</button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Two-Factor Authentication</h3>
+                            <p class="text-sm text-textMedium">Increase your account security</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="twoFactorToggle" class="sr-only">
+                            <label for="twoFactorToggle" class="block bg-gray-300 w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ease-in-out">
+                                <span class="block w-4 h-4 mt-1 ml-1 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Settings -->
+            <div class="bg-lightSecondary rounded-lg overflow-hidden mb-6">
+                <div class="bg-primary/5 p-4 border-b border-gray-200">
+                    <h2 class="font-semibold">Privacy & Visibility</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Profile Visibility</h3>
+                            <p class="text-sm text-textMedium">Who can see your full profile</p>
+                        </div>
+                        <select class="bg-lightBg border rounded px-2 py-1 text-sm">
+                            <option>Everyone</option>
+                            <option>Connections Only</option>
+                            <option>Private</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Contact Information</h3>
+                            <p class="text-sm text-textMedium">Who can see your contact details</p>
+                        </div>
+                        <select class="bg-lightBg border rounded px-2 py-1 text-sm">
+                            <option>Connections Only</option>
+                            <option>Everyone</option>
+                            <option>Private</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Connection Requests</h3>
+                            <p class="text-sm text-textMedium">Who can send you connection requests</p>
+                        </div>
+                        <select class="bg-lightBg border rounded px-2 py-1 text-sm">
+                            <option>Everyone</option>
+                            <option>2nd Connections</option>
+                            <option>Nobody</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="bg-lightSecondary rounded-lg overflow-hidden mb-6">
+                <div class="bg-primary/5 p-4 border-b border-gray-200">
+                    <h2 class="font-semibold">Notification Preferences</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Email Notifications</h3>
+                            <p class="text-sm text-textMedium">Receive updates via email</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="emailToggle" class="sr-only" checked>
+                            <label for="emailToggle" class="block bg-primary w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ease-in-out">
+                                <span class="block w-4 h-4 mt-1 ml-7 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Connection Requests</h3>
+                            <p class="text-sm text-textMedium">Notify when someone wants to connect</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="connectionToggle" class="sr-only" checked>
+                            <label for="connectionToggle" class="block bg-primary w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ease-in-out">
+                                <span class="block w-4 h-4 mt-1 ml-7 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Messages</h3>
+                            <p class="text-sm text-textMedium">Notify when you receive messages</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="messagesToggle" class="sr-only" checked>
+                            <label for="messagesToggle" class="block bg-primary w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ease-in-out">
+                                <span class="block w-4 h-4 mt-1 ml-7 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Endorsements</h3>
+                            <p class="text-sm text-textMedium">Notify about skill endorsements</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="endorsementsToggle" class="sr-only" checked>
+                            <label for="endorsementsToggle" class="block bg-primary w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ease-in-out">
+                                <span class="block w-4 h-4 mt-1 ml-7 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Display Settings -->
+            <div class="bg-lightSecondary rounded-lg overflow-hidden mb-6">
+                <div class="bg-primary/5 p-4 border-b border-gray-200">
+                    <h2 class="font-semibold">Display Settings</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Dark Mode</h3>
+                            <p class="text-sm text-textMedium">Use dark theme</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="darkModeToggle" class="sr-only">
+                            <label for="darkModeToggle" class="block bg-gray-300 w-12 h-6 rounded-full relative cursor-pointer transition-colors duration-300 ease-in-out">
+                                <span class="block w-4 h-4 mt-1 ml-1 bg-white rounded-full transition-transform duration-300 ease-in-out"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Language</h3>
+                            <p class="text-sm text-textMedium">Select your preferred language</p>
+                        </div>
+                        <select class="bg-lightBg border rounded px-2 py-1 text-sm">
+                            <option>English</option>
+                            <option>Spanish</option>
+                            <option>French</option>
+                            <option>German</option>
+                            <option>Chinese</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data & Privacy -->
+            <div class="bg-lightSecondary rounded-lg overflow-hidden mb-6">
+                <div class="bg-primary/5 p-4 border-b border-gray-200">
+                    <h2 class="font-semibold">Data & Privacy</h2>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Download Your Data</h3>
+                            <p class="text-sm text-textMedium">Get a copy of your ProConnect data</p>
+                        </div>
+                        <button class="text-primary text-sm">Export</button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-medium">Delete Account</h3>
+                            <p class="text-sm text-textMedium">Permanently remove your account</p>
+                        </div>
+                        <button class="text-danger text-sm">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session & Logout -->
+            <div class="bg-lightSecondary rounded-lg overflow-hidden mb-6">
+                <div class="bg-primary/5 p-4 border-b border-gray-200">
+                    <h2 class="font-semibold">Session</h2>
+                </div>
+                <div class="p-4">
+                    <button id="logoutBtn" class="w-full bg-lightTertiary hover:bg-gray-300 text-textDark font-medium py-2 rounded-lg transition">
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
+            <a href="index.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="chat.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-comments text-xl"></i>
+                <span class="text-xs mt-1">Chat</span>
+            </a>
+            <a href="search.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-search text-xl"></i>
+                <span class="text-xs mt-1">Search</span>
+            </a>
+            <a href="profile.html" class="text-primary flex flex-col items-center">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const authCheck = document.getElementById('authCheck');
+            const settingsContent = document.getElementById('settingsContent');
+            
+            if (!currentUser) {
+                // Show auth check message and hide settings content
+                authCheck.classList.remove('hidden');
+                settingsContent.classList.add('hidden');
+                return;
+            } else {
+                // Hide auth check message and show settings content
+                authCheck.classList.add('hidden');
+                settingsContent.classList.remove('hidden');
+                
+                // Set user email
+                document.getElementById('userEmail').textContent = currentUser.email || 'user@example.com';
+            }
+            
+            // Toggle functionality for switches
+            const toggles = ['twoFactorToggle', 'emailToggle', 'connectionToggle', 'messagesToggle', 'endorsementsToggle', 'darkModeToggle'];
+            
+            toggles.forEach(toggleId => {
+                const toggle = document.getElementById(toggleId);
+                if (toggle) {
+                    toggle.addEventListener('change', function() {
+                        const label = this.nextElementSibling;
+                        if (this.checked) {
+                            label.classList.remove('bg-gray-300');
+                            label.classList.add('bg-primary');
+                            label.querySelector('span').classList.remove('ml-1');
+                            label.querySelector('span').classList.add('ml-7');
+                        } else {
+                            label.classList.remove('bg-primary');
+                            label.classList.add('bg-gray-300');
+                            label.querySelector('span').classList.remove('ml-7');
+                            label.querySelector('span').classList.add('ml-1');
+                        }
+                    });
+                }
+            });
+            
+            // Handle dark mode toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                // Check if dark mode is preferred by system
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    darkModeToggle.checked = true;
+                    darkModeToggle.dispatchEvent(new Event('change'));
+                    document.documentElement.classList.add('dark');
+                }
+                
+                darkModeToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                });
+            }
+            
+            // Handle logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                // Clear user data
+                localStorage.removeItem('currentUser');
+                
+                // Redirect to login page
+                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                window.location.href = baseUrl + "index.html";
+            });
+        });
+    </script>
+</body>
+</html>
