@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProConnect - Search</title>
+    <title>ProConnect - Professional Match</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -29,6 +29,140 @@
             }
         }
     </script>
+    <style>
+        /* Card swiping animation */
+        .card-container {
+            position: relative;
+            height: 450px;
+            max-width: 350px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            overflow: hidden;
+        }
+        
+        .card-next {
+            transform: translateY(15px) scale(0.95);
+            opacity: 0.8;
+            z-index: -1;
+        }
+        
+        .card-swipe-left {
+            transform: translateX(-150%) rotate(-25deg);
+            opacity: 0;
+        }
+        
+        .card-swipe-right {
+            transform: translateX(150%) rotate(25deg);
+            opacity: 0;
+        }
+        
+        .card-header {
+            height: 35%;
+            background: linear-gradient(90deg, #0078D4, #50A0E4);
+            position: relative;
+        }
+        
+        .card-body {
+            padding: 70px 20px 20px;
+            height: 65%;
+            overflow-y: auto;
+        }
+        
+        .profile-image {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background-color: #f0f0f0;
+            bottom: -40px;
+            left: 20px;
+            object-fit: cover;
+        }
+        
+        .swipe-indicator {
+            position: absolute;
+            top: 40%;
+            font-size: 4rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(-50%);
+            transition: opacity 0.2s;
+            padding: 20px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .swipe-left {
+            left: 30px;
+            color: #E74C3C;
+            transform: rotate(-25deg);
+        }
+        
+        .swipe-right {
+            right: 30px;
+            color: #27AE60;
+            transform: rotate(25deg);
+        }
+        
+        .swipe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.2), transparent 30%, transparent 70%, rgba(39, 174, 96, 0.2));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        /* Progress bar */
+        .swipe-progress {
+            height: 6px;
+            border-radius: 3px;
+            background-color: #E9ECEF;
+            margin-bottom: 1rem;
+        }
+        
+        .swipe-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            background-color: #0078D4;
+            transition: width 0.3s ease;
+        }
+        
+        /* Swipe limit notification */
+        .swipe-limit-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            max-width: 300px;
+        }
+    </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md pb-20">
@@ -37,8 +171,10 @@
             <a href="index.html" class="text-primary">
                 <i class="fas fa-arrow-left text-xl"></i>
             </a>
-            <h1 class="text-xl font-bold text-primary">Search</h1>
-            <div class="w-6"></div> <!-- Empty div for balanced header -->
+            <h1 class="text-xl font-bold text-primary">Professional Match</h1>
+            <button id="filterBtn" class="text-primary">
+                <i class="fas fa-sliders-h text-xl"></i>
+            </button>
         </header>
 
         <!-- Authentication Check -->
@@ -46,8 +182,8 @@
             <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <i class="fas fa-lock text-primary text-2xl"></i>
             </div>
-            <h3 class="text-lg font-semibold mb-2">Sign in to search</h3>
-            <p class="text-textMedium mb-4 text-center">Please sign in or create an account to search for professionals</p>
+            <h3 class="text-lg font-semibold mb-2">Sign in to find matches</h3>
+            <p class="text-textMedium mb-4 text-center">Please sign in or create an account to browse professionals</p>
             <div class="flex space-x-4">
                 <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
                     Sign In
@@ -76,49 +212,58 @@
                 <button class="filter-btn whitespace-nowrap px-3 py-1 bg-lightTertiary text-textDark rounded-full text-sm" data-filter="location">Location</button>
             </div>
             
-            <!-- Advanced Filters (initially hidden) -->
-            <div id="advancedFilters" class="bg-lightSecondary p-4 rounded-lg mb-4 hidden">
-                <h3 class="font-medium mb-3">Advanced Filters</h3>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block mb-1 text-sm font-medium">Experience Level</label>
-                        <select class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                            <option value="">Any</option>
-                            <option value="0-2">0-2 years</option>
-                            <option value="3-5">3-5 years</option>
-                            <option value="6-10">6-10 years</option>
-                            <option value="10+">10+ years</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block mb-1 text-sm font-medium">Position Level</label>
-                        <select class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                            <option value="">Any</option>
-                            <option value="Entry">Entry Level</option>
-                            <option value="Mid">Mid Level</option>
-                            <option value="Senior">Senior Level</option>
-                            <option value="Manager">Manager</option>
-                            <option value="Director">Director</option>
-                            <option value="Executive">Executive</option>
-                        </select>
-                    </div>
-                    <div class="flex justify-end">
-                        <button class="bg-primary text-white px-4 py-1 rounded-lg text-sm">Apply Filters</button>
-                    </div>
+            <!-- Swipe Counter -->
+            <div class="mb-4">
+                <div class="flex justify-between mb-1">
+                    <span class="text-xs text-textMedium">Today's Swipes</span>
+                    <span id="swipeCounter" class="text-xs text-textMedium">0/20</span>
                 </div>
-            </div>
-            
-            <div class="flex justify-between items-center">
-                <button id="toggleAdvancedBtn" class="text-primary text-sm flex items-center">
-                    <i class="fas fa-sliders-h mr-1"></i> Advanced
-                </button>
-                <span class="text-sm text-textMedium" id="resultsCount">24 results</span>
+                <div class="swipe-progress">
+                    <div id="swipeProgressBar" class="swipe-progress-bar" style="width: 0%"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Search Results -->
-        <div id="searchResults" class="space-y-3">
-            <!-- Results will be populated dynamically -->
+        <!-- Cards Container -->
+        <div id="cardDeck" class="card-container mb-8 hidden">
+            <!-- Cards will be added dynamically here -->
+        </div>
+        
+        <!-- No Results State -->
+        <div id="noResultsState" class="hidden text-center py-8">
+            <i class="fas fa-search text-4xl text-textLight mb-3"></i>
+            <p class="text-textMedium">No results found</p>
+            <p class="text-sm text-textLight">Try adjusting your search or filters</p>
+        </div>
+        
+        <!-- Swipe Limit Reached State -->
+        <div id="swipeLimitState" class="hidden flex flex-col items-center justify-center py-8">
+            <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-clock text-accent text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Daily Swipe Limit Reached</h3>
+            <p class="text-textMedium mb-4 text-center">You've used all 20 swipes for today. Come back tomorrow for more matches!</p>
+            <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                Return Home
+            </a>
+        </div>
+
+        <!-- Swipe Buttons -->
+        <div id="swipeButtons" class="flex justify-center space-x-8 mb-6 hidden">
+            <button id="swipeLeftBtn" class="w-14 h-14 bg-lightTertiary rounded-full flex items-center justify-center shadow-md hover:bg-gray-300 transition">
+                <i class="fas fa-times text-danger text-xl"></i>
+            </button>
+            <button id="swipeRightBtn" class="w-14 h-14 bg-lightTertiary rounded-full flex items-center justify-center shadow-md hover:bg-gray-300 transition">
+                <i class="fas fa-check text-success text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Swipe Limit Alert -->
+        <div id="swipeLimitAlert" class="swipe-limit-alert">
+            <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+            <h3 class="text-lg font-bold mb-2">Swipe Limit Reached</h3>
+            <p class="mb-4">You've used all your swipes for today. Come back tomorrow for more matches!</p>
+            <button id="closeAlertBtn" class="bg-white text-black px-4 py-2 rounded-lg">Got it</button>
         </div>
 
         <!-- Bottom Navigation -->
@@ -133,7 +278,7 @@
             </a>
             <a href="search.html" class="text-primary flex flex-col items-center">
                 <i class="fas fa-search text-xl"></i>
-                <span class="text-xs mt-1">Search</span>
+                <span class="text-xs mt-1">Find</span>
             </a>
             <a href="profile.html" class="text-textLight flex flex-col items-center">
                 <i class="fas fa-user text-xl"></i>
@@ -148,19 +293,49 @@
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const authCheck = document.getElementById('authCheck');
             const searchForm = document.getElementById('searchForm');
-            const searchResults = document.getElementById('searchResults');
+            const cardDeck = document.getElementById('cardDeck');
+            const swipeButtons = document.getElementById('swipeButtons');
+            const noResultsState = document.getElementById('noResultsState');
+            const swipeLimitState = document.getElementById('swipeLimitState');
+            const swipeCounter = document.getElementById('swipeCounter');
+            const swipeProgressBar = document.getElementById('swipeProgressBar');
+            const swipeLeftBtn = document.getElementById('swipeLeftBtn');
+            const swipeRightBtn = document.getElementById('swipeRightBtn');
+            const swipeLimitAlert = document.getElementById('swipeLimitAlert');
+            const closeAlertBtn = document.getElementById('closeAlertBtn');
+            
+            // Constants
+            const DAILY_SWIPE_LIMIT = 20;
+            const SWIPE_STORAGE_KEY = 'proconnect_daily_swipes';
+            
+            // Current state
+            let currentCardIndex = 0;
+            let filteredUsers = [];
+            let isAnimating = false;
+            let startX, startY, moveX, moveY;
+            let dailySwipes = getDailySwipes();
             
             if (!currentUser) {
                 // Show auth check message and hide search form
                 authCheck.classList.remove('hidden');
                 searchForm.classList.add('hidden');
-                searchResults.classList.add('hidden');
+                cardDeck.classList.add('hidden');
+                swipeButtons.classList.add('hidden');
                 return;
             } else {
                 // Hide auth check message and show search form
                 authCheck.classList.add('hidden');
                 searchForm.classList.remove('hidden');
-                searchResults.classList.remove('hidden');
+                
+                // Check if daily swipe limit is reached
+                if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
+                    showSwipeLimitState();
+                } else {
+                    initializeCardDeck();
+                }
+                
+                // Update swipe counter
+                updateSwipeCounter();
             }
             
             // Sample user data for search results
@@ -172,6 +347,7 @@
                     company: "TechCorp",
                     industry: "Technology",
                     location: "San Francisco, CA",
+                    bio: "Experienced product manager specializing in AI-powered solutions. Looking to connect with technical experts and industry professionals.",
                     skills: ["Product Management", "User Research", "UX Design", "Agile", "Strategy"],
                     image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                     match: 98
@@ -183,6 +359,7 @@
                     company: "Innovate Inc",
                     industry: "Technology",
                     location: "New York, NY",
+                    bio: "Serial entrepreneur with 3 successful exits. Currently building solutions in the fintech space. Looking for co-founders and investors.",
                     skills: ["Business Strategy", "Startup", "Fundraising", "Product Development", "Marketing"],
                     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                     match: 87
@@ -194,6 +371,7 @@
                     company: "CodeTech",
                     industry: "Technology",
                     location: "Austin, TX",
+                    bio: "Full-stack developer with expertise in React and Node.js. Passionate about mentoring junior developers and building scalable applications.",
                     skills: ["JavaScript", "React", "Node.js", "Cloud Architecture", "Team Leadership"],
                     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                     match: 82
@@ -205,6 +383,7 @@
                     company: "Global Banking",
                     industry: "Finance",
                     location: "Singapore",
+                    bio: "Finance professional with international experience. Specializing in investment strategy and risk management for high-growth companies.",
                     skills: ["Financial Strategy", "Investment", "Risk Management", "Banking", "Leadership"],
                     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                     match: 76
@@ -216,6 +395,7 @@
                     company: "Brand Solutions",
                     industry: "Marketing",
                     location: "Chicago, IL",
+                    bio: "Creative marketing director with a passion for data-driven strategies. Expertise in digital marketing, content creation, and brand development.",
                     skills: ["Digital Marketing", "Brand Strategy", "Content Creation", "Analytics", "Team Management"],
                     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                     match: 73
@@ -227,6 +407,7 @@
                     company: "Health Innovations",
                     industry: "Healthcare",
                     location: "Boston, MA",
+                    bio: "Healthcare consultant with a background in medicine. Helping healthcare organizations adopt new technologies and improve patient outcomes.",
                     skills: ["Healthcare Strategy", "Medical Devices", "Regulatory Affairs", "Clinical Trials", "Market Analysis"],
                     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80",
                     match: 68
@@ -236,13 +417,444 @@
             // Store users in localStorage for profile viewing
             localStorage.setItem('sampleUsers', JSON.stringify(users));
             
-            // Populate search results initially
-            populateSearchResults(users);
-            document.getElementById('resultsCount').textContent = `${users.length} results`;
+            // Function to get daily swipes from localStorage
+            function getDailySwipes() {
+                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+                const storedSwipes = JSON.parse(localStorage.getItem(SWIPE_STORAGE_KEY)) || { date: today, count: 0 };
+                
+                // Reset counter if it's a new day
+                if (storedSwipes.date !== today) {
+                    storedSwipes.date = today;
+                    storedSwipes.count = 0;
+                    localStorage.setItem(SWIPE_STORAGE_KEY, JSON.stringify(storedSwipes));
+                }
+                
+                return storedSwipes;
+            }
+            
+            // Function to update swipe counter
+            function updateSwipeCounter() {
+                dailySwipes = getDailySwipes();
+                swipeCounter.textContent = `${dailySwipes.count}/${DAILY_SWIPE_LIMIT}`;
+                
+                // Update progress bar
+                const progressPercentage = (dailySwipes.count / DAILY_SWIPE_LIMIT) * 100;
+                swipeProgressBar.style.width = `${progressPercentage}%`;
+                
+                // Change color based on usage
+                if (progressPercentage > 75) {
+                    swipeProgressBar.classList.add('bg-danger');
+                    swipeProgressBar.classList.remove('bg-primary');
+                } else {
+                    swipeProgressBar.classList.add('bg-primary');
+                    swipeProgressBar.classList.remove('bg-danger');
+                }
+            }
+            
+            // Function to increment swipe counter
+            function incrementSwipeCounter() {
+                dailySwipes.count++;
+                localStorage.setItem(SWIPE_STORAGE_KEY, JSON.stringify(dailySwipes));
+                updateSwipeCounter();
+                
+                // Check if limit is reached
+                if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
+                    showSwipeLimitAlert();
+                }
+            }
+            
+            // Function to show swipe limit alert
+            function showSwipeLimitAlert() {
+                swipeLimitAlert.style.display = 'block';
+                setTimeout(() => {
+                    showSwipeLimitState();
+                }, 2000);
+            }
+            
+            // Function to show swipe limit state
+            function showSwipeLimitState() {
+                cardDeck.classList.add('hidden');
+                swipeButtons.classList.add('hidden');
+                swipeLimitState.classList.remove('hidden');
+            }
+            
+            // Function to initialize card deck
+            function initializeCardDeck() {
+                // Initialize with all users
+                filteredUsers = [...users];
+                
+                // Show card deck & swipe buttons if there are users
+                if (filteredUsers.length > 0) {
+                    cardDeck.classList.remove('hidden');
+                    swipeButtons.classList.remove('hidden');
+                    noResultsState.classList.add('hidden');
+                    
+                    // Create cards
+                    createCards();
+                } else {
+                    cardDeck.classList.add('hidden');
+                    swipeButtons.classList.add('hidden');
+                    noResultsState.classList.remove('hidden');
+                }
+            }
+            
+            // Function to create cards
+            function createCards() {
+                cardDeck.innerHTML = '';
+                
+                // Add cards for first few users (showing 3 cards at most)
+                const cardsToShow = Math.min(3, filteredUsers.length);
+                
+                for (let i = 0; i < cardsToShow; i++) {
+                    const user = filteredUsers[i];
+                    const card = createCard(user, i);
+                    cardDeck.appendChild(card);
+                }
+                
+                // Set current index to 0
+                currentCardIndex = 0;
+            }
+            
+            // Function to create a single card
+            function createCard(user, index) {
+                const card = document.createElement('div');
+                card.className = `card ${index === 0 ? '' : 'card-next'}`;
+                card.style.zIndex = 10 - index;
+                
+                // Create swipe indicators (hidden initially)
+                const swipeLeftIndicator = document.createElement('div');
+                swipeLeftIndicator.className = 'swipe-indicator swipe-left';
+                swipeLeftIndicator.innerHTML = '<i class="fas fa-times"></i>';
+                
+                const swipeRightIndicator = document.createElement('div');
+                swipeRightIndicator.className = 'swipe-indicator swipe-right';
+                swipeRightIndicator.innerHTML = '<i class="fas fa-check"></i>';
+                
+                // Create swipe overlay
+                const swipeOverlay = document.createElement('div');
+                swipeOverlay.className = 'swipe-overlay';
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <img src="${user.image}" alt="${user.name}" class="profile-image">
+                    </div>
+                    <div class="card-body">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-lg font-bold">${user.name}</h3>
+                                <p class="text-sm text-textMedium">${user.title} at ${user.company}</p>
+                            </div>
+                            <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-medium">${user.match}% Match</span>
+                        </div>
+                        <p class="text-sm text-textMedium mb-3">${user.bio}</p>
+                        <div class="mb-3">
+                            <h4 class="text-sm font-medium mb-1">Skills</h4>
+                            <div class="flex flex-wrap gap-1">
+                                ${user.skills.map(skill => 
+                                    `<span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">${skill}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium mb-1">Location</h4>
+                            <p class="text-sm text-textMedium"><i class="fas fa-map-marker-alt mr-1"></i>${user.location}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Add swipe indicators and overlay
+                card.appendChild(swipeLeftIndicator);
+                card.appendChild(swipeRightIndicator);
+                card.appendChild(swipeOverlay);
+                
+                // Add event listeners for touch/mouse events
+                if (index === 0) {
+                    addSwipeEvents(card);
+                }
+                
+                return card;
+            }
+            
+            // Function to add swipe events to card
+            function addSwipeEvents(card) {
+                // Touch events
+                card.addEventListener('touchstart', handleTouchStart, false);
+                card.addEventListener('touchmove', handleTouchMove, false);
+                card.addEventListener('touchend', handleTouchEnd, false);
+                
+                // Mouse events
+                card.addEventListener('mousedown', handleMouseDown, false);
+                document.addEventListener('mousemove', handleMouseMove, false);
+                document.addEventListener('mouseup', handleMouseUp, false);
+            }
+            
+            // Touch event handlers
+            function handleTouchStart(e) {
+                if (isAnimating) return;
+                
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                moveX = 0;
+                moveY = 0;
+                
+                e.preventDefault();
+            }
+            
+            function handleTouchMove(e) {
+                if (isAnimating || !startX) return;
+                
+                moveX = e.touches[0].clientX - startX;
+                moveY = e.touches[0].clientY - startY;
+                
+                // Update card position
+                updateCardPosition(this, moveX, moveY);
+                
+                e.preventDefault();
+            }
+            
+            function handleTouchEnd(e) {
+                if (isAnimating || !startX) return;
+                
+                // Check if it's a swipe
+                if (Math.abs(moveX) > 100) {
+                    if (moveX > 0) {
+                        swipeRight(this);
+                    } else {
+                        swipeLeft(this);
+                    }
+                } else {
+                    // Reset position
+                    resetCardPosition(this);
+                }
+                
+                startX = null;
+                startY = null;
+                
+                e.preventDefault();
+            }
+            
+            // Mouse event handlers
+            function handleMouseDown(e) {
+                if (isAnimating) return;
+                
+                startX = e.clientX;
+                startY = e.clientY;
+                moveX = 0;
+                moveY = 0;
+                
+                e.preventDefault();
+            }
+            
+            function handleMouseMove(e) {
+                if (isAnimating || !startX) return;
+                
+                moveX = e.clientX - startX;
+                moveY = e.clientY - startY;
+                
+                // Get the current card
+                const currentCard = document.querySelector('.card:not(.card-next)');
+                if (currentCard) {
+                    // Update card position
+                    updateCardPosition(currentCard, moveX, moveY);
+                }
+                
+                e.preventDefault();
+            }
+            
+            function handleMouseUp(e) {
+                if (isAnimating || !startX) return;
+                
+                // Get the current card
+                const currentCard = document.querySelector('.card:not(.card-next)');
+                if (currentCard) {
+                    // Check if it's a swipe
+                    if (Math.abs(moveX) > 100) {
+                        if (moveX > 0) {
+                            swipeRight(currentCard);
+                        } else {
+                            swipeLeft(currentCard);
+                        }
+                    } else {
+                        // Reset position
+                        resetCardPosition(currentCard);
+                    }
+                }
+                
+                startX = null;
+                startY = null;
+                
+                e.preventDefault();
+            }
+            
+            // Function to update card position during swipe
+            function updateCardPosition(card, moveX, moveY) {
+                const rotation = moveX * 0.03; // Rotate slightly based on distance
+                card.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${rotation}deg)`;
+                
+                // Update swipe indicators and overlay
+                const swipeOverlay = card.querySelector('.swipe-overlay');
+                if (Math.abs(moveX) > 50) {
+                    if (moveX > 0) {
+                        card.querySelector('.swipe-right').style.opacity = Math.min(moveX / 100, 1);
+                        card.querySelector('.swipe-left').style.opacity = 0;
+                    } else {
+                        card.querySelector('.swipe-left').style.opacity = Math.min(Math.abs(moveX) / 100, 1);
+                        card.querySelector('.swipe-right').style.opacity = 0;
+                    }
+                    swipeOverlay.style.opacity = Math.min(Math.abs(moveX) / 300, 0.5);
+                } else {
+                    card.querySelector('.swipe-right').style.opacity = 0;
+                    card.querySelector('.swipe-left').style.opacity = 0;
+                    swipeOverlay.style.opacity = 0;
+                }
+            }
+            
+            // Function to reset card position
+            function resetCardPosition(card) {
+                isAnimating = true;
+                card.style.transition = 'transform 0.3s ease';
+                card.style.transform = '';
+                
+                // Reset swipe indicators and overlay
+                card.querySelector('.swipe-right').style.opacity = 0;
+                card.querySelector('.swipe-left').style.opacity = 0;
+                card.querySelector('.swipe-overlay').style.opacity = 0;
+                
+                setTimeout(() => {
+                    card.style.transition = '';
+                    isAnimating = false;
+                }, 300);
+            }
+            
+            // Function to swipe card left (skip)
+            function swipeLeft(card) {
+                // Check if swipe limit reached
+                if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
+                    resetCardPosition(card);
+                    showSwipeLimitAlert();
+                    return;
+                }
+                
+                isAnimating = true;
+                
+                // Animate card off screen to the left
+                card.style.transition = 'transform 0.5s ease';
+                card.classList.add('card-swipe-left');
+                
+                // Increment swipe counter
+                incrementSwipeCounter();
+                
+                // After animation, remove card and show next
+                setTimeout(() => {
+                    processNextCard();
+                    isAnimating = false;
+                }, 500);
+            }
+            
+            // Function to swipe card right (connect)
+            function swipeRight(card) {
+                // Check if swipe limit reached
+                if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
+                    resetCardPosition(card);
+                    showSwipeLimitAlert();
+                    return;
+                }
+                
+                isAnimating = true;
+                
+                // Animate card off screen to the right
+                card.style.transition = 'transform 0.5s ease';
+                card.classList.add('card-swipe-right');
+                
+                // Get user that was swiped
+                const user = filteredUsers[currentCardIndex];
+                
+                // Handle successful match
+                handleMatch(user);
+                
+                // Increment swipe counter
+                incrementSwipeCounter();
+                
+                // After animation, remove card and show next
+                setTimeout(() => {
+                    processNextCard();
+                    isAnimating = false;
+                }, 500);
+            }
+            
+            // Function to handle a successful match
+            function handleMatch(user) {
+                // In a real app, you would send this to the server
+                console.log(`Matched with ${user.name}!`);
+                
+                // For demo purposes, add to current user's connections
+                if (currentUser) {
+                    if (!currentUser.connections) {
+                        currentUser.connections = [];
+                    }
+                    
+                    // Add to connections if not already there
+                    const alreadyConnected = currentUser.connections.some(conn => conn.id === user.id);
+                    if (!alreadyConnected) {
+                        currentUser.connections.push({
+                            id: user.id,
+                            name: user.name,
+                            timestamp: new Date().getTime()
+                        });
+                        
+                        // Update current user in localStorage
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        
+                        // If this is a real connection, we would show a match notification here
+                    }
+                }
+            }
+            
+            // Function to process next card
+            function processNextCard() {
+                // Remove the current card
+                const currentCard = document.querySelector('.card:not(.card-next)');
+                if (currentCard) {
+                    currentCard.remove();
+                }
+                
+                // Move to next card index
+                currentCardIndex++;
+                
+                // Make the next card current
+                const nextCard = document.querySelector('.card.card-next');
+                if (nextCard) {
+                    nextCard.classList.remove('card-next');
+                    addSwipeEvents(nextCard);
+                }
+                
+                // Check if we need to add more cards
+                const cardCount = document.querySelectorAll('.card').length;
+                if (cardCount < 3 && currentCardIndex + cardCount < filteredUsers.length) {
+                    const newUserIndex = currentCardIndex + cardCount;
+                    const newCard = createCard(filteredUsers[newUserIndex], cardCount);
+                    cardDeck.appendChild(newCard);
+                }
+                
+                // Check if we've run out of cards
+                if (cardCount === 0) {
+                    if (currentCardIndex >= filteredUsers.length) {
+                        // No more users to show
+                        noResultsState.classList.remove('hidden');
+                        swipeButtons.classList.add('hidden');
+                    } else {
+                        // Add back the current card (this shouldn't normally happen)
+                        const newCard = createCard(filteredUsers[currentCardIndex], 0);
+                        cardDeck.appendChild(newCard);
+                    }
+                }
+            }
             
             // Search input functionality
             const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', performSearch);
+            searchInput.addEventListener('input', function() {
+                performSearch();
+            });
             
             // Filter buttons functionality
             const filterButtons = document.querySelectorAll('.filter-btn');
@@ -261,88 +873,74 @@
                 });
             });
             
-            // Toggle advanced filters
-            document.getElementById('toggleAdvancedBtn').addEventListener('click', function() {
-                const advancedFilters = document.getElementById('advancedFilters');
-                advancedFilters.classList.toggle('hidden');
-            });
-            
-            // Search function
+            // Function to perform search and filter
             function performSearch() {
+                if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
+                    // Don't update if swipe limit is reached
+                    return;
+                }
+                
                 const searchTerm = searchInput.value.toLowerCase();
                 const activeFilter = document.querySelector('.filter-btn.bg-primary').getAttribute('data-filter');
                 
-                let filteredUsers = users;
-                
-                // Filter based on search term
-                if (searchTerm) {
-                    filteredUsers = users.filter(user => {
-                        if (activeFilter === 'all') {
-                            return user.name.toLowerCase().includes(searchTerm) || 
-                                   user.title.toLowerCase().includes(searchTerm) ||
-                                   user.company.toLowerCase().includes(searchTerm) ||
-                                   user.skills.some(skill => skill.toLowerCase().includes(searchTerm)) ||
-                                   user.industry.toLowerCase().includes(searchTerm) ||
-                                   user.location.toLowerCase().includes(searchTerm);
-                        } else if (activeFilter === 'skills') {
-                            return user.skills.some(skill => skill.toLowerCase().includes(searchTerm));
-                        } else if (activeFilter === 'company') {
-                            return user.company.toLowerCase().includes(searchTerm);
-                        } else if (activeFilter === 'industry') {
-                            return user.industry.toLowerCase().includes(searchTerm);
-                        } else if (activeFilter === 'location') {
-                            return user.location.toLowerCase().includes(searchTerm);
-                        }
-                        return false;
-                    });
-                }
-                
-                // Update search results
-                populateSearchResults(filteredUsers);
-                document.getElementById('resultsCount').textContent = `${filteredUsers.length} results`;
-            }
-            
-            // Populate search results
-            function populateSearchResults(users) {
-                const resultsContainer = document.getElementById('searchResults');
-                resultsContainer.innerHTML = '';
-                
-                users.forEach(user => {
-                    const userCard = document.createElement('div');
-                    userCard.className = 'bg-lightSecondary rounded-lg p-3 shadow-sm';
-                    userCard.innerHTML = `
-                        <div class="flex items-start">
-                            <img src="${user.image}" class="w-12 h-12 rounded-full object-cover mr-3" alt="${user.name}">
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <a href="user-profile.html?id=${user.id}" class="font-medium hover:text-primary">${user.name}</a>
-                                    <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">${user.match}% Match</span>
-                                </div>
-                                <p class="text-sm text-textMedium">${user.title} at ${user.company}</p>
-                                <p class="text-xs text-textMedium">${user.location}</p>
-                                <div class="flex flex-wrap gap-1 mt-2">
-                                    ${user.skills.slice(0, 3).map(skill => 
-                                        `<span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">${skill}</span>`
-                                    ).join('')}
-                                    ${user.skills.length > 3 ? `<span class="text-xs text-textMedium">+${user.skills.length - 3} more</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    resultsContainer.appendChild(userCard);
+                filteredUsers = users.filter(user => {
+                    if (activeFilter === 'all') {
+                        return user.name.toLowerCase().includes(searchTerm) || 
+                               user.title.toLowerCase().includes(searchTerm) ||
+                               user.company.toLowerCase().includes(searchTerm) ||
+                               user.skills.some(skill => skill.toLowerCase().includes(searchTerm)) ||
+                               user.industry.toLowerCase().includes(searchTerm) ||
+                               user.location.toLowerCase().includes(searchTerm);
+                    } else if (activeFilter === 'skills') {
+                        return user.skills.some(skill => skill.toLowerCase().includes(searchTerm));
+                    } else if (activeFilter === 'company') {
+                        return user.company.toLowerCase().includes(searchTerm);
+                    } else if (activeFilter === 'industry') {
+                        return user.industry.toLowerCase().includes(searchTerm);
+                    } else if (activeFilter === 'location') {
+                        return user.location.toLowerCase().includes(searchTerm);
+                    }
+                    return false;
                 });
                 
-                // If no results
-                if (users.length === 0) {
-                    resultsContainer.innerHTML = `
-                        <div class="text-center py-8">
-                            <i class="fas fa-search text-4xl text-textLight mb-3"></i>
-                            <p class="text-textMedium">No results found</p>
-                            <p class="text-sm text-textLight">Try adjusting your search or filters</p>
-                        </div>
-                    `;
+                // Reset card index and recreate cards
+                currentCardIndex = 0;
+                
+                // Show card deck & swipe buttons if there are users
+                if (filteredUsers.length > 0) {
+                    cardDeck.classList.remove('hidden');
+                    swipeButtons.classList.remove('hidden');
+                    noResultsState.classList.add('hidden');
+                    
+                    // Create cards
+                    createCards();
+                } else {
+                    cardDeck.classList.add('hidden');
+                    swipeButtons.classList.add('hidden');
+                    noResultsState.classList.remove('hidden');
                 }
             }
+            
+            // Swipe buttons functionality
+            swipeLeftBtn.addEventListener('click', function() {
+                const currentCard = document.querySelector('.card:not(.card-next)');
+                if (currentCard && !isAnimating) {
+                    swipeLeft(currentCard);
+                }
+            });
+            
+            swipeRightBtn.addEventListener('click', function() {
+                const currentCard = document.querySelector('.card:not(.card-next)');
+                if (currentCard && !isAnimating) {
+                    swipeRight(currentCard);
+                }
+            });
+            
+            // Close alert button
+            closeAlertBtn.addEventListener('click', function() {
+                swipeLimitAlert.style.display = 'none';
+                showSwipeLimitState();
+            });
         });
     </script>
 </body>
