@@ -6,6 +6,8 @@
     <title>ProConnect - Messages</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include the user search utility -->
+    <script src="user-search.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -65,6 +67,45 @@
             0% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.05); opacity: 1; }
             100% { transform: scale(1); opacity: 0.8; }
+        }
+        
+        /* User list styling */
+        .user-list-item {
+            transition: all 0.2s ease;
+        }
+        
+        .user-list-item:active {
+            background-color: rgba(0, 120, 212, 0.1);
+        }
+        
+        /* Typing indicator */
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #6C757D;
+            margin-right: 3px;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation: typingAnimation 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation: typingAnimation 1.4s infinite;
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation: typingAnimation 1.4s infinite;
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingAnimation {
+            0% { opacity: 0.3; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-3px); }
+            100% { opacity: 0.3; transform: translateY(0); }
         }
     </style>
 </head>
@@ -126,6 +167,12 @@
                 <button id="startConversationBtn" class="bg-primary text-white px-6 py-2 rounded-lg flex items-center">
                     <i class="fas fa-plus mr-2"></i> New Message
                 </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden flex flex-col items-center justify-center py-8">
+                <div class="w-16 h-16 rounded-full border-4 border-primary/30 border-t-primary animate-spin mb-4"></div>
+                <h3 class="text-lg font-semibold">Loading conversations...</h3>
             </div>
 
             <!-- Messages List (Shown only if authenticated and has messages) -->
@@ -238,6 +285,7 @@
             const authCheck = document.getElementById('authCheck');
             const messagesList = document.getElementById('messagesList');
             const emptyState = document.getElementById('emptyState');
+            const loadingState = document.getElementById('loadingState');
             const chatView = document.getElementById('chatView');
             const newMessagePanel = document.getElementById('newMessagePanel');
             const newMessageBtn = document.getElementById('newMessageBtn');
@@ -256,6 +304,7 @@
             let currentChatUserId = null;
             let registeredUsers = [];
             let conversations = [];
+            let isLoading = true;
             
             // Check if user is logged in
             if (!currentUser) {
@@ -263,17 +312,25 @@
                 authCheck.classList.remove('hidden');
                 messagesList.classList.add('hidden');
                 emptyState.classList.add('hidden');
+                loadingState.classList.add('hidden');
                 return;
             } else {
-                // Hide auth check message
+                // Hide auth check message, show loading
                 authCheck.classList.add('hidden');
+                loadingState.classList.remove('hidden');
                 
                 // Load conversations and registered users
-                loadConversations();
-                loadUsers();
-                
-                // Display conversations or empty state
-                displayConversations();
+                setTimeout(() => {
+                    loadConversations();
+                    loadUsers();
+                    
+                    // Update UI after loading
+                    isLoading = false;
+                    loadingState.classList.add('hidden');
+                    
+                    // Display conversations or empty state
+                    displayConversations();
+                }, 500); // Simulate loading time
             }
             
             // Function to load conversations
@@ -290,62 +347,8 @@
             
             // Function to load registered users
             function loadUsers() {
-                // Get all stored users from various sources
-                
-                // 1. Get from sampleUsers (if using the dummy data from search.html)
-                const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
-                
-                // 2. Try to get any registered users
-                let registeredUsersList = [];
-                
-                // Scan localStorage for user data with a specific pattern
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    
-                    // Check if this is a user object (not the current user or other data)
-                    if (key === 'currentUser') {
-                        continue; // Skip current user
-                    }
-                    
-                    try {
-                        const value = JSON.parse(localStorage.getItem(key));
-                        // Check if this looks like a user object
-                        if (value && value.fullName && value.id && value.id !== currentUser.id) {
-                            registeredUsersList.push(value);
-                        }
-                    } catch (e) {
-                        // Not a valid JSON, skip
-                        continue;
-                    }
-                }
-                
-                // Combine users from different sources, avoiding duplicates
-                const allUsers = [...sampleUsers, ...registeredUsersList];
-                
-                // Remove duplicates by ID
-                const userMap = new Map();
-                allUsers.forEach(user => {
-                    if (!userMap.has(user.id)) {
-                        userMap.set(user.id, user);
-                    }
-                });
-                
-                // Also ensure current user's connections are included
-                if (currentUser.connections) {
-                    currentUser.connections.forEach(conn => {
-                        if (!userMap.has(conn.id)) {
-                            // Create a minimal user object if not found elsewhere
-                            userMap.set(conn.id, {
-                                id: conn.id,
-                                fullName: conn.name,
-                                profileImage: conn.profileImage || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
-                            });
-                        }
-                    });
-                }
-                
-                // Convert map to array
-                registeredUsers = Array.from(userMap.values());
+                // Use the ProConnectUsers utility to get all registered users
+                registeredUsers = ProConnectUsers.getAllUsers();
             }
             
             // Function to display conversations
@@ -395,27 +398,26 @@
                     
                     if (conversation.messages.length > 0) {
                         const lastMsg = conversation.messages[conversation.messages.length - 1];
-                        latestMessage = lastMsg.content;
                         
-                        // Format timestamp
-                        const msgDate = new Date(lastMsg.timestamp);
-                        const today = new Date();
-                        const yesterday = new Date(today);
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        
-                        if (msgDate.toDateString() === today.toDateString()) {
-                            // Today - show time
-                            latestTime = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        } else if (msgDate.toDateString() === yesterday.toDateString()) {
-                            // Yesterday
-                            latestTime = 'Yesterday';
+                        // Skip system messages for display
+                        if (lastMsg.sender === 'system') {
+                            if (conversation.messages.length > 1) {
+                                const prevMsg = conversation.messages[conversation.messages.length - 2];
+                                latestMessage = prevMsg.content;
+                                // Format timestamp for the previous message
+                                latestTime = formatConversationTime(prevMsg.timestamp);
+                            } else {
+                                latestMessage = "New connection";
+                                latestTime = formatConversationTime(lastMsg.timestamp);
+                            }
                         } else {
-                            // Earlier - show date
-                            latestTime = msgDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                            latestMessage = lastMsg.content;
+                            // Format timestamp
+                            latestTime = formatConversationTime(lastMsg.timestamp);
                         }
                         
                         // Count unread messages
-                        unreadCount = conversation.messages.filter(msg => !msg.read && msg.sender !== currentUser.id).length;
+                        unreadCount = conversation.messages.filter(msg => !msg.read && msg.sender !== currentUser.id && msg.sender !== 'system').length;
                     }
                     
                     // Create conversation item
@@ -429,7 +431,7 @@
                     item.innerHTML = `
                         <div class="flex items-center">
                             <div class="relative mr-3">
-                                <img src="${user.profileImage || 'https://via.placeholder.com/200'}" class="w-12 h-12 rounded-full object-cover" alt="Profile photo">
+                                <img src="${user.profileImage}" class="w-12 h-12 rounded-full object-cover" alt="Profile photo">
                                 ${isOnline ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>' : ''}
                             </div>
                             <div class="flex-1">
@@ -438,7 +440,7 @@
                                     <span class="text-xs text-textLight">${latestTime}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <p class="text-sm text-textMedium truncate">${latestMessage || 'Start a conversation'}</p>
+                                    <p class="text-sm text-textMedium truncate max-w-[180px]">${latestMessage || 'Start a conversation'}</p>
                                     ${unreadCount > 0 ? `<span class="bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center ml-2">${unreadCount}</span>` : ''}
                                 </div>
                             </div>
@@ -452,6 +454,25 @@
                         openChat(conversation.userId);
                     });
                 });
+            }
+            
+            // Function to format conversation time
+            function formatConversationTime(timestamp) {
+                const msgDate = new Date(timestamp);
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (msgDate.toDateString() === today.toDateString()) {
+                    // Today - show time
+                    return msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } else if (msgDate.toDateString() === yesterday.toDateString()) {
+                    // Yesterday
+                    return 'Yesterday';
+                } else {
+                    // Earlier - show date
+                    return msgDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                }
             }
             
             // Function to find user by ID
@@ -472,7 +493,12 @@
                     // Create new conversation
                     conversation = {
                         userId: userId,
-                        messages: []
+                        messages: [{
+                            sender: 'system',
+                            content: `You are now connected with ${user.fullName}! Say hello to start the conversation.`,
+                            timestamp: Date.now(),
+                            read: true
+                        }]
                     };
                     conversations.push(conversation);
                     saveConversations();
@@ -483,8 +509,8 @@
                 
                 // Update chat header
                 document.getElementById('chatUserName').textContent = user.fullName;
-                document.getElementById('chatUserStatus').textContent = Math.random() > 0.5 ? 'Online' : 'Last seen recently';
-                document.getElementById('chatUserImage').src = user.profileImage || 'https://via.placeholder.com/200';
+                document.getElementById('chatUserStatus').textContent = user.currentRole ? `${user.currentRole}${user.company ? ' at ' + user.company : ''}` : (Math.random() > 0.5 ? 'Online' : 'Last seen recently');
+                document.getElementById('chatUserImage').src = user.profileImage;
                 
                 // Mark all messages as read
                 conversation.messages.forEach(msg => {
@@ -499,28 +525,17 @@
                 
                 // Show chat view
                 chatView.classList.remove('hidden');
+                
+                // Focus on message input
+                setTimeout(() => {
+                    messageInput.focus();
+                }, 300);
             }
             
             // Function to display chat messages
             function displayChatMessages(conversation) {
                 const messagesContainer = document.getElementById('chatMessages');
                 messagesContainer.innerHTML = '';
-                
-                // If no messages, show welcome message
-                if (conversation.messages.length === 0) {
-                    const welcomeDiv = document.createElement('div');
-                    welcomeDiv.className = 'flex justify-center';
-                    welcomeDiv.innerHTML = `
-                        <div class="bg-primary/5 px-4 py-2 rounded-lg text-center">
-                            <p class="text-sm text-textMedium">
-                                This is the beginning of your conversation.<br>
-                                Say hello!
-                            </p>
-                        </div>
-                    `;
-                    messagesContainer.appendChild(welcomeDiv);
-                    return;
-                }
                 
                 // Group messages by date
                 let currentDate = null;
@@ -555,6 +570,19 @@
                         messagesContainer.appendChild(dateSeparator);
                     }
                     
+                    // Handle system messages differently
+                    if (message.sender === 'system') {
+                        const systemMessageElement = document.createElement('div');
+                        systemMessageElement.className = 'flex justify-center my-4';
+                        systemMessageElement.innerHTML = `
+                            <div class="bg-primary/5 px-4 py-2 rounded-lg">
+                                <p class="text-sm text-textMedium text-center">${message.content}</p>
+                            </div>
+                        `;
+                        messagesContainer.appendChild(systemMessageElement);
+                        return;
+                    }
+                    
                     // Add message
                     const messageElement = document.createElement('div');
                     
@@ -577,7 +605,7 @@
                         const user = findUserById(message.sender);
                         messageElement.className = 'flex items-end';
                         messageElement.innerHTML = `
-                            <img src="${user?.profileImage || 'https://via.placeholder.com/200'}" class="w-8 h-8 rounded-full object-cover mr-2" alt="Profile photo">
+                            <img src="${user?.profileImage}" class="w-8 h-8 rounded-full object-cover mr-2" alt="Profile photo">
                             <div class="max-w-[80%]">
                                 <div class="bg-lightSecondary p-3 chat-bubble-received">
                                     <p class="text-sm">${message.content}</p>
@@ -630,75 +658,95 @@
                 // Update display
                 displayChatMessages(conversation);
                 
-                // Simulate received message after a delay (for demo purposes)
+                // Show typing indicator after a short delay
                 setTimeout(() => {
-                    simulateResponse(conversation);
-                }, 1000 + Math.random() * 3000);
+                    showTypingIndicator();
+                    
+                    // Simulate received message after a delay (for demo purposes)
+                    setTimeout(() => {
+                        hideTypingIndicator();
+                        simulateResponse(conversation);
+                    }, 1000 + Math.random() * 3000);
+                }, 500);
             }
             
-            // Function to simulate response (for demo purposes)
-            function simulateResponse(conversation) {
-                // Set typing indicator
+            // Function to show typing indicator
+            function showTypingIndicator() {
                 const messagesContainer = document.getElementById('chatMessages');
+                
+                // Remove existing typing indicator if any
+                const existingIndicator = document.getElementById('typingIndicator');
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                }
+                
+                // Create typing indicator
                 const typingElement = document.createElement('div');
                 typingElement.className = 'flex items-end typing-indicator';
                 typingElement.id = 'typingIndicator';
                 
-                const user = findUserById(conversation.userId);
+                const user = findUserById(currentChatUserId);
                 
                 typingElement.innerHTML = `
-                    <img src="${user?.profileImage || 'https://via.placeholder.com/200'}" class="w-8 h-8 rounded-full object-cover mr-2" alt="Profile photo">
+                    <img src="${user?.profileImage}" class="w-8 h-8 rounded-full object-cover mr-2" alt="Profile photo">
                     <div class="max-w-[80%]">
-                        <div class="bg-lightSecondary p-3 chat-bubble-received flex space-x-1">
-                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                            <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
+                        <div class="bg-lightSecondary p-3 chat-bubble-received">
+                            <div class="flex items-center">
+                                <span class="typing-dot"></span>
+                                <span class="typing-dot"></span>
+                                <span class="typing-dot"></span>
+                            </div>
                         </div>
                     </div>
                 `;
                 
                 messagesContainer.appendChild(typingElement);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // Function to hide typing indicator
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            // Function to simulate response (for demo purposes)
+            function simulateResponse(conversation) {
+                // Sample responses
+                const responses = [
+                    "That's interesting, tell me more!",
+                    "I agree with your perspective.",
+                    "Thanks for sharing that information!",
+                    "Good point, I hadn't thought of it that way.",
+                    "I'd love to discuss this further sometime.",
+                    "That aligns with my experience as well.",
+                    "What made you interested in this topic?",
+                    "I appreciate your insights!",
+                    "Let's schedule a call to discuss further.",
+                    "Do you have any resources on this subject you could share?"
+                ];
                 
-                // Generate a response after a delay
-                setTimeout(() => {
-                    // Remove typing indicator
-                    document.getElementById('typingIndicator')?.remove();
-                    
-                    // Sample responses
-                    const responses = [
-                        "That's interesting, tell me more!",
-                        "I agree with your perspective.",
-                        "Thanks for sharing that information!",
-                        "Good point, I hadn't thought of it that way.",
-                        "I'd love to discuss this further sometime.",
-                        "That aligns with my experience as well.",
-                        "What made you interested in this topic?",
-                        "I appreciate your insights!",
-                        "Let's schedule a call to discuss further.",
-                        "Do you have any resources on this subject you could share?"
-                    ];
-                    
-                    // Select random response
-                    const responseText = responses[Math.floor(Math.random() * responses.length)];
-                    
-                    // Create message object
-                    const responseMessage = {
-                        sender: conversation.userId,
-                        content: responseText,
-                        timestamp: Date.now(),
-                        read: true // Mark as read since we're already in the chat
-                    };
-                    
-                    // Add message to conversation
-                    conversation.messages.push(responseMessage);
-                    
-                    // Save conversations
-                    saveConversations();
-                    
-                    // Update display
-                    displayChatMessages(conversation);
-                }, 1500);
+                // Select random response
+                const responseText = responses[Math.floor(Math.random() * responses.length)];
+                
+                // Create message object
+                const responseMessage = {
+                    sender: conversation.userId,
+                    content: responseText,
+                    timestamp: Date.now(),
+                    read: true // Mark as read since we're already in the chat
+                };
+                
+                // Add message to conversation
+                conversation.messages.push(responseMessage);
+                
+                // Save conversations
+                saveConversations();
+                
+                // Update display
+                displayChatMessages(conversation);
             }
             
             // Function to search for users
@@ -717,12 +765,8 @@
                     return;
                 }
                 
-                // Filter users based on search term
-                const filteredUsers = registeredUsers.filter(user => 
-                    user.fullName.toLowerCase().includes(searchTerm) ||
-                    (user.currentRole && user.currentRole.toLowerCase().includes(searchTerm)) ||
-                    (user.company && user.company.toLowerCase().includes(searchTerm))
-                );
+                // Search users with ProConnectUsers utility
+                const filteredUsers = ProConnectUsers.searchUsers(searchTerm, 'all');
                 
                 if (filteredUsers.length === 0) {
                     userSearchResults.innerHTML = `
@@ -735,15 +779,26 @@
                 
                 // Create results
                 filteredUsers.forEach(user => {
+                    // Check if conversation already exists
+                    const existingConvo = conversations.find(c => c.userId == user.id);
+                    const isConnection = currentUser.connections && currentUser.connections.some(conn => conn.id == user.id);
+                    
                     const userItem = document.createElement('div');
-                    userItem.className = 'flex items-center p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
+                    userItem.className = 'user-list-item flex items-center p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
                     
                     userItem.innerHTML = `
-                        <img src="${user.profileImage || 'https://via.placeholder.com/200'}" class="w-12 h-12 rounded-full object-cover mr-3" alt="Profile photo">
-                        <div>
+                        <img src="${user.profileImage}" class="w-12 h-12 rounded-full object-cover mr-3" alt="Profile photo">
+                        <div class="flex-1">
                             <h3 class="font-medium">${user.fullName}</h3>
-                            <p class="text-sm text-textMedium">${user.currentRole || ''} ${user.company ? 'at ' + user.company : ''}</p>
+                            <p class="text-sm text-textMedium">${user.currentRole || ''}${user.company ? ' at ' + user.company : ''}</p>
                         </div>
+                        ${existingConvo ? 
+                            '<span class="text-primary text-sm">Message</span>' : 
+                            (isConnection ? 
+                                '<span class="text-primary text-sm">Connect</span>' : 
+                                '<span class="text-textLight text-sm">Add Connection</span>'
+                            )
+                        }
                     `;
                     
                     userSearchResults.appendChild(userItem);
@@ -757,6 +812,31 @@
             
             // Function to start a new conversation
             function startNewConversation(userId) {
+                // Check if this is a new connection
+                let isNewConnection = false;
+                
+                if (currentUser.connections) {
+                    isNewConnection = !currentUser.connections.some(conn => conn.id == userId);
+                } else {
+                    currentUser.connections = [];
+                    isNewConnection = true;
+                }
+                
+                // If new connection, add it
+                if (isNewConnection) {
+                    const user = findUserById(userId);
+                    if (user) {
+                        currentUser.connections.push({
+                            id: userId,
+                            name: user.fullName,
+                            timestamp: Date.now(),
+                            profileImage: user.profileImage
+                        });
+                        
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    }
+                }
+                
                 // Close new message panel
                 newMessagePanel.classList.add('slide-out');
                 
@@ -829,8 +909,11 @@
             // View profile button
             viewProfileBtn.addEventListener('click', function() {
                 if (currentChatUserId) {
+                    // Store the user ID for viewing
+                    localStorage.setItem('viewProfileId', currentChatUserId);
+                    
                     // Redirect to user profile page
-                    window.location.href = `user-profile.html?id=${currentChatUserId}`;
+                    window.location.href = `profile.html?view=${currentChatUserId}`;
                 }
             });
         });
