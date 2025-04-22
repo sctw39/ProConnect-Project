@@ -6,6 +6,7 @@
     <title>ProConnect - My Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -120,6 +121,21 @@
             from {bottom: 100px; opacity: 1;}
             to {bottom: 0; opacity: 0;}
         }
+        
+        /* Tab transitions */
+        .tab-content {
+            transition: opacity 0.3s ease;
+        }
+        
+        .tab-content.hidden {
+            display: none;
+            opacity: 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
@@ -166,8 +182,14 @@
             </div>
         </div>
 
-        <!-- Profile Content -->
-        <div class="mt-6">
+        <!-- Profile Tabs -->
+        <div class="flex justify-center mb-4 mt-6 border-b">
+            <button id="profileTabBtn" class="px-4 py-2 border-b-2 border-primary text-primary font-medium">Profile</button>
+            <button id="analyticsTabBtn" class="px-4 py-2 border-b-2 border-transparent text-textMedium font-medium">Analytics</button>
+        </div>
+
+        <!-- PROFILE TAB CONTENT -->
+        <div id="profileTabContent" class="tab-content active">
             <!-- Profile Stats -->
             <div class="flex justify-around bg-lightSecondary p-4 rounded-lg mb-6">
                 <div class="text-center">
@@ -277,6 +299,197 @@
             </div>
         </div>
 
+        <!-- ANALYTICS TAB CONTENT -->
+        <div id="analyticsTabContent" class="tab-content hidden">
+            <!-- Time Range Selector -->
+            <div class="bg-lightSecondary p-3 rounded-lg mb-4 flex justify-between items-center overflow-x-auto">
+                <button class="text-primary font-medium px-3 py-1 bg-primary/10 rounded-full text-sm whitespace-nowrap">30 Days</button>
+                <button class="text-textMedium font-medium px-3 py-1 rounded-full text-sm whitespace-nowrap">3 Months</button>
+                <button class="text-textMedium font-medium px-3 py-1 rounded-full text-sm whitespace-nowrap">6 Months</button>
+                <button class="text-textMedium font-medium px-3 py-1 rounded-full text-sm whitespace-nowrap">1 Year</button>
+            </div>
+
+            <!-- Overview Cards -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Network Size</h3>
+                        <span id="networkGrowthRate" class="text-xs text-success">+12%</span>
+                    </div>
+                    <p id="networkSizeAnalytics" class="text-xl font-bold">142</p>
+                    <p class="text-xs text-textMedium">Connections</p>
+                </div>
+                
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Profile Views</h3>
+                        <span id="profileViewsGrowth" class="text-xs text-success">+8%</span>
+                    </div>
+                    <p id="profileViews" class="text-xl font-bold">38</p>
+                    <p class="text-xs text-textMedium">Last 30 days</p>
+                </div>
+                
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Messages</h3>
+                        <span id="messagesGrowth" class="text-xs text-success">+23%</span>
+                    </div>
+                    <p id="messageCount" class="text-xl font-bold">27</p>
+                    <p class="text-xs text-textMedium">Last 30 days</p>
+                </div>
+                
+                <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-sm font-medium">Response Rate</h3>
+                        <span id="responseRateGrowth" class="text-xs text-success">+5%</span>
+                    </div>
+                    <p id="responseRate" class="text-xl font-bold">82%</p>
+                    <p class="text-xs text-textMedium">Avg. time: 4h</p>
+                </div>
+            </div>
+            
+            <!-- Network Growth Chart -->
+            <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                <h3 class="text-base font-medium mb-3">Network Growth</h3>
+                <canvas id="networkGrowthChart" height="200"></canvas>
+            </div>
+            
+            <!-- Connection Distribution -->
+            <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                <h3 class="text-base font-medium mb-3">Connection Distribution</h3>
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-3">
+                    <div class="w-full md:w-1/2">
+                        <canvas id="industryDistributionChart" height="200"></canvas>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Technology</span>
+                                <span class="text-xs">45%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Finance</span>
+                                <span class="text-xs">22%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-secondary h-1.5 rounded-full" style="width: 22%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Healthcare</span>
+                                <span class="text-xs">15%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-accent h-1.5 rounded-full" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Marketing</span>
+                                <span class="text-xs">12%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 12%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs">Other</span>
+                                <span class="text-xs">6%</span>
+                            </div>
+                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                                <div class="bg-gray-500 h-1.5 rounded-full" style="width: 6%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Networking ROI Calculator -->
+            <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 text-white mb-4">
+                <h3 class="text-base font-medium mb-2">Networking ROI Calculator</h3>
+                <p class="text-sm mb-3">Track the value generated from your professional networking activities</p>
+                
+                <div class="bg-white/20 rounded-lg p-3 mb-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">Opportunities Generated</span>
+                        <span class="font-semibold">12</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">Meetings Conducted</span>
+                        <span class="font-semibold">18</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">Projects Secured</span>
+                        <span class="font-semibold">3</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium">Estimated Value</span>
+                        <span class="font-bold">$250,000</span>
+                    </div>
+                </div>
+                
+                <button class="bg-white text-primary font-medium w-full py-2 rounded-lg">
+                    Update ROI Data
+                </button>
+            </div>
+            
+            <!-- Engagement Analytics -->
+            <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
+                <h3 class="text-base font-medium mb-3">Engagement Analytics</h3>
+                
+                <div class="mb-4">
+                    <h4 class="text-sm font-medium mb-2">Top Performing Content</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-file-alt text-primary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm">AI in Healthcare: Future Perspectives</p>
+                                <div class="flex text-xs text-textMedium">
+                                    <span class="mr-2"><i class="far fa-eye mr-1"></i>52</span>
+                                    <span class="mr-2"><i class="far fa-comment mr-1"></i>8</span>
+                                    <span><i class="far fa-share-square mr-1"></i>3</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-image text-primary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm">Speaking at Tech Conference 2023</p>
+                                <div class="flex text-xs text-textMedium">
+                                    <span class="mr-2"><i class="far fa-eye mr-1"></i>43</span>
+                                    <span class="mr-2"><i class="far fa-comment mr-1"></i>12</span>
+                                    <span><i class="far fa-share-square mr-1"></i>5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-sm font-medium mb-2">Profile Completion</h4>
+                    <div class="flex items-center mb-1">
+                        <div class="w-full bg-lightTertiary rounded-full h-2.5 mr-2">
+                            <div id="profileCompletionBar" class="bg-primary h-2.5 rounded-full" style="width: 92%"></div>
+                        </div>
+                        <span id="profileCompletionPercentage">92%</span>
+                    </div>
+                    <p class="text-xs text-textMedium">Add your certifications to reach 100%</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Toast Notification -->
         <div id="toastNotification" class="toast rounded-lg">This is a notification</div>
 
@@ -290,9 +503,9 @@
                 <i class="fas fa-comments text-xl"></i>
                 <span class="text-xs mt-1">Chat</span>
             </a>
-            <a href="analytics.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-chart-line text-xl"></i>
-                <span class="text-xs mt-1">Analytics</span>
+            <a href="search.html" class="text-textLight flex flex-col items-center">
+                <i class="fas fa-search text-xl"></i>
+                <span class="text-xs mt-1">Find</span>
             </a>
             <a href="profile.html" class="text-primary flex flex-col items-center">
                 <i class="fas fa-user text-xl"></i>
@@ -313,7 +526,7 @@
                 return;
             }
             
-            // DOM elements
+            // DOM elements - Profile Tab
             const editToggleBtn = document.getElementById('editToggleBtn');
             const saveProfileBtn = document.getElementById('saveProfileBtn');
             const cancelEditBtn = document.getElementById('cancelEditBtn');
@@ -334,11 +547,25 @@
             const lookingForViewContainer = document.getElementById('lookingForViewContainer');
             const lookingForEditContainer = document.getElementById('lookingForEditContainer');
             
+            // Tab elements
+            const profileTabBtn = document.getElementById('profileTabBtn');
+            const analyticsTabBtn = document.getElementById('analyticsTabBtn');
+            const profileTabContent = document.getElementById('profileTabContent');
+            const analyticsTabContent = document.getElementById('analyticsTabContent');
+            
             // Initialize the profile
             initializeProfile();
             
             // Event listeners
             setupEventListeners();
+            
+            // Tab switching
+            setupTabSwitching();
+
+            // Initialize charts (if analytics tab is active)
+            if (!analyticsTabContent.classList.contains('hidden')) {
+                initializeCharts();
+            }
             
             // Function to initialize the profile with user data
             function initializeProfile() {
@@ -359,6 +586,12 @@
                 document.getElementById('expertiseScore').textContent = currentUser.expertiseScore || '78';
                 document.getElementById('endorsementCount').textContent = currentUser.endorsements || '23';
                 
+                // Also update analytics numbers
+                document.getElementById('networkSizeAnalytics').textContent = currentUser.networkSize || '142';
+                
+                // Set profile completion percentage based on filled fields
+                updateProfileCompletion();
+                
                 // Set skills
                 displaySkills();
                 
@@ -367,6 +600,27 @@
                 
                 // Set looking for
                 displayLookingFor();
+            }
+
+            // Function to update profile completion percentage
+            function updateProfileCompletion() {
+                // Calculate completion based on filled fields
+                let totalFields = 7; // Name, title, company, about, skills, experience, profile picture
+                let filledFields = 0;
+                
+                if (currentUser.fullName) filledFields++;
+                if (currentUser.currentRole) filledFields++;
+                if (currentUser.company) filledFields++;
+                if (currentUser.about) filledFields++;
+                if (currentUser.skills && (typeof currentUser.skills === 'string' ? currentUser.skills.trim() !== '' : currentUser.skills.length > 0)) filledFields++;
+                if (currentUser.experience && currentUser.experience.length > 0) filledFields++;
+                if (currentUser.profileImage) filledFields++;
+                
+                const completionPercentage = Math.round((filledFields / totalFields) * 100);
+                
+                // Update UI
+                document.getElementById('profileCompletionPercentage').textContent = completionPercentage + '%';
+                document.getElementById('profileCompletionBar').style.width = completionPercentage + '%';
             }
             
             // Function to display skills
@@ -641,6 +895,40 @@
                     addExperienceForm();
                 });
             }
+
+            // Function to setup tab switching
+            function setupTabSwitching() {
+                profileTabBtn.addEventListener('click', function() {
+                    // Update active tab buttons
+                    profileTabBtn.classList.add('border-primary', 'text-primary');
+                    profileTabBtn.classList.remove('border-transparent', 'text-textMedium');
+                    analyticsTabBtn.classList.add('border-transparent', 'text-textMedium');
+                    analyticsTabBtn.classList.remove('border-primary', 'text-primary');
+                    
+                    // Show/hide tab content
+                    profileTabContent.classList.remove('hidden');
+                    profileTabContent.classList.add('active');
+                    analyticsTabContent.classList.add('hidden');
+                    analyticsTabContent.classList.remove('active');
+                });
+                
+                analyticsTabBtn.addEventListener('click', function() {
+                    // Update active tab buttons
+                    analyticsTabBtn.classList.add('border-primary', 'text-primary');
+                    analyticsTabBtn.classList.remove('border-transparent', 'text-textMedium');
+                    profileTabBtn.classList.add('border-transparent', 'text-textMedium');
+                    profileTabBtn.classList.remove('border-primary', 'text-primary');
+                    
+                    // Show/hide tab content
+                    analyticsTabContent.classList.remove('hidden');
+                    analyticsTabContent.classList.add('active');
+                    profileTabContent.classList.add('hidden');
+                    profileTabContent.classList.remove('active');
+                    
+                    // Initialize charts when analytics tab is first shown
+                    initializeCharts();
+                });
+            }
             
             // Function to enable edit mode
             function enableEditMode() {
@@ -791,6 +1079,82 @@
                 initializeProfile();
                 
                 showToast("Profile saved successfully!");
+            }
+            
+            // Function to initialize analytics charts
+            function initializeCharts() {
+                // Network Growth Chart
+                const networkGrowthCtx = document.getElementById('networkGrowthChart')?.getContext('2d');
+                if (networkGrowthCtx && !networkGrowthCtx._chart) {
+                    networkGrowthCtx._chart = new Chart(networkGrowthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Connections',
+                                data: [65, 78, 90, 105, 125, 142],
+                                borderColor: '#0078D4',
+                                backgroundColor: 'rgba(0, 120, 212, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Industry Distribution Chart
+                const industryDistributionCtx = document.getElementById('industryDistributionChart')?.getContext('2d');
+                if (industryDistributionCtx && !industryDistributionCtx._chart) {
+                    industryDistributionCtx._chart = new Chart(industryDistributionCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Technology', 'Finance', 'Healthcare', 'Marketing', 'Other'],
+                            datasets: [{
+                                data: [45, 22, 15, 12, 6],
+                                backgroundColor: [
+                                    '#0078D4', // primary
+                                    '#2BC48A', // secondary
+                                    '#FFB900', // accent
+                                    '#9333EA', // purple
+                                    '#6B7280'  // gray
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
             }
             
             // Function to show toast notification
