@@ -162,7 +162,20 @@
             z-index: 1000;
             max-width: 300px;
         }
+        
+        /* Empty state animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite ease-in-out;
+        }
     </style>
+    <!-- Include the user search utility -->
+    <script src="user-search.js"></script>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md pb-20">
@@ -231,9 +244,31 @@
         
         <!-- No Results State -->
         <div id="noResultsState" class="hidden text-center py-8">
-            <i class="fas fa-search text-4xl text-textLight mb-3"></i>
-            <p class="text-textMedium">No results found</p>
-            <p class="text-sm text-textLight">Try adjusting your search or filters</p>
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto pulse-animation">
+                <i class="fas fa-search text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">No results found</h3>
+            <p class="text-textMedium mb-4">Try adjusting your search or filters</p>
+            <button id="viewAllUsersBtn" class="bg-primary text-white px-4 py-2 rounded-lg text-sm">
+                View All Users
+            </button>
+        </div>
+        
+        <!-- No Users State -->
+        <div id="noUsersState" class="hidden text-center py-8">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto pulse-animation">
+                <i class="fas fa-users text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Grow Your Network</h3>
+            <p class="text-textMedium mb-6">There aren't any users to connect with yet. Share ProConnect with colleagues to build your professional network!</p>
+            <div class="flex flex-col items-center">
+                <button class="bg-primary text-white px-6 py-2 rounded-lg mb-3 flex items-center">
+                    <i class="fas fa-share-alt mr-2"></i> Invite Colleagues
+                </button>
+                <button id="createSampleUsersBtn" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg text-sm">
+                    Create Sample Users (Demo)
+                </button>
+            </div>
         </div>
         
         <!-- Swipe Limit Reached State -->
@@ -266,6 +301,38 @@
             <button id="closeAlertBtn" class="bg-white text-black px-4 py-2 rounded-lg">Got it</button>
         </div>
 
+        <!-- Match Success Modal -->
+        <div id="matchModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+            <div class="absolute inset-0 bg-black opacity-70"></div>
+            <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4 relative z-10">
+                <div class="text-center">
+                    <div class="mb-4">
+                        <div class="rounded-full bg-success/20 p-4 inline-block">
+                            <i class="fas fa-handshake text-success text-3xl"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-xl font-bold mb-2">It's a Match!</h2>
+                    <p id="matchUserName" class="text-lg text-textMedium mb-4">You and <span class="font-medium text-primary">Sarah Chen</span> have connected!</p>
+                    <div class="flex mb-6 justify-center space-x-4">
+                        <div id="matchCurrentUserImg" class="w-16 h-16 rounded-full border-2 border-primary overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Your profile" class="w-full h-full object-cover">
+                        </div>
+                        <div id="matchUserImg" class="w-16 h-16 rounded-full border-2 border-primary overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Match profile" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <button id="startChatBtn" class="w-full bg-primary text-white py-2 rounded-lg">
+                            <i class="fas fa-comment mr-1"></i> Start a Conversation
+                        </button>
+                        <button id="keepSearchingBtn" class="w-full bg-lightTertiary text-textDark py-2 rounded-lg">
+                            Keep Browsing
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
             <a href="index.html" class="text-textLight flex flex-col items-center">
@@ -296,6 +363,7 @@
             const cardDeck = document.getElementById('cardDeck');
             const swipeButtons = document.getElementById('swipeButtons');
             const noResultsState = document.getElementById('noResultsState');
+            const noUsersState = document.getElementById('noUsersState');
             const swipeLimitState = document.getElementById('swipeLimitState');
             const swipeCounter = document.getElementById('swipeCounter');
             const swipeProgressBar = document.getElementById('swipeProgressBar');
@@ -303,6 +371,14 @@
             const swipeRightBtn = document.getElementById('swipeRightBtn');
             const swipeLimitAlert = document.getElementById('swipeLimitAlert');
             const closeAlertBtn = document.getElementById('closeAlertBtn');
+            const viewAllUsersBtn = document.getElementById('viewAllUsersBtn');
+            const createSampleUsersBtn = document.getElementById('createSampleUsersBtn');
+            const matchModal = document.getElementById('matchModal');
+            const matchUserName = document.getElementById('matchUserName');
+            const matchUserImg = document.getElementById('matchUserImg');
+            const matchCurrentUserImg = document.getElementById('matchCurrentUserImg');
+            const startChatBtn = document.getElementById('startChatBtn');
+            const keepSearchingBtn = document.getElementById('keepSearchingBtn');
             
             // Constants
             const DAILY_SWIPE_LIMIT = 20;
@@ -311,6 +387,7 @@
             // Current state
             let currentCardIndex = 0;
             let filteredUsers = [];
+            let currentMatchedUser = null;
             let isAnimating = false;
             let startX, startY, moveX, moveY;
             let dailySwipes = getDailySwipes();
@@ -337,85 +414,6 @@
                 // Update swipe counter
                 updateSwipeCounter();
             }
-            
-            // Sample user data for search results
-            const users = [
-                {
-                    id: 1,
-                    name: "Sarah Chen",
-                    title: "Product Manager",
-                    company: "TechCorp",
-                    industry: "Technology",
-                    location: "San Francisco, CA",
-                    bio: "Experienced product manager specializing in AI-powered solutions. Looking to connect with technical experts and industry professionals.",
-                    skills: ["Product Management", "User Research", "UX Design", "Agile", "Strategy"],
-                    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    match: 98
-                },
-                {
-                    id: 2,
-                    name: "David Wong",
-                    title: "Tech Entrepreneur",
-                    company: "Innovate Inc",
-                    industry: "Technology",
-                    location: "New York, NY",
-                    bio: "Serial entrepreneur with 3 successful exits. Currently building solutions in the fintech space. Looking for co-founders and investors.",
-                    skills: ["Business Strategy", "Startup", "Fundraising", "Product Development", "Marketing"],
-                    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    match: 87
-                },
-                {
-                    id: 3,
-                    name: "Aisha Johnson",
-                    title: "Senior Developer",
-                    company: "CodeTech",
-                    industry: "Technology",
-                    location: "Austin, TX",
-                    bio: "Full-stack developer with expertise in React and Node.js. Passionate about mentoring junior developers and building scalable applications.",
-                    skills: ["JavaScript", "React", "Node.js", "Cloud Architecture", "Team Leadership"],
-                    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    match: 82
-                },
-                {
-                    id: 4,
-                    name: "Michael Lin",
-                    title: "Finance Director",
-                    company: "Global Banking",
-                    industry: "Finance",
-                    location: "Singapore",
-                    bio: "Finance professional with international experience. Specializing in investment strategy and risk management for high-growth companies.",
-                    skills: ["Financial Strategy", "Investment", "Risk Management", "Banking", "Leadership"],
-                    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    match: 76
-                },
-                {
-                    id: 5,
-                    name: "James Wilson",
-                    title: "Marketing Director",
-                    company: "Brand Solutions",
-                    industry: "Marketing",
-                    location: "Chicago, IL",
-                    bio: "Creative marketing director with a passion for data-driven strategies. Expertise in digital marketing, content creation, and brand development.",
-                    skills: ["Digital Marketing", "Brand Strategy", "Content Creation", "Analytics", "Team Management"],
-                    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    match: 73
-                },
-                {
-                    id: 6,
-                    name: "Emily Rodriguez",
-                    title: "Healthcare Consultant",
-                    company: "Health Innovations",
-                    industry: "Healthcare",
-                    location: "Boston, MA",
-                    bio: "Healthcare consultant with a background in medicine. Helping healthcare organizations adopt new technologies and improve patient outcomes.",
-                    skills: ["Healthcare Strategy", "Medical Devices", "Regulatory Affairs", "Clinical Trials", "Market Analysis"],
-                    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80",
-                    match: 68
-                }
-            ];
-            
-            // Store users in localStorage for profile viewing
-            localStorage.setItem('sampleUsers', JSON.stringify(users));
             
             // Function to get daily swipes from localStorage
             function getDailySwipes() {
@@ -476,25 +474,119 @@
                 cardDeck.classList.add('hidden');
                 swipeButtons.classList.add('hidden');
                 swipeLimitState.classList.remove('hidden');
+                noResultsState.classList.add('hidden');
+                noUsersState.classList.add('hidden');
+            }
+            
+            // Function to create sample users (for demonstration)
+            function createSampleUsers() {
+                const sampleUsers = [
+                    {
+                        id: 'sample_1',
+                        fullName: "Sarah Chen",
+                        currentRole: "Product Manager",
+                        company: "TechCorp",
+                        industry: "Technology",
+                        location: "San Francisco, CA",
+                        about: "Experienced product manager specializing in AI-powered solutions. Looking to connect with technical experts and industry professionals.",
+                        skills: ["Product Management", "User Research", "UX Design", "Agile", "Strategy"],
+                        profileImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                    },
+                    {
+                        id: 'sample_2',
+                        fullName: "David Wong",
+                        currentRole: "Tech Entrepreneur",
+                        company: "Innovate Inc",
+                        industry: "Technology",
+                        location: "New York, NY",
+                        about: "Serial entrepreneur with 3 successful exits. Currently building solutions in the fintech space. Looking for co-founders and investors.",
+                        skills: ["Business Strategy", "Startup", "Fundraising", "Product Development", "Marketing"],
+                        profileImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                    },
+                    {
+                        id: 'sample_3',
+                        fullName: "Aisha Johnson",
+                        currentRole: "Senior Developer",
+                        company: "CodeTech",
+                        industry: "Technology",
+                        location: "Austin, TX",
+                        about: "Full-stack developer with expertise in React and Node.js. Passionate about mentoring junior developers and building scalable applications.",
+                        skills: ["JavaScript", "React", "Node.js", "Cloud Architecture", "Team Leadership"],
+                        profileImage: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                    },
+                    {
+                        id: 'sample_4',
+                        fullName: "Michael Lin",
+                        currentRole: "Finance Director",
+                        company: "Global Banking",
+                        industry: "Finance",
+                        location: "Singapore",
+                        about: "Finance professional with international experience. Specializing in investment strategy and risk management for high-growth companies.",
+                        skills: ["Financial Strategy", "Investment", "Risk Management", "Banking", "Leadership"],
+                        profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                    },
+                    {
+                        id: 'sample_5',
+                        fullName: "James Wilson",
+                        currentRole: "Marketing Director",
+                        company: "Brand Solutions",
+                        industry: "Marketing",
+                        location: "Chicago, IL",
+                        about: "Creative marketing director with a passion for data-driven strategies. Expertise in digital marketing, content creation, and brand development.",
+                        skills: ["Digital Marketing", "Brand Strategy", "Content Creation", "Analytics", "Team Management"],
+                        profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                    },
+                    {
+                        id: 'sample_6',
+                        fullName: "Emily Rodriguez",
+                        currentRole: "Healthcare Consultant",
+                        company: "Health Innovations",
+                        industry: "Healthcare",
+                        location: "Boston, MA",
+                        about: "Healthcare consultant with a background in medicine. Helping healthcare organizations adopt new technologies and improve patient outcomes.",
+                        skills: ["Healthcare Strategy", "Medical Devices", "Regulatory Affairs", "Clinical Trials", "Market Analysis"],
+                        profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
+                    }
+                ];
+                
+                // Register each sample user
+                sampleUsers.forEach(user => {
+                    localStorage.setItem('user_' + user.id, JSON.stringify(user));
+                });
+                
+                // Refresh the page to show the new users
+                window.location.reload();
             }
             
             // Function to initialize card deck
             function initializeCardDeck() {
-                // Initialize with all users
-                filteredUsers = [...users];
+                // Get all available users using our utility
+                filteredUsers = ProConnectUsers.getAllUsers();
+                
+                // Calculate match percentages compared to current user
+                if (currentUser) {
+                    filteredUsers.forEach(user => {
+                        user.match = ProConnectUsers.calculateMatchPercentage(currentUser, user);
+                    });
+                    
+                    // Sort by match percentage (highest first)
+                    filteredUsers.sort((a, b) => b.match - a.match);
+                }
                 
                 // Show card deck & swipe buttons if there are users
                 if (filteredUsers.length > 0) {
                     cardDeck.classList.remove('hidden');
                     swipeButtons.classList.remove('hidden');
                     noResultsState.classList.add('hidden');
+                    noUsersState.classList.add('hidden');
                     
                     // Create cards
                     createCards();
                 } else {
                     cardDeck.classList.add('hidden');
                     swipeButtons.classList.add('hidden');
-                    noResultsState.classList.remove('hidden');
+                    noResultsState.classList.add('hidden');
+                    noUsersState.classList.remove('hidden');
                 }
             }
             
@@ -534,30 +626,45 @@
                 const swipeOverlay = document.createElement('div');
                 swipeOverlay.className = 'swipe-overlay';
                 
+                // Prepare skills display
+                let skillsHtml = '';
+                let skills = [];
+                
+                if (typeof user.skills === 'string') {
+                    skills = user.skills.split(',').map(skill => skill.trim()).filter(s => s);
+                } else if (Array.isArray(user.skills)) {
+                    skills = user.skills.filter(s => s);
+                }
+                
+                skillsHtml = skills.map(skill => 
+                    `<span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">${skill}</span>`
+                ).join('');
+                
+                // Format bio/about text
+                const bio = user.about || user.bio || `Professional working in ${user.industry || 'their industry'}.`;
+                
                 card.innerHTML = `
                     <div class="card-header">
-                        <img src="${user.image}" alt="${user.name}" class="profile-image">
+                        <img src="${user.profileImage}" alt="${user.fullName}" class="profile-image">
                     </div>
                     <div class="card-body">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <h3 class="text-lg font-bold">${user.name}</h3>
-                                <p class="text-sm text-textMedium">${user.title} at ${user.company}</p>
+                                <h3 class="text-lg font-bold">${user.fullName}</h3>
+                                <p class="text-sm text-textMedium">${user.currentRole || ''} ${user.company ? 'at ' + user.company : ''}</p>
                             </div>
                             <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-medium">${user.match}% Match</span>
                         </div>
-                        <p class="text-sm text-textMedium mb-3">${user.bio}</p>
+                        <p class="text-sm text-textMedium mb-3">${bio}</p>
                         <div class="mb-3">
                             <h4 class="text-sm font-medium mb-1">Skills</h4>
                             <div class="flex flex-wrap gap-1">
-                                ${user.skills.map(skill => 
-                                    `<span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">${skill}</span>`
-                                ).join('')}
+                                ${skillsHtml || '<span class="text-sm text-textLight">No skills listed</span>'}
                             </div>
                         </div>
                         <div>
                             <h4 class="text-sm font-medium mb-1">Location</h4>
-                            <p class="text-sm text-textMedium"><i class="fas fa-map-marker-alt mr-1"></i>${user.location}</p>
+                            <p class="text-sm text-textMedium"><i class="fas fa-map-marker-alt mr-1"></i>${user.location || 'Not specified'}</p>
                         </div>
                     </div>
                 `;
@@ -785,7 +892,7 @@
             // Function to handle a successful match
             function handleMatch(user) {
                 // In a real app, you would send this to the server
-                console.log(`Matched with ${user.name}!`);
+                console.log(`Matched with ${user.fullName}!`);
                 
                 // For demo purposes, add to current user's connections
                 if (currentUser) {
@@ -798,14 +905,26 @@
                     if (!alreadyConnected) {
                         currentUser.connections.push({
                             id: user.id,
-                            name: user.name,
-                            timestamp: new Date().getTime()
+                            name: user.fullName,
+                            timestamp: new Date().getTime(),
+                            profileImage: user.profileImage
                         });
                         
                         // Update current user in localStorage
                         localStorage.setItem('currentUser', JSON.stringify(currentUser));
                         
-                        // If this is a real connection, we would show a match notification here
+                        // Show match notification
+                        currentMatchedUser = user;
+                        
+                        // Update match modal content
+                        matchUserName.innerHTML = `You and <span class="font-medium text-primary">${user.fullName}</span> have connected!`;
+                        matchUserImg.querySelector('img').src = user.profileImage;
+                        matchCurrentUserImg.querySelector('img').src = currentUser.profileImage || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80";
+                        
+                        // Show match modal after a short delay
+                        setTimeout(() => {
+                            matchModal.classList.remove('hidden');
+                        }, 600);
                     }
                 }
             }
@@ -840,8 +959,9 @@
                 if (cardCount === 0) {
                     if (currentCardIndex >= filteredUsers.length) {
                         // No more users to show
-                        noResultsState.classList.remove('hidden');
+                        cardDeck.classList.add('hidden');
                         swipeButtons.classList.add('hidden');
+                        noResultsState.classList.remove('hidden');
                     } else {
                         // Add back the current card (this shouldn't normally happen)
                         const newCard = createCard(filteredUsers[currentCardIndex], 0);
@@ -873,7 +993,7 @@
                 });
             });
             
-            // Function to perform search and filter
+            // Function to perform search
             function performSearch() {
                 if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
                     // Don't update if swipe limit is reached
@@ -883,25 +1003,18 @@
                 const searchTerm = searchInput.value.toLowerCase();
                 const activeFilter = document.querySelector('.filter-btn.bg-primary').getAttribute('data-filter');
                 
-                filteredUsers = users.filter(user => {
-                    if (activeFilter === 'all') {
-                        return user.name.toLowerCase().includes(searchTerm) || 
-                               user.title.toLowerCase().includes(searchTerm) ||
-                               user.company.toLowerCase().includes(searchTerm) ||
-                               user.skills.some(skill => skill.toLowerCase().includes(searchTerm)) ||
-                               user.industry.toLowerCase().includes(searchTerm) ||
-                               user.location.toLowerCase().includes(searchTerm);
-                    } else if (activeFilter === 'skills') {
-                        return user.skills.some(skill => skill.toLowerCase().includes(searchTerm));
-                    } else if (activeFilter === 'company') {
-                        return user.company.toLowerCase().includes(searchTerm);
-                    } else if (activeFilter === 'industry') {
-                        return user.industry.toLowerCase().includes(searchTerm);
-                    } else if (activeFilter === 'location') {
-                        return user.location.toLowerCase().includes(searchTerm);
-                    }
-                    return false;
-                });
+                // Use the ProConnectUsers utility to search
+                filteredUsers = ProConnectUsers.searchUsers(searchTerm, activeFilter);
+                
+                // Calculate match percentages with current user
+                if (currentUser) {
+                    filteredUsers.forEach(user => {
+                        user.match = ProConnectUsers.calculateMatchPercentage(currentUser, user);
+                    });
+                    
+                    // Sort by match percentage (highest first)
+                    filteredUsers.sort((a, b) => b.match - a.match);
+                }
                 
                 // Reset card index and recreate cards
                 currentCardIndex = 0;
@@ -911,15 +1024,45 @@
                     cardDeck.classList.remove('hidden');
                     swipeButtons.classList.remove('hidden');
                     noResultsState.classList.add('hidden');
+                    noUsersState.classList.add('hidden');
                     
                     // Create cards
                     createCards();
                 } else {
                     cardDeck.classList.add('hidden');
                     swipeButtons.classList.add('hidden');
-                    noResultsState.classList.remove('hidden');
+                    
+                    // Check if it's because there are no users at all
+                    const allUsers = ProConnectUsers.getAllUsers();
+                    if (allUsers.length === 0) {
+                        noResultsState.classList.add('hidden');
+                        noUsersState.classList.remove('hidden');
+                    } else {
+                        noResultsState.classList.remove('hidden');
+                        noUsersState.classList.add('hidden');
+                    }
                 }
             }
+            
+            // View all users button
+            viewAllUsersBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                
+                // Reset filter to "All"
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('bg-lightTertiary', 'text-textDark');
+                });
+                filterButtons[0].classList.remove('bg-lightTertiary', 'text-textDark');
+                filterButtons[0].classList.add('bg-primary', 'text-white');
+                
+                performSearch();
+            });
+            
+            // Create sample users button
+            createSampleUsersBtn.addEventListener('click', function() {
+                createSampleUsers();
+            });
             
             // Swipe buttons functionality
             swipeLeftBtn.addEventListener('click', function() {
@@ -934,6 +1077,42 @@
                 if (currentCard && !isAnimating) {
                     swipeRight(currentCard);
                 }
+            });
+            
+            // Match modal buttons
+            startChatBtn.addEventListener('click', function() {
+                if (currentMatchedUser) {
+                    // Check if conversation already exists in localStorage
+                    const conversations = JSON.parse(localStorage.getItem('userConversations_' + currentUser.id)) || [];
+                    
+                    // Find or create conversation
+                    let conversation = conversations.find(c => c.userId == currentMatchedUser.id);
+                    
+                    if (!conversation) {
+                        // Create a new conversation
+                        conversation = {
+                            userId: currentMatchedUser.id,
+                            messages: [{
+                                sender: 'system',
+                                content: `You matched with ${currentMatchedUser.fullName}! Say hello to start the conversation.`,
+                                timestamp: Date.now(),
+                                read: true
+                            }]
+                        };
+                        
+                        conversations.push(conversation);
+                        localStorage.setItem('userConversations_' + currentUser.id, JSON.stringify(conversations));
+                    }
+                    
+                    // Redirect to chat page
+                    window.location.href = 'chat.html';
+                }
+                
+                matchModal.classList.add('hidden');
+            });
+            
+            keepSearchingBtn.addEventListener('click', function() {
+                matchModal.classList.add('hidden');
             });
             
             // Close alert button
