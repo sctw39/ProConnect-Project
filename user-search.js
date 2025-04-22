@@ -1,6 +1,6 @@
 /**
- * ProConnect User Search Utility
- * This utility provides functions to find and search for registered users across the app
+ * ProConnect User Search Utility (Enhanced Version)
+ * This utility provides improved functions to find and search for registered users across the app
  */
 
 // Main namespace to avoid global conflicts
@@ -10,37 +10,72 @@ const ProConnectUsers = {
      * @returns {Array} Array of user objects
      */
     getAllUsers: function() {
+        console.log("Searching for all users in localStorage...");
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         const currentUserId = currentUser ? currentUser.id : null;
         let allUsers = [];
         
-        // Scan all localStorage items to find user objects
+        // Debug: Log current localStorage items
+        console.log("Total localStorage items:", localStorage.length);
+        
+        // Scan all localStorage items to find user objects with improved detection
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             
-            // Skip non-user items
+            // Skip obvious non-user items
             if (key === 'currentUser' || 
+                key === 'loglevel:webpack-dev-server' ||
                 key.startsWith('proconnect_') || 
-                key.startsWith('swipe_') || 
-                key.includes('Conversations')) {
+                key.includes('Conversations') ||
+                key === 'sampleUsers') {
                 continue;
             }
             
             try {
                 const value = JSON.parse(localStorage.getItem(key));
                 
-                // Check if this is a user object by looking for common properties
-                if (value && (value.fullName || value.name) && value.id) {
+                // Skip if not an object or null
+                if (!value || typeof value !== 'object') continue;
+                
+                // Debug the current item
+                console.log("Examining localStorage item:", key, "Value type:", typeof value);
+                
+                // Improved user object detection with multiple patterns
+                const isUserObject = 
+                    // Pattern 1: Has fullName or name property
+                    (value.fullName || value.name) ||
+                    // Pattern 2: Has email and id properties
+                    (value.email && value.id) ||
+                    // Pattern 3: Has username property
+                    value.username ||
+                    // Pattern 4: Has specific user-related properties
+                    (value.currentRole || value.company || value.skills || value.bio || value.about);
+                
+                if (isUserObject) {
+                    console.log("Found user object:", key, value);
+                    
                     // Normalize user object format
                     const user = this.normalizeUserObject(value);
                     
-                    // Don't include current user
-                    if (user.id !== currentUserId) {
-                        allUsers.push(user);
+                    // Ensure it has an ID (create one if missing)
+                    if (!user.id) {
+                        console.log("User missing ID, creating one based on key:", key);
+                        user.id = key;
                     }
+                    
+                    // Don't include current user
+                    if (currentUserId && user.id === currentUserId) {
+                        console.log("Skipping current user:", user.fullName || user.name);
+                        continue;
+                    }
+                    
+                    // Add to users list
+                    allUsers.push(user);
+                    console.log("Added user to results:", user.fullName);
                 }
             } catch (e) {
                 // Not a valid JSON or user object, skip
+                console.log("Error processing item:", key, e);
                 continue;
             }
         }
@@ -48,10 +83,12 @@ const ProConnectUsers = {
         // Also get users from sampleUsers if available
         try {
             const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
+            console.log("Found sample users:", sampleUsers.length);
             sampleUsers.forEach(user => {
                 // Check if user already exists in allUsers
-                if (!allUsers.some(u => u.id == user.id) && user.id !== currentUserId) {
+                if (!allUsers.some(u => u.id == user.id) && (user.id !== currentUserId)) {
                     allUsers.push(this.normalizeUserObject(user));
+                    console.log("Added sample user:", user.fullName || user.name);
                 }
             });
         } catch (e) {
@@ -60,10 +97,11 @@ const ProConnectUsers = {
         
         // Also ensure current user's connections are included
         if (currentUser && currentUser.connections) {
+            console.log("Adding connections from current user:", currentUser.connections.length);
             currentUser.connections.forEach(conn => {
                 if (!allUsers.some(u => u.id == conn.id)) {
                     // Create a minimal user object if not found elsewhere
-                    allUsers.push({
+                    const connUser = {
                         id: conn.id,
                         fullName: conn.name || "Unknown User",
                         profileImage: conn.profileImage || this.getDefaultProfileImage(),
@@ -71,11 +109,14 @@ const ProConnectUsers = {
                         company: conn.company || "",
                         industry: "Unknown",
                         isConnection: true
-                    });
+                    };
+                    allUsers.push(connUser);
+                    console.log("Added connection:", connUser.fullName);
                 }
             });
         }
         
+        console.log("Total users found:", allUsers.length);
         return allUsers;
     },
     
@@ -85,18 +126,22 @@ const ProConnectUsers = {
      * @returns {Object} Normalized user object
      */
     normalizeUserObject: function(user) {
+        // Get best name option
+        const fullName = user.fullName || user.name || user.username || "Unknown User";
+        
         return {
-            id: user.id,
-            fullName: user.fullName || user.name || "Unknown User",
-            profileImage: user.profileImage || user.image || this.getDefaultProfileImage(),
-            currentRole: user.currentRole || user.title || "",
-            company: user.company || "",
-            industry: user.industry || "Unknown",
+            id: user.id || ("user_" + Date.now()),
+            fullName: fullName,
+            profileImage: user.profileImage || user.image || user.avatar || this.getDefaultProfileImage(),
+            currentRole: user.currentRole || user.title || user.role || user.jobTitle || "",
+            company: user.company || user.organization || user.companyName || "",
+            industry: user.industry || "",
             location: user.location || "",
             skills: user.skills || [],
-            about: user.about || user.bio || "",
+            about: user.about || user.bio || user.description || "",
             lookingFor: user.lookingFor || [],
-            match: user.match || Math.floor(Math.random() * 50) + 50 // Random match score between 50-99
+            match: user.match || Math.floor(Math.random() * 50) + 50, // Random match score between 50-99
+            email: user.email || ""
         };
     },
     
@@ -121,12 +166,21 @@ const ProConnectUsers = {
      * @returns {Array} Filtered array of users
      */
     searchUsers: function(query, filter = 'all') {
-        if (!query) return this.getAllUsers();
+        console.log("Searching users with query:", query, "filter:", filter);
         
-        const searchTerm = query.toLowerCase();
+        // Get all users
         const allUsers = this.getAllUsers();
         
-        return allUsers.filter(user => {
+        // If query is empty, return all users
+        if (!query || query.trim() === '') {
+            console.log("Empty query, returning all users:", allUsers.length);
+            return allUsers;
+        }
+        
+        const searchTerm = query.toLowerCase().trim();
+        
+        // Filter based on the selected filter type
+        const results = allUsers.filter(user => {
             if (filter === 'all') {
                 return this.matchesAnyField(user, searchTerm);
             } else if (filter === 'skills') {
@@ -140,6 +194,9 @@ const ProConnectUsers = {
             }
             return false;
         });
+        
+        console.log("Search results:", results.length);
+        return results;
     },
     
     /**
@@ -149,11 +206,12 @@ const ProConnectUsers = {
      * @returns {Boolean} True if matches
      */
     matchesAnyField: function(user, term) {
-        return user.fullName.toLowerCase().includes(term) ||
-               user.currentRole.toLowerCase().includes(term) ||
-               user.company.toLowerCase().includes(term) ||
-               user.industry.toLowerCase().includes(term) ||
-               user.location.toLowerCase().includes(term) ||
+        return (user.fullName && user.fullName.toLowerCase().includes(term)) ||
+               (user.email && user.email.toLowerCase().includes(term)) ||
+               (user.currentRole && user.currentRole.toLowerCase().includes(term)) ||
+               (user.company && user.company.toLowerCase().includes(term)) ||
+               (user.industry && user.industry.toLowerCase().includes(term)) ||
+               (user.location && user.location.toLowerCase().includes(term)) ||
                (user.about && user.about.toLowerCase().includes(term)) ||
                this.matchesSkills(user, term);
     },
@@ -183,7 +241,7 @@ const ProConnectUsers = {
      * @returns {Boolean} True if matches
      */
     matchesCompany: function(user, term) {
-        return user.company.toLowerCase().includes(term);
+        return user.company && user.company.toLowerCase().includes(term);
     },
     
     /**
@@ -193,7 +251,7 @@ const ProConnectUsers = {
      * @returns {Boolean} True if matches
      */
     matchesIndustry: function(user, term) {
-        return user.industry.toLowerCase().includes(term);
+        return user.industry && user.industry.toLowerCase().includes(term);
     },
     
     /**
@@ -203,26 +261,7 @@ const ProConnectUsers = {
      * @returns {Boolean} True if matches
      */
     matchesLocation: function(user, term) {
-        return user.location.toLowerCase().includes(term);
-    },
-    
-    /**
-     * Register a new user
-     * @param {Object} user - User object
-     * @returns {Boolean} Success status
-     */
-    registerUser: function(user) {
-        if (!user.id) {
-            user.id = 'user_' + Date.now();
-        }
-        
-        try {
-            localStorage.setItem('user_' + user.id, JSON.stringify(user));
-            return true;
-        } catch (e) {
-            console.error("Error registering user:", e);
-            return false;
-        }
+        return user.location && user.location.toLowerCase().includes(term);
     },
     
     /**
@@ -287,3 +326,19 @@ const ProConnectUsers = {
         return Math.min(Math.max(Math.round(matchScore), 0), 100);
     }
 };
+
+// Debug function to show all users in console
+function debugShowAllUsers() {
+    const users = ProConnectUsers.getAllUsers();
+    console.table(users.map(u => ({
+        id: u.id,
+        name: u.fullName,
+        role: u.currentRole,
+        company: u.company
+    })));
+    
+    return `Found ${users.length} users`;
+}
+
+// Add a global debug function
+window.debugUsers = debugShowAllUsers;
