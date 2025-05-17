@@ -23,7 +23,10 @@
                         lightTertiary: '#E9ECEF',
                         textDark: '#212529',
                         textMedium: '#495057',
-                        textLight: '#6C757D'
+                        textLight: '#6C757D',
+                        darkBg: '#181818',
+                        darkSecondary: '#202020',
+                        darkTertiary: '#2A2A2A'
                     }
                 }
             }
@@ -352,6 +355,20 @@
         .dark .loading-shimmer {
             background: linear-gradient(to right, #2A2A2A 8%, #3A3A3A 18%, #2A2A2A 33%);
         }
+        
+        /* Bottom navigation - dark mode */
+        .dark .bottom-nav {
+            background-color: #202020 !important;
+            border-color: #2A2A2A !important;
+        }
+        
+        .dark .nav-icon {
+            color: #6C757D !important;
+        }
+        
+        .dark .nav-icon.active {
+            color: #0078D4 !important;
+        }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
@@ -599,7 +616,7 @@
         <!-- Match Success Modal -->
         <div id="matchModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
             <div class="absolute inset-0 bg-black opacity-70"></div>
-            <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4 relative z-10 fade-in">
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-6 max-w-sm w-full mx-4 relative z-10 fade-in">
                 <div class="text-center">
                     <div class="mb-4">
                         <div class="rounded-full bg-success/20 p-4 inline-block match-glow">
@@ -620,7 +637,7 @@
                         <button id="startChatBtn" class="w-full bg-primary text-white py-2 rounded-lg">
                             <i class="fas fa-comment mr-1"></i> Start a Conversation
                         </button>
-                        <button id="viewProfileBtn" class="w-full bg-lightTertiary text-textDark py-2 rounded-lg">
+                        <button id="viewProfileBtn" class="w-full bg-lightTertiary dark:bg-darkTertiary text-textDark dark:text-textLight py-2 rounded-lg">
                             <i class="fas fa-user mr-1"></i> View Profile
                         </button>
                         <button id="keepSearchingBtn" class="w-full text-textMedium py-2">
@@ -636,23 +653,23 @@
             Your changes have been saved
         </div>
 
-        <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
-            <a href="index.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-chart-line text-xl"></i>
-                <span class="text-xs mt-1">Analytics</span>
+        <!-- Bottom Navigation - Dark mode compatible -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-darkSecondary border-t dark:border-darkTertiary p-3 flex justify-around bottom-nav">
+            <a href="index.html" class="flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl text-textLight dark:text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Analytics</span>
             </a>
-            <a href="chat.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-comments text-xl"></i>
-                <span class="text-xs mt-1">Chat</span>
+            <a href="chat.html" class="flex flex-col items-center">
+                <i class="fas fa-comments text-xl text-textLight dark:text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Chat</span>
             </a>
-            <a href="search.html" class="text-primary flex flex-col items-center">
-                <i class="fas fa-search text-xl"></i>
-                <span class="text-xs mt-1">Find</span>
+            <a href="search.html" class="flex flex-col items-center">
+                <i class="fas fa-search text-xl text-primary nav-icon active"></i>
+                <span class="text-xs mt-1 text-primary">Find</span>
             </a>
-            <a href="profile.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-user text-xl"></i>
-                <span class="text-xs mt-1">Profile</span>
+            <a href="profile.html" class="flex flex-col items-center">
+                <i class="fas fa-user text-xl text-textLight dark:text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Profile</span>
             </a>
         </nav>
     </div>
