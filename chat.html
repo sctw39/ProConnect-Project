@@ -28,6 +28,19 @@
                 }
             }
         }
+        
+        // Check for dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
     </script>
     <style>
         .chat-bubble-received {
@@ -165,10 +178,63 @@
         .status-away {
             background-color: #FFB900;
         }
+        
+        /* Loading shimmer effect */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        
+        /* Dark mode overrides */
+        .dark .bg-white {
+            background-color: #1E1E1E;
+        }
+        
+        .dark .bg-lightBg {
+            background-color: #121212;
+        }
+        
+        .dark .bg-lightSecondary {
+            background-color: #2A2A2A;
+        }
+        
+        .dark .text-textDark {
+            color: #E9ECEF;
+        }
+        
+        .dark .text-textMedium {
+            color: #ADB5BD;
+        }
+        
+        .dark .text-textLight {
+            color: #6C757D;
+        }
+        
+        .dark .border-gray-200 {
+            border-color: #2A2A2A;
+        }
+        
+        .dark .chat-bubble-received {
+            background-color: #2A2A2A;
+        }
+        
+        .dark .loading-shimmer {
+            background: linear-gradient(to right, #2A2A2A 8%, #3A3A3A 18%, #2A2A2A 33%);
+        }
+        
+        .dark .reaction-popup {
+            background-color: #2A2A2A;
+        }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+    <div class="container mx-auto px-4 py-6 max-w-md pb-20">
         <!-- App Header -->
         <header class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-bold text-primary">Messages</h1>
@@ -225,9 +291,46 @@
             </div>
 
             <!-- Loading State -->
-            <div id="loadingState" class="hidden flex flex-col items-center justify-center py-8">
-                <div class="w-16 h-16 rounded-full border-4 border-primary/30 border-t-primary animate-spin mb-4"></div>
-                <h3 class="text-lg font-semibold">Loading conversations...</h3>
+            <div id="loadingState" class="hidden">
+                <!-- Shimmer loading for conversations -->
+                <div class="space-y-3">
+                    <div class="bg-lightSecondary p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full loading-shimmer mr-3"></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <div class="w-24 h-5 loading-shimmer rounded-md"></div>
+                                    <div class="w-10 h-4 loading-shimmer rounded-md"></div>
+                                </div>
+                                <div class="w-32 h-4 loading-shimmer rounded-md mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-lightSecondary p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full loading-shimmer mr-3"></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <div class="w-24 h-5 loading-shimmer rounded-md"></div>
+                                    <div class="w-10 h-4 loading-shimmer rounded-md"></div>
+                                </div>
+                                <div class="w-32 h-4 loading-shimmer rounded-md mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-lightSecondary p-3 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full loading-shimmer mr-3"></div>
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <div class="w-24 h-5 loading-shimmer rounded-md"></div>
+                                    <div class="w-10 h-4 loading-shimmer rounded-md"></div>
+                                </div>
+                                <div class="w-32 h-4 loading-shimmer rounded-md mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- No Connections State -->
@@ -396,7 +499,7 @@
     </div>
 
     <script>
-        // User Search Utility (Simplified version)
+        // User Search Utility 
         const ProConnectUsers = {
             getAllUsers: function() {
                 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -410,7 +513,8 @@
                     // Skip non-user items
                     if (key === 'currentUser' || 
                         key.includes('Conversations') || 
-                        key.startsWith('proconnect_')) {
+                        key.startsWith('proconnect_') ||
+                        key.startsWith('swipe_')) {
                         continue;
                     }
                     
@@ -435,6 +539,19 @@
                         // Skip invalid JSON entries
                         continue;
                     }
+                }
+                
+                // Check for sample users
+                try {
+                    const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
+                    sampleUsers.forEach(user => {
+                        // Check if user already exists in allUsers
+                        if (!allUsers.some(u => u.id == user.id) && user.id !== currentUserId) {
+                            allUsers.push(this.normalizeUserObject(user));
+                        }
+                    });
+                } catch (e) {
+                    console.log("Error loading sample users:", e);
                 }
                 
                 // Also ensure current user's connections are included
@@ -467,8 +584,19 @@
                     company: user.company || "",
                     industry: user.industry || "",
                     location: user.location || "",
-                    isOnline: !!user.isOnline // Default to offline
+                    skills: this.normalizeSkills(user.skills),
+                    about: user.about || user.bio || "",
+                    isConnection: !!user.isConnection
                 };
+            },
+            
+            normalizeSkills: function(skills) {
+                if (typeof skills === 'string') {
+                    return skills.split(',').map(s => s.trim()).filter(s => s !== '');
+                } else if (Array.isArray(skills)) {
+                    return skills.filter(s => s);
+                }
+                return [];
             },
             
             getDefaultProfileImage: function() {
@@ -498,7 +626,8 @@
             },
             
             getUserById: function(userId) {
-                return this.getAllUsers().find(user => user.id == userId);
+                const allUsers = this.getAllUsers();
+                return allUsers.find(user => user.id == userId);
             }
         };
 
@@ -576,7 +705,7 @@
                     
                     // Set up polling for new messages
                     setupMessagePolling();
-                }, 500); // Simulate loading time
+                }, 800); // Simulate loading time
             }
             
             // Function to set up online status simulation
@@ -791,7 +920,7 @@
                     
                     // Create conversation item
                     const item = document.createElement('div');
-                    item.className = 'chat-item bg-lightSecondary p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
+                    item.className = 'bg-lightSecondary p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
                     item.dataset.userId = conversation.userId;
                     
                     // User online status
@@ -1139,9 +1268,21 @@
                         reactionPopup.classList.add('show');
                     });
                     
+                    // Add reaction click handlers
+                    const reactionButtons = messageElement.querySelectorAll('.reaction-btn');
+                    reactionButtons.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            // In a real app, this would send the reaction to the backend
+                            showToast(`Reaction ${this.textContent} sent`);
+                            reactionPopup.classList.remove('show');
+                        });
+                    });
+                    
                     // Hide reaction popup when clicking elsewhere
-                    document.addEventListener('click', function() {
-                        reactionPopup.classList.remove('show');
+                    document.addEventListener('click', function(e) {
+                        if (!e.target.closest('.reaction-popup') && !e.target.closest('.chat-bubble-sent') && !e.target.closest('.chat-bubble-received')) {
+                            reactionPopup.classList.remove('show');
+                        }
                     });
                     
                     // Add message to container
@@ -1397,7 +1538,7 @@
                 const conversationIndex = conversations.findIndex(convo => convo.userId == currentChatUserId);
                 if (conversationIndex === -1) return;
                 
-                // Confirm with user
+                // Confirm with user (in a real app, use a custom dialog instead of native confirm)
                 if (confirm("Are you sure you want to clear all messages in this chat?")) {
                     // Keep the conversation but clear messages
                     conversations[conversationIndex].messages = [{
@@ -1615,18 +1756,14 @@
             });
             
             // Hide menus when clicking outside
-            document.addEventListener('click', function() {
-                chatOptionsDropdown.classList.add('hidden');
-                attachmentMenu.classList.add('hidden');
-            });
-            
-            // Prevent dropdown from closing when clicking inside it
-            chatOptionsDropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-            
-            attachmentMenu.addEventListener('click', function(e) {
-                e.stopPropagation();
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#chatOptionsBtn') && !e.target.closest('#chatOptionsDropdown')) {
+                    chatOptionsDropdown.classList.add('hidden');
+                }
+                
+                if (!e.target.closest('#attachmentBtn') && !e.target.closest('#attachmentMenu')) {
+                    attachmentMenu.classList.add('hidden');
+                }
             });
         });
     </script>
