@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - Connections</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0078D4',
+                        primaryLight: '#50A0E4',
+                        primaryDark: '#106EBE',
+                        secondary: '#2BC48A',
+                        accent: '#FFB900',
+                        danger: '#E74C3C',
+                        success: '#27AE60',
+                        lightBg: '#FFFFFF',
+                        lightSecondary: '#F8F9FA',
+                        lightTertiary: '#E9ECEF',
+                        textDark: '#212529',
+                        textMedium: '#495057',
+                        textLight: '#6C757D',
+                        darkBg: '#181818',
+                        darkSecondary: '#202020',
+                        darkTertiary: '#2A2A2A'
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+        
+        // Force dark mode
+        document.documentElement.classList.add('dark');
+    </script>
+    <style>
+        /* General dark mode styling */
+        body {
+            background-color: #181818 !important;
+            color: #F8F9FA !important;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Request card animations */
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s forwards;
+        }
+        
+        /* Button styles */
+        .btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+        
+        /* Profile modal animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        /* Bottom navigation */
+        .bottom-nav {
+            background-color: #202020 !important;
+            border-color: #2A2A2A !important;
+        }
+        
+        .nav-icon {
+            color: #6C757D !important;
+        }
+        
+        .nav-icon.active {
+            color: #0078D4 !important;
+        }
+        
+        /* Tab styling */
+        .tab-btn {
+            padding: 0.75rem 0;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            flex: 1;
+            color: #CED4DA;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-btn.active {
+            color: #0078D4;
+            border-bottom: 2px solid #0078D4;
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #E74C3C;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-white min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-md pb-20">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-primary">Connection Requests</h1>
+            <div class="flex items-center">
+                <a href="profile.html" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition">
+                    <i class="fas fa-user text-xl"></i>
+                </a>
+                <a href="search.html" class="text-primary block p-2 hover:bg-darkTertiary rounded-full transition">
+                    <i class="fas fa-search text-xl"></i>
+                </a>
+            </div>
+        </header>
+        
+        <!-- Tabs -->
+        <div class="flex mb-6 border-b border-darkTertiary">
+            <button id="receivedTab" class="tab-btn active">
+                <span>Received</span>
+                <span id="receivedCount" class="inline-block bg-primary text-white text-xs rounded-full w-5 h-5 ml-1">2</span>
+            </button>
+            <button id="sentTab" class="tab-btn">
+                <span>Sent</span>
+                <span id="sentCount" class="inline-block bg-gray-500 text-white text-xs rounded-full w-5 h-5 ml-1">1</span>
+            </button>
+            <button id="connectionsTab" class="tab-btn">Connections</button>
+        </div>
+        
+        <!-- Received Requests Tab Content -->
+        <div id="receivedTabContent" class="space-y-4">
+            <!-- Received request 1 -->
+            <div class="request-card bg-darkSecondary rounded-lg overflow-hidden shadow-sm mb-4">
+                <div class="p-4">
+                    <div class="flex items-center">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Sarah Johnson" 
+                            class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-white">Sarah Johnson</h3>
+                            <p class="text-sm text-gray-300">Marketing Director at Digital Solutions</p>
+                            <p class="text-xs text-gray-400 mt-1">Marketing</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-3">
+                        <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_1">
+                            View Profile
+                        </button>
+                        <button class="ignore-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_1">
+                            Ignore
+                        </button>
+                        <button class="accept-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="user_1">
+                            Accept
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Received request 2 -->
+            <div class="request-card bg-darkSecondary rounded-lg overflow-hidden shadow-sm mb-4">
+                <div class="p-4">
+                    <div class="flex items-center">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Michael Chen" 
+                            class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-white">Michael Chen</h3>
+                            <p class="text-sm text-gray-300">Software Engineer at Tech Innovations</p>
+                            <p class="text-xs text-gray-400 mt-1">Technology</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-3">
+                        <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_2">
+                            View Profile
+                        </button>
+                        <button class="ignore-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_2">
+                            Ignore
+                        </button>
+                        <button class="accept-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="user_2">
+                            Accept
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sent Requests Tab Content (Hidden initially) -->
+        <div id="sentTabContent" class="space-y-4 hidden">
+            <!-- Sent request 1 -->
+            <div class="request-card bg-darkSecondary rounded-lg overflow-hidden shadow-sm mb-4">
+                <div class="p-4">
+                    <div class="flex items-center">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Emma Wilson" 
+                            class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-white">Emma Wilson</h3>
+                            <p class="text-sm text-gray-300">Data Scientist at Analytics Pro</p>
+                            <p class="text-xs text-gray-400 mt-1">Technology</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-3">
+                        <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_3">
+                            View Profile
+                        </button>
+                        <button class="cancel-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_3">
+                            Cancel Request
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Connections Tab Content (Hidden initially) -->
+        <div id="connectionsTabContent" class="space-y-4 hidden">
+            <!-- Connection 1 -->
+            <div class="connection-card bg-darkSecondary rounded-lg overflow-hidden shadow-sm mb-4">
+                <div class="p-4">
+                    <div class="flex items-center">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Olivia Rodriguez" 
+                            class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-white">Olivia Rodriguez</h3>
+                            <p class="text-sm text-gray-300">UX Designer at Creative Solutions</p>
+                            <p class="text-xs text-gray-400 mt-1">Technology</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-3">
+                        <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_5">
+                            View Profile
+                        </button>
+                        <button class="message-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="user_5">
+                            Message
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connection 2 -->
+            <div class="connection-card bg-darkSecondary rounded-lg overflow-hidden shadow-sm mb-4">
+                <div class="p-4">
+                    <div class="flex items-center">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="David Patel" 
+                            class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-white">David Patel</h3>
+                            <p class="text-sm text-gray-300">Finance Manager at Global Investments</p>
+                            <p class="text-xs text-gray-400 mt-1">Finance</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-3">
+                        <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="user_4">
+                            View Profile
+                        </button>
+                        <button class="message-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="user_4">
+                            Message
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Profile Modal (Hidden initially) -->
+        <div id="userProfileModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+            <div class="absolute inset-0 bg-black opacity-70"></div>
+            <div class="bg-darkSecondary rounded-lg p-6 max-w-md w-full relative z-10 fade-in max-h-[90vh] overflow-y-auto">
+                <div class="text-right mb-2">
+                    <button id="closeUserProfileBtn" class="text-gray-300 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="text-center mb-4">
+                    <img id="modalUserImage" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="User" class="w-24 h-24 rounded-full object-cover mx-auto border-4 border-darkTertiary mb-3">
+                    <h2 id="modalUserName" class="text-xl font-bold text-white">Sarah Johnson</h2>
+                    <p id="modalUserTitle" class="text-gray-300">Marketing Director at Digital Solutions</p>
+                    <p id="modalUserLocation" class="text-gray-400 text-sm mt-1"><i class="fas fa-map-marker-alt mr-1"></i>New York, NY</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="font-medium text-white mb-2">About</h3>
+                    <p id="modalUserAbout" class="text-gray-300 text-sm">Marketing director with 10+ years of experience in digital transformation and brand development.</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="font-medium text-white mb-2">Skills</h3>
+                    <div id="modalUserSkills" class="flex flex-wrap">
+                        <span class="skill-badge">Digital Marketing</span>
+                        <span class="skill-badge">SEO</span>
+                        <span class="skill-badge">Content Strategy</span>
+                        <span class="skill-badge">Social Media</span>
+                    </div>
+                </div>
+                
+                <div id="modalActionButtons" class="flex justify-center space-x-3">
+                    <button id="modalIgnoreBtn" class="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-darkTertiary transition btn">
+                        Ignore
+                    </button>
+                    <button id="modalAcceptBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition btn">
+                        Accept Connection
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="toast">
+            Connection request accepted
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-darkSecondary border-t border-darkTertiary bottom-nav">
+            <a href="analytics.html" class="flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Analytics</span>
+            </a>
+            <a href="search.html" class="flex flex-col items-center">
+                <i class="fas fa-search text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Find</span>
+            </a>
+            <a href="connections.html" class="flex flex-col items-center">
+                <i class="fas fa-bell text-xl text-primary nav-icon active"></i>
+                <span class="text-xs mt-1 text-primary">Requests</span>
+            </a>
+            <a href="profile.html" class="flex flex-col items-center">
+                <i class="fas fa-user text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const receivedTab = document.getElementById('receivedTab');
+            const sentTab = document.getElementById('sentTab');
+            const connectionsTab = document.getElementById('connectionsTab');
+            const receivedCount = document.getElementById('receivedCount');
+            const sentCount = document.getElementById('sentCount');
+            const receivedTabContent = document.getElementById('receivedTabContent');
+            const sentTabContent = document.getElementById('sentTabContent');
+            const connectionsTabContent = document.getElementById('connectionsTabContent');
+            const userProfileModal = document.getElementById('userProfileModal');
+            const closeUserProfileBtn = document.getElementById('closeUserProfileBtn');
+            const modalUserImage = document.getElementById('modalUserImage');
+            const modalUserName = document.getElementById('modalUserName');
+            const modalUserTitle = document.getElementById('modalUserTitle');
+            const modalUserLocation = document.getElementById('modalUserLocation');
+            const modalUserAbout = document.getElementById('modalUserAbout');
+            const modalUserSkills = document.getElementById('modalUserSkills');
+            const modalActionButtons = document.getElementById('modalActionButtons');
+            const modalIgnoreBtn = document.getElementById('modalIgnoreBtn');
+            const modalAcceptBtn = document.getElementById('modalAcceptBtn');
+            const toastNotification = document.getElementById('toastNotification');
+            
+            // State variables
+            let currentTab = 'received';
+            let selectedUserId = null;
+            
+            // Show toast notification
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.style.opacity = 1;
+                
+                setTimeout(() => {
+                    toastNotification.style.opacity = 0;
+                }, 3000);
+            }
+            
+            // Change active tab
+            function changeTab(tabName) {
+                // Hide all tab contents
+                receivedTabContent.classList.add('hidden');
+                sentTabContent.classList.add('hidden');
+                connectionsTabContent.classList.add('hidden');
+                
+                // Remove active class from all tabs
+                receivedTab.classList.remove('active');
+                sentTab.classList.remove('active');
+                connectionsTab.classList.remove('active');
+                
+                // Show selected tab content and add active class to tab
+                switch (tabName) {
+                    case 'received':
+                        receivedTabContent.classList.remove('hidden');
+                        receivedTab.classList.add('active');
+                        break;
+                    case 'sent':
+                        sentTabContent.classList.remove('hidden');
+                        sentTab.classList.add('active');
+                        break;
+                    case 'connections':
+                        connectionsTabContent.classList.remove('hidden');
+                        connectionsTab.classList.add('active');
+                        break;
+                }
+                
+                currentTab = tabName;
+            }
+            
+            // Set up event listeners
+            
+            // Tab navigation
+            receivedTab.addEventListener('click', function() {
+                changeTab('received');
+            });
+            
+            sentTab.addEventListener('click', function() {
+                changeTab('sent');
+            });
+            
+            connectionsTab.addEventListener('click', function() {
+                changeTab('connections');
+            });
+            
+            // Close user profile modal
+            closeUserProfileBtn.addEventListener('click', function() {
+                userProfileModal.classList.add('hidden');
+            });
+            
+            // View profile buttons
+            const viewProfileBtns = document.querySelectorAll('.view-profile-btn');
+            viewProfileBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    selectedUserId = userId;
+                    
+                    // Determine context based on current tab
+                    let showActionButtons = true;
+                    
+                    // Customize profile modal based on tab
+                    if (currentTab === 'received') {
+                        modalActionButtons.innerHTML = `
+                            <button id="modalIgnoreBtn" class="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-darkTertiary transition btn">
+                                Ignore
+                            </button>
+                            <button id="modalAcceptBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition btn">
+                                Accept Connection
+                            </button>
+                        `;
+                    } else if (currentTab === 'sent') {
+                        modalActionButtons.innerHTML = `
+                            <button id="modalCancelBtn" class="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-red-500 hover:text-white transition btn">
+                                Cancel Request
+                            </button>
+                        `;
+                    } else if (currentTab === 'connections') {
+                        modalActionButtons.innerHTML = `
+                            <button id="modalMessageBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition btn">
+                                Message
+                            </button>
+                        `;
+                    }
+                    
+                    // Add event listeners for modal buttons
+                    modalActionButtons.querySelectorAll('button').forEach(button => {
+                        button.addEventListener('click', handleModalAction);
+                    });
+                    
+                    // Show user profile modal
+                    userProfileModal.classList.remove('hidden');
+                });
+            });
+            
+            // Handle modal action button clicks
+            function handleModalAction(e) {
+                const buttonId = e.target.id;
+                
+                if (buttonId === 'modalAcceptBtn') {
+                    acceptConnection(selectedUserId);
+                } else if (buttonId === 'modalIgnoreBtn') {
+                    ignoreConnection(selectedUserId);
+                } else if (buttonId === 'modalCancelBtn') {
+                    cancelRequest(selectedUserId);
+                } else if (buttonId === 'modalMessageBtn') {
+                    showToast('Messaging feature coming soon');
+                    userProfileModal.classList.add('hidden');
+                }
+            }
+            
+            // Accept connection
+            function acceptConnection(userId) {
+                const requestCard = document.querySelector(`.request-card [data-id="${userId}"]`).closest('.request-card');
+                
+                // Show toast notification
+                showToast('Connection request accepted');
+                
+                // Animate card removal
+                requestCard.classList.add('fade-out');
+                
+                // Process after animation
+                setTimeout(() => {
+                    requestCard.remove();
+                    
+                    // Update counter
+                    const currentCount = parseInt(receivedCount.textContent);
+                    if (currentCount > 1) {
+                        receivedCount.textContent = currentCount - 1;
+                    } else {
+                        receivedCount.textContent = '0';
+                        receivedCount.classList.add('hidden');
+                        
+                        // Show empty state
+                        receivedTabContent.innerHTML = `
+                            <div class="flex items-center justify-center py-16">
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-inbox text-gray-400 text-xl"></i>
+                                    </div>
+                                    <p class="text-gray-400">No connection requests</p>
+                                    <a href="search.html" class="text-primary mt-2 inline-block">Find people to connect with</a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Close modal
+                    userProfileModal.classList.add('hidden');
+                }, 500);
+            }
+            
+            // Ignore connection
+            function ignoreConnection(userId) {
+                const requestCard = document.querySelector(`.request-card [data-id="${userId}"]`).closest('.request-card');
+                
+                // Show toast notification
+                showToast('Connection request ignored');
+                
+                // Animate card removal
+                requestCard.classList.add('fade-out');
+                
+                // Process after animation
+                setTimeout(() => {
+                    requestCard.remove();
+                    
+                    // Update counter
+                    const currentCount = parseInt(receivedCount.textContent);
+                    if (currentCount > 1) {
+                        receivedCount.textContent = currentCount - 1;
+                    } else {
+                        receivedCount.textContent = '0';
+                        receivedCount.classList.add('hidden');
+                        
+                        // Show empty state
+                        receivedTabContent.innerHTML = `
+                            <div class="flex items-center justify-center py-16">
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-inbox text-gray-400 text-xl"></i>
+                                    </div>
+                                    <p class="text-gray-400">No connection requests</p>
+                                    <a href="search.html" class="text-primary mt-2 inline-block">Find people to connect with</a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Close modal
+                    userProfileModal.classList.add('hidden');
+                }, 500);
+            }
+            
+            // Cancel request
+            function cancelRequest(userId) {
+                const requestCard = document.querySelector(`.request-card [data-id="${userId}"]`).closest('.request-card');
+                
+                // Show toast notification
+                showToast('Connection request canceled');
+                
+                // Animate card removal
+                requestCard.classList.add('fade-out');
+                
+                // Process after animation
+                setTimeout(() => {
+                    requestCard.remove();
+                    
+                    // Update counter
+                    const currentCount = parseInt(sentCount.textContent);
+                    if (currentCount > 1) {
+                        sentCount.textContent = currentCount - 1;
+                    } else {
+                        sentCount.textContent = '0';
+                        sentCount.classList.add('hidden');
+                        
+                        // Show empty state
+                        sentTabContent.innerHTML = `
+                            <div class="flex items-center justify-center py-16">
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-paper-plane text-gray-400 text-xl"></i>
+                                    </div>
+                                    <p class="text-gray-400">No sent requests</p>
+                                    <a href="search.html" class="text-primary mt-2 inline-block">Find people to connect with</a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Close modal
+                    userProfileModal.classList.add('hidden');
+                }, 500);
+            }
+            
+            // Accept/Ignore/Cancel buttons in cards
+            document.querySelectorAll('.accept-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    acceptConnection(userId);
+                });
+            });
+            
+            document.querySelectorAll('.ignore-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    ignoreConnection(userId);
+                });
+            });
+            
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    cancelRequest(userId);
+                });
+            });
+            
+            // Message buttons
+            document.querySelectorAll('.message-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showToast('Messaging feature coming soon');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
