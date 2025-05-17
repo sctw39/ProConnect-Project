@@ -136,6 +136,27 @@
             display: block;
             opacity: 1;
         }
+        
+        /* Analytics animations */
+        @keyframes growBar {
+            from { width: 0%; }
+            to { width: var(--target-width); }
+        }
+        
+        .animate-grow {
+            animation: growBar 1s ease-out forwards;
+        }
+        
+        /* Pulse animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
@@ -309,183 +330,119 @@
                 <button class="text-textMedium font-medium px-3 py-1 rounded-full text-sm whitespace-nowrap">1 Year</button>
             </div>
 
-            <!-- Overview Cards -->
+            <!-- Key Metrics Cards -->
+            <div class="col-span-2 bg-primary/10 rounded-lg p-4 mb-4">
+                <h3 class="text-primary font-semibold text-lg mb-2">Professional Score</h3>
+                <div class="flex items-center">
+                    <div class="text-4xl font-bold text-primary mr-3">84</div>
+                    <div class="flex-1">
+                        <div class="w-full bg-white/50 rounded-full h-3">
+                            <div class="bg-primary h-3 rounded-full animate-grow" style="--target-width: 84%"></div>
+                        </div>
+                        <p class="text-xs mt-1 text-textMedium">Based on profile completeness, engagement, and connections</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Indicators -->
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-sm font-medium">Network Size</h3>
-                        <span id="networkGrowthRate" class="text-xs text-success">+12%</span>
-                    </div>
-                    <p id="networkSizeAnalytics" class="text-xl font-bold">142</p>
-                    <p class="text-xs text-textMedium">Connections</p>
+                    <h3 class="text-sm font-medium mb-1">Network Growth</h3>
+                    <p id="networkGrowthRate" class="text-xl font-bold text-success">+12%</p>
+                    <p class="text-xs text-textMedium">Last 30 days</p>
                 </div>
                 
                 <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-sm font-medium">Profile Views</h3>
-                        <span id="profileViewsGrowth" class="text-xs text-success">+8%</span>
-                    </div>
+                    <h3 class="text-sm font-medium mb-1">Profile Views</h3>
                     <p id="profileViews" class="text-xl font-bold">38</p>
                     <p class="text-xs text-textMedium">Last 30 days</p>
                 </div>
                 
                 <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-sm font-medium">Messages</h3>
-                        <span id="messagesGrowth" class="text-xs text-success">+23%</span>
-                    </div>
-                    <p id="messageCount" class="text-xl font-bold">27</p>
-                    <p class="text-xs text-textMedium">Last 30 days</p>
+                    <h3 class="text-sm font-medium mb-1">Response Rate</h3>
+                    <p id="responseRate" class="text-xl font-bold">82%</p>
+                    <p class="text-xs text-textMedium">Average: 4h</p>
                 </div>
                 
                 <div class="bg-lightSecondary p-3 rounded-lg shadow-sm">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-sm font-medium">Response Rate</h3>
-                        <span id="responseRateGrowth" class="text-xs text-success">+5%</span>
-                    </div>
-                    <p id="responseRate" class="text-xl font-bold">82%</p>
-                    <p class="text-xs text-textMedium">Avg. time: 4h</p>
+                    <h3 class="text-sm font-medium mb-1">Engagement</h3>
+                    <p id="engagementScore" class="text-xl font-bold">28</p>
+                    <p class="text-xs text-textMedium">Interactions/week</p>
                 </div>
             </div>
             
-            <!-- Network Growth Chart -->
+            <!-- Network Summary -->
             <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
-                <h3 class="text-base font-medium mb-3">Network Growth</h3>
-                <canvas id="networkGrowthChart" height="200"></canvas>
+                <h3 class="text-base font-medium mb-3">Network Summary</h3>
+                <canvas id="networkSummaryChart" height="200"></canvas>
+                
+                <!-- Industry Distribution -->
+                <div class="mt-4">
+                    <h4 class="text-sm font-medium mb-2">Industry Breakdown</h4>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-xs">Technology</span>
+                            <span class="text-xs">45%</span>
+                        </div>
+                        <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                            <div class="bg-primary h-1.5 rounded-full animate-grow" style="--target-width: 45%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-xs">Finance</span>
+                            <span class="text-xs">22%</span>
+                        </div>
+                        <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                            <div class="bg-secondary h-1.5 rounded-full animate-grow" style="--target-width: 22%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-xs">Healthcare</span>
+                            <span class="text-xs">15%</span>
+                        </div>
+                        <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                            <div class="bg-accent h-1.5 rounded-full animate-grow" style="--target-width: 15%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-xs">Other</span>
+                            <span class="text-xs">18%</span>
+                        </div>
+                        <div class="w-full bg-lightTertiary rounded-full h-1.5">
+                            <div class="bg-gray-500 h-1.5 rounded-full animate-grow" style="--target-width: 18%"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Connection Distribution -->
+            <!-- Most Valuable Connections -->
             <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
-                <h3 class="text-base font-medium mb-3">Connection Distribution</h3>
-                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-3">
-                    <div class="w-full md:w-1/2">
-                        <canvas id="industryDistributionChart" height="200"></canvas>
-                    </div>
-                    <div class="w-full md:w-1/2">
-                        <div class="mb-3">
-                            <div class="flex justify-between mb-1">
-                                <span class="text-xs">Technology</span>
-                                <span class="text-xs">45%</span>
-                            </div>
-                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                <div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
-                            </div>
+                <h3 class="text-base font-medium mb-3">Top Connections</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="Sarah Chen">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium">Sarah Chen</h4>
+                            <p class="text-xs text-textMedium">Product Designer at DesignCo</p>
                         </div>
-                        <div class="mb-3">
-                            <div class="flex justify-between mb-1">
-                                <span class="text-xs">Finance</span>
-                                <span class="text-xs">22%</span>
-                            </div>
-                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                <div class="bg-secondary h-1.5 rounded-full" style="width: 22%"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="flex justify-between mb-1">
-                                <span class="text-xs">Healthcare</span>
-                                <span class="text-xs">15%</span>
-                            </div>
-                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                <div class="bg-accent h-1.5 rounded-full" style="width: 15%"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="flex justify-between mb-1">
-                                <span class="text-xs">Marketing</span>
-                                <span class="text-xs">12%</span>
-                            </div>
-                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 12%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span class="text-xs">Other</span>
-                                <span class="text-xs">6%</span>
-                            </div>
-                            <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                                <div class="bg-gray-500 h-1.5 rounded-full" style="width: 6%"></div>
-                            </div>
-                        </div>
+                        <div class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">87% Match</div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Networking ROI Calculator -->
-            <div class="bg-gradient-to-r from-primary to-primaryLight rounded-lg p-4 text-white mb-4">
-                <h3 class="text-base font-medium mb-2">Networking ROI Calculator</h3>
-                <p class="text-sm mb-3">Track the value generated from your professional networking activities</p>
-                
-                <div class="bg-white/20 rounded-lg p-3 mb-3">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm">Opportunities Generated</span>
-                        <span class="font-semibold">12</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm">Meetings Conducted</span>
-                        <span class="font-semibold">18</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm">Projects Secured</span>
-                        <span class="font-semibold">3</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium">Estimated Value</span>
-                        <span class="font-bold">$250,000</span>
-                    </div>
-                </div>
-                
-                <button class="bg-white text-primary font-medium w-full py-2 rounded-lg">
-                    Update ROI Data
-                </button>
-            </div>
-            
-            <!-- Engagement Analytics -->
-            <div class="bg-lightSecondary p-4 rounded-lg shadow-sm mb-4">
-                <h3 class="text-base font-medium mb-3">Engagement Analytics</h3>
-                
-                <div class="mb-4">
-                    <h4 class="text-sm font-medium mb-2">Top Performing Content</h4>
-                    <div class="space-y-2">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-file-alt text-primary"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm">AI in Healthcare: Future Perspectives</p>
-                                <div class="flex text-xs text-textMedium">
-                                    <span class="mr-2"><i class="far fa-eye mr-1"></i>52</span>
-                                    <span class="mr-2"><i class="far fa-comment mr-1"></i>8</span>
-                                    <span><i class="far fa-share-square mr-1"></i>3</span>
-                                </div>
-                            </div>
+                    
+                    <div class="flex items-center">
+                        <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="David Wong">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium">David Wong</h4>
+                            <p class="text-xs text-textMedium">Tech Entrepreneur</p>
                         </div>
-                        
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-image text-primary"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm">Speaking at Tech Conference 2023</p>
-                                <div class="flex text-xs text-textMedium">
-                                    <span class="mr-2"><i class="far fa-eye mr-1"></i>43</span>
-                                    <span class="mr-2"><i class="far fa-comment mr-1"></i>12</span>
-                                    <span><i class="far fa-share-square mr-1"></i>5</span>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">82% Match</div>
                     </div>
-                </div>
-                
-                <div>
-                    <h4 class="text-sm font-medium mb-2">Profile Completion</h4>
-                    <div class="flex items-center mb-1">
-                        <div class="w-full bg-lightTertiary rounded-full h-2.5 mr-2">
-                            <div id="profileCompletionBar" class="bg-primary h-2.5 rounded-full" style="width: 92%"></div>
-                        </div>
-                        <span id="profileCompletionPercentage">92%</span>
-                    </div>
-                    <p class="text-xs text-textMedium">Add your certifications to reach 100%</p>
                 </div>
             </div>
         </div>
@@ -562,11 +519,6 @@
             // Tab switching
             setupTabSwitching();
 
-            // Initialize charts (if analytics tab is active)
-            if (!analyticsTabContent.classList.contains('hidden')) {
-                initializeCharts();
-            }
-            
             // Function to initialize the profile with user data
             function initializeProfile() {
                 // Set profile image
@@ -582,15 +534,15 @@
                 aboutText.textContent = currentUser.about || 'Product manager with 8+ years of experience in technology companies.';
                 
                 // Set stats
-                document.getElementById('connectionCount').textContent = currentUser.networkSize || '142';
+                document.getElementById('connectionCount').textContent = currentUser.connections?.length || (currentUser.networkSize || '142');
                 document.getElementById('expertiseScore').textContent = currentUser.expertiseScore || '78';
                 document.getElementById('endorsementCount').textContent = currentUser.endorsements || '23';
                 
-                // Also update analytics numbers
-                document.getElementById('networkSizeAnalytics').textContent = currentUser.networkSize || '142';
-                
-                // Set profile completion percentage based on filled fields
-                updateProfileCompletion();
+                // Set stats in analytics tab
+                document.getElementById('networkGrowthRate').textContent = '+12%';
+                document.getElementById('profileViews').textContent = '38';
+                document.getElementById('responseRate').textContent = '82%';
+                document.getElementById('engagementScore').textContent = '28';
                 
                 // Set skills
                 displaySkills();
@@ -600,27 +552,6 @@
                 
                 // Set looking for
                 displayLookingFor();
-            }
-
-            // Function to update profile completion percentage
-            function updateProfileCompletion() {
-                // Calculate completion based on filled fields
-                let totalFields = 7; // Name, title, company, about, skills, experience, profile picture
-                let filledFields = 0;
-                
-                if (currentUser.fullName) filledFields++;
-                if (currentUser.currentRole) filledFields++;
-                if (currentUser.company) filledFields++;
-                if (currentUser.about) filledFields++;
-                if (currentUser.skills && (typeof currentUser.skills === 'string' ? currentUser.skills.trim() !== '' : currentUser.skills.length > 0)) filledFields++;
-                if (currentUser.experience && currentUser.experience.length > 0) filledFields++;
-                if (currentUser.profileImage) filledFields++;
-                
-                const completionPercentage = Math.round((filledFields / totalFields) * 100);
-                
-                // Update UI
-                document.getElementById('profileCompletionPercentage').textContent = completionPercentage + '%';
-                document.getElementById('profileCompletionBar').style.width = completionPercentage + '%';
             }
             
             // Function to display skills
@@ -1071,6 +1002,7 @@
                 
                 // Save to localStorage
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem(`user_${currentUser.id}`, JSON.stringify(currentUser));
                 
                 // Disable edit mode
                 disableEditMode();
@@ -1083,10 +1015,12 @@
             
             // Function to initialize analytics charts
             function initializeCharts() {
-                // Network Growth Chart
-                const networkGrowthCtx = document.getElementById('networkGrowthChart')?.getContext('2d');
-                if (networkGrowthCtx && !networkGrowthCtx._chart) {
-                    networkGrowthCtx._chart = new Chart(networkGrowthCtx, {
+                if (!window.Chart) return;
+                
+                // Network Summary Chart
+                const ctx = document.getElementById('networkSummaryChart');
+                if (ctx && !ctx.chart) {
+                    ctx.chart = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
@@ -1118,38 +1052,6 @@
                                     grid: {
                                         display: false
                                     }
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                // Industry Distribution Chart
-                const industryDistributionCtx = document.getElementById('industryDistributionChart')?.getContext('2d');
-                if (industryDistributionCtx && !industryDistributionCtx._chart) {
-                    industryDistributionCtx._chart = new Chart(industryDistributionCtx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Technology', 'Finance', 'Healthcare', 'Marketing', 'Other'],
-                            datasets: [{
-                                data: [45, 22, 15, 12, 6],
-                                backgroundColor: [
-                                    '#0078D4', // primary
-                                    '#2BC48A', // secondary
-                                    '#FFB900', // accent
-                                    '#9333EA', // purple
-                                    '#6B7280'  // gray
-                                ],
-                                borderWidth: 0
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            cutout: '70%',
-                            plugins: {
-                                legend: {
-                                    display: false
                                 }
                             }
                         }
