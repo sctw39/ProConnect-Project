@@ -920,3 +920,88 @@
     </script>
 </body>
 </html>
+// Enhanced chat system - add to chat.html
+const ProConnectChat = {
+  // Initialize chat with real-time features
+  initialize: function() {
+    // Set up polling for "real-time" updates
+    this.startMessagePolling();
+    
+    // Add online status simulation
+    this.simulateOnlineStatus();
+    
+    // Add typing indicators
+    this.setupTypingIndicators();
+  },
+  
+  // Poll for new messages every 5 seconds
+  startMessagePolling: function() {
+    setInterval(() => {
+      if (window.currentChatUserId) {
+        this.checkForNewMessages(window.currentChatUserId);
+      }
+    }, 5000);
+  },
+  
+  // Check if there are new messages
+  checkForNewMessages: function(userId) {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) return;
+    
+    // In a real app, this would call an API endpoint
+    // For now, we'll simulate occasional responses
+    if (Math.random() < 0.1) { // 10% chance of new message
+      // Find conversation
+      const conversations = JSON.parse(localStorage.getItem('userConversations_' + currentUser.id)) || [];
+      const conversation = conversations.find(c => c.userId == userId);
+      
+      if (conversation && window.simulateResponse) {
+        window.simulateResponse(conversation);
+        // Refresh UI
+        if (window.displayChatMessages) {
+          window.displayChatMessages(conversation);
+        }
+      }
+    }
+  },
+  
+  // Simulate online status changes
+  simulateOnlineStatus: function() {
+    const users = ProConnectUsers.getAllUsers();
+    
+    // Randomly update online status every 30 seconds
+    setInterval(() => {
+      users.forEach(user => {
+        user.isOnline = Math.random() > 0.5;
+        user.lastSeen = user.isOnline ? null : new Date().toISOString();
+      });
+      
+      // Update UI if on chat screen
+      if (window.displayConversations) {
+        window.displayConversations();
+      }
+    }, 30000);
+  },
+  
+  // Set up realistic typing indicators
+  setupTypingIndicators: function() {
+    if (!window.messageInput) return;
+    
+    // Track when user is typing
+    let typingTimeout;
+    window.messageInput.addEventListener('input', () => {
+      // In a real app, this would notify the other user
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        // Typing stopped
+      }, 1000);
+    });
+  }
+};
+
+// Initialize enhanced chat
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.location.pathname.includes('chat.html')) {
+    ProConnectChat.initialize();
+  }
+});
