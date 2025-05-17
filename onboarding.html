@@ -593,6 +593,35 @@
             // Initialize skill options
             function initSkillOptions() {
                 const skillOptions = document.querySelectorAll('.skill-option');
+                // Registration handler function - add to your onboarding.html
+function registerUser(userData) {
+  // Generate unique ID
+  const userId = 'user_' + Date.now();
+  
+  // Basic required fields
+  const user = {
+    id: userId,
+    fullName: userData.fullName || 'Anonymous User',
+    email: userData.email || '',
+    profileImage: userData.profileImage || null,
+    currentRole: userData.currentRole || '',
+    company: userData.company || '',
+    industry: userData.industry || '',
+    location: userData.location || '',
+    skills: userData.skills || [],
+    about: userData.about || '',
+    connections: [],
+    joinDate: Date.now()
+  };
+  
+  // Store user data in proper format for search
+  localStorage.setItem(userId, JSON.stringify(user));
+  
+  // Log in the user
+  localStorage.setItem('currentUser', JSON.stringify(user));
+  
+  return user;
+}
                 skillOptions.forEach(option => {
                     option.addEventListener('click', function() {
                         const checkbox = this.querySelector('input[type="checkbox"]');
