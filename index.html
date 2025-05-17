@@ -218,3 +218,32 @@
     </script>
 </body>
 </html>
+// Add this to your app.js or index.js
+function cleanupForDeployment() {
+  // Don't run in development mode
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log("Development mode - skipping cleanup");
+    return;
+  }
+
+  // Check if cleanup has already been done
+  if (localStorage.getItem('proconnect_deployment_cleaned')) return;
+  
+  // Remove sample/dummy users
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('sample_') || 
+        key.startsWith('dummy_') || 
+        key.startsWith('test_') || 
+        key.startsWith('searchable_')) {
+      localStorage.removeItem(key);
+    }
+  }
+  
+  // Mark as cleaned
+  localStorage.setItem('proconnect_deployment_cleaned', 'true');
+  console.log("Deployment cleanup completed - dummy data removed");
+}
+
+// Run on app initialization
+document.addEventListener('DOMContentLoaded', cleanupForDeployment);
