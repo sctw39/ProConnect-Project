@@ -134,6 +134,36 @@
             transition: width 1s ease-in-out;
         }
         
+        /* Auth buttons styling */
+        .auth-btn {
+            transition: all 0.3s ease;
+            font-weight: 600;
+            padding: 0.75rem 0;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-btn-primary {
+            background-color: #0078D4;
+            color: white;
+        }
+        
+        .auth-btn-secondary {
+            background-color: white;
+            color: #0078D4;
+            border: 2px solid #0078D4;
+        }
+        
         /* Dark mode support */
         .dark .bg-lightBg {
             background-color: #181818 !important;
@@ -186,6 +216,11 @@
             background-color: rgba(0, 120, 212, 0.2);
             border-color: #0078D4;
         }
+        
+        .dark .auth-btn-secondary {
+            background-color: #202020;
+            color: #0078D4;
+        }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen dark:bg-darkBg">
@@ -199,12 +234,12 @@
             <p class="text-textMedium mt-1">Your Professional Network</p>
         </div>
         
-        <!-- Authentication Buttons -->
+        <!-- Authentication Tabs -->
         <div class="flex space-x-4 mb-8">
-            <button id="showSignInBtn" class="flex-1 py-3 bg-primary text-white rounded-lg font-medium shadow-sm">
+            <button id="showSignInBtn" class="auth-btn auth-btn-primary flex-1 rounded-lg shadow-md">
                 Sign In
             </button>
-            <button id="showSignUpBtn" class="flex-1 py-3 bg-white text-primary border-2 border-primary rounded-lg font-medium shadow-sm dark:bg-darkSecondary">
+            <button id="showSignUpBtn" class="auth-btn auth-btn-secondary flex-1 rounded-lg shadow-md">
                 Sign Up
             </button>
         </div>
@@ -214,7 +249,7 @@
             <form class="space-y-4">
                 <div>
                     <label for="loginEmail" class="block text-sm font-medium mb-1">Email</label>
-                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your email" required>
+                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your email" required>
                 </div>
                 
                 <div>
@@ -222,7 +257,7 @@
                         <label for="loginPassword" class="block text-sm font-medium">Password</label>
                         <a href="#" class="text-primary text-sm">Forgot?</a>
                     </div>
-                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your password" required>
+                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your password" required>
                 </div>
                 
                 <div class="flex items-center">
@@ -230,7 +265,7 @@
                     <label for="rememberMe" class="text-sm">Remember me</label>
                 </div>
                 
-                <button type="button" id="signInBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md">
+                <button type="button" id="signInBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md hover:bg-primaryDark transition duration-300">
                     Sign In
                 </button>
             </form>
@@ -246,13 +281,13 @@
                 </div>
                 
                 <div class="mt-6 grid grid-cols-3 gap-3">
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary">
+                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition">
                         <i class="fab fa-google text-red-500"></i>
                     </button>
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary">
+                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition">
                         <i class="fab fa-linkedin text-blue-600"></i>
                     </button>
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary">
+                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition">
                         <i class="fab fa-github text-gray-700 dark:text-gray-300"></i>
                     </button>
                 </div>
@@ -267,38 +302,38 @@
                 
                 <div>
                     <label for="registerFullName" class="block text-sm font-medium mb-1">Full Name*</label>
-                    <input type="text" id="registerFullName" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your full name" required>
+                    <input type="text" id="registerFullName" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your full name" required>
                 </div>
                 
                 <div>
                     <label for="registerEmail" class="block text-sm font-medium mb-1">Email*</label>
-                    <input type="email" id="registerEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your email" required>
+                    <input type="email" id="registerEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your email" required>
                 </div>
                 
                 <div>
                     <label for="registerPassword" class="block text-sm font-medium mb-1">Password*</label>
-                    <input type="password" id="registerPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Create a password" required>
+                    <input type="password" id="registerPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Create a password" required>
                     <p class="text-xs text-textMedium mt-1">Password must be at least 8 characters long</p>
                 </div>
                 
                 <div>
                     <label for="registerConfirmPassword" class="block text-sm font-medium mb-1">Confirm Password*</label>
-                    <input type="password" id="registerConfirmPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Confirm your password" required>
+                    <input type="password" id="registerConfirmPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Confirm your password" required>
                 </div>
                 
                 <div>
                     <label for="registerTitle" class="block text-sm font-medium mb-1">Professional Title*</label>
-                    <input type="text" id="registerTitle" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. Product Manager" required>
+                    <input type="text" id="registerTitle" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Product Manager" required>
                 </div>
                 
                 <div>
                     <label for="registerCompany" class="block text-sm font-medium mb-1">Company</label>
-                    <input type="text" id="registerCompany" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. TechCorp">
+                    <input type="text" id="registerCompany" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. TechCorp">
                 </div>
                 
                 <div>
                     <label for="registerIndustry" class="block text-sm font-medium mb-1">Industry</label>
-                    <select id="registerIndustry" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base">
+                    <select id="registerIndustry" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary">
                         <option value="">Select your industry</option>
                         <option value="Technology">Technology</option>
                         <option value="Finance">Finance</option>
@@ -314,18 +349,18 @@
                 
                 <div>
                     <label for="registerLocation" class="block text-sm font-medium mb-1">Location</label>
-                    <input type="text" id="registerLocation" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. New York, NY">
+                    <input type="text" id="registerLocation" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. New York, NY">
                 </div>
                 
                 <div>
                     <label for="registerSkills" class="block text-sm font-medium mb-1">Skills</label>
-                    <input type="text" id="registerSkills" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. Marketing, SEO, Analytics (comma separated)">
+                    <input type="text" id="registerSkills" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Marketing, SEO, Analytics (comma separated)">
                     <p class="text-xs text-textMedium mt-1">Enter skills separated by commas</p>
                 </div>
                 
                 <div>
                     <label for="registerAbout" class="block text-sm font-medium mb-1">About</label>
-                    <textarea id="registerAbout" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary resize-none text-base" rows="3" placeholder="Tell us about yourself"></textarea>
+                    <textarea id="registerAbout" class="w-full p-3 border rounded-lg form-input focus:outline-none resize-none text-base dark:bg-darkTertiary dark:border-darkTertiary" rows="3" placeholder="Tell us about yourself"></textarea>
                 </div>
                 
                 <div class="flex items-center">
@@ -333,7 +368,7 @@
                     <label for="termsAgreement" class="text-sm">I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a></label>
                 </div>
                 
-                <button type="button" id="continueToQuizBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md">
+                <button type="button" id="continueToQuizBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md hover:bg-primaryDark transition duration-300">
                     Continue to Networking Quiz
                 </button>
                 
@@ -376,7 +411,7 @@
                             </div>
                         </div>
                         <div class="flex justify-end">
-                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg">
+                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
                                 Next <i class="fas fa-arrow-right ml-1"></i>
                             </button>
                         </div>
@@ -409,10 +444,10 @@
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
-                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg">
+                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
                                 Next <i class="fas fa-arrow-right ml-1"></i>
                             </button>
                         </div>
@@ -441,10 +476,10 @@
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
-                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg">
+                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
                                 Next <i class="fas fa-arrow-right ml-1"></i>
                             </button>
                         </div>
@@ -473,10 +508,10 @@
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
-                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg">
+                            <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
                                 Next <i class="fas fa-arrow-right ml-1"></i>
                             </button>
                         </div>
@@ -515,10 +550,10 @@
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
-                            <button type="button" id="calculateNetworkingScore" class="px-4 py-2 bg-primary text-white rounded-lg">
+                            <button type="button" id="calculateNetworkingScore" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
                                 Finish <i class="fas fa-check ml-1"></i>
                             </button>
                         </div>
@@ -566,7 +601,7 @@
                     <p id="networkingRecommendation" class="text-sm">Based on your profile, we recommend focusing on expanding your business connections in the technology sector. ProConnect can help you find potential partners, clients, and mentors to accelerate your business growth.</p>
                 </div>
                 
-                <button id="completeSignUpBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md">
+                <button id="completeSignUpBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md hover:bg-primaryDark transition duration-300">
                     Complete Sign Up & Start Networking
                 </button>
             </div>
@@ -666,30 +701,40 @@
             
             // Switch to sign in form
             function showSignInForm() {
-                showSignInBtn.classList.add('bg-primary', 'text-white');
-                showSignInBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
+                // Update button styles
+                showSignInBtn.classList.add('auth-btn-primary');
+                showSignInBtn.classList.remove('auth-btn-secondary');
                 
-                showSignUpBtn.classList.remove('bg-primary', 'text-white');
-                showSignUpBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
+                showSignUpBtn.classList.remove('auth-btn-primary');
+                showSignUpBtn.classList.add('auth-btn-secondary');
                 
+                // Show sign in form, hide others
                 signUpForm.classList.add('hidden');
                 networkingQuiz.classList.add('hidden');
                 networkingResults.classList.add('hidden');
                 signInForm.classList.remove('hidden');
+                
+                // Show subtle animation
+                signInForm.classList.add('fade-in');
             }
             
             // Switch to sign up form
             function showSignUpForm() {
-                showSignUpBtn.classList.add('bg-primary', 'text-white');
-                showSignUpBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
+                // Update button styles
+                showSignUpBtn.classList.add('auth-btn-primary');
+                showSignUpBtn.classList.remove('auth-btn-secondary');
                 
-                showSignInBtn.classList.remove('bg-primary', 'text-white');
-                showSignInBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
+                showSignInBtn.classList.remove('auth-btn-primary');
+                showSignInBtn.classList.add('auth-btn-secondary');
                 
+                // Show sign up form, hide others
                 signInForm.classList.add('hidden');
                 networkingQuiz.classList.add('hidden');
                 networkingResults.classList.add('hidden');
                 signUpForm.classList.remove('hidden');
+                
+                // Show subtle animation
+                signUpForm.classList.add('fade-in');
             }
             
             // Show networking quiz
@@ -701,6 +746,9 @@
                 
                 // Reset quiz to first question
                 updateQuizProgress(1);
+                
+                // Show subtle animation
+                networkingQuiz.classList.add('fade-in');
             }
             
             // Show quiz results
@@ -712,6 +760,9 @@
                 
                 // Calculate and display networking score
                 calculateAndDisplayNetworkingScore();
+                
+                // Show subtle animation
+                networkingResults.classList.add('fade-in');
             }
             
             // Show success message and start countdown
@@ -1148,6 +1199,9 @@
                 // Redirect to profile page
                 window.location.href = 'profile.html';
             }
+            
+            // Set initial state - start with Sign In view
+            showSignInForm();
         });
     </script>
 </body>
