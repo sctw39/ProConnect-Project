@@ -49,12 +49,19 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             background-color: white;
             overflow: hidden;
+            transform-origin: center;
         }
         
         .card-next {
             transform: translateY(15px) scale(0.95);
             opacity: 0.8;
             z-index: -1;
+        }
+        
+        .card-next-next {
+            transform: translateY(30px) scale(0.9);
+            opacity: 0.6;
+            z-index: -2;
         }
         
         .card-swipe-left {
@@ -107,6 +114,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 10;
         }
         
         .swipe-left {
@@ -130,6 +138,7 @@
             background: linear-gradient(90deg, rgba(231, 76, 60, 0.2), transparent 30%, transparent 70%, rgba(39, 174, 96, 0.2));
             opacity: 0;
             transition: opacity 0.3s;
+            z-index: 5;
         }
         
         /* Progress bar */
@@ -173,17 +182,110 @@
         .pulse-animation {
             animation: pulse 2s infinite ease-in-out;
         }
+        
+        /* Match animation */
+        @keyframes matchGlow {
+            0% { box-shadow: 0 0 10px rgba(0, 120, 212, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(0, 120, 212, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(0, 120, 212, 0.5); }
+        }
+        
+        .match-glow {
+            animation: matchGlow 2s infinite;
+        }
+        
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Filter button animations */
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Skill badge styling */
+        .skill-badge {
+            display: inline-block;
+            background-color: rgba(0, 120, 212, 0.1);
+            color: #0078D4;
+            border-radius: 50px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            white-space: nowrap;
+        }
+        
+        .skill-badge-match {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: #27AE60;
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .bg-lightBg {
+                background-color: #181818 !important;
+            }
+            
+            .bg-lightSecondary, .bg-lightTertiary {
+                background-color: #2A2A2A !important;
+            }
+            
+            .text-textDark {
+                color: #F8F9FA !important;
+            }
+            
+            .text-textMedium {
+                color: #CED4DA !important;
+            }
+            
+            .card {
+                background-color: #2A2A2A !important;
+            }
+            
+            .swipe-progress {
+                background-color: #3A3A3A;
+            }
+            
+            .skill-badge {
+                background-color: rgba(0, 120, 212, 0.2);
+            }
+            
+            .skill-badge-match {
+                background-color: rgba(39, 174, 96, 0.2);
+            }
+        }
     </style>
-    <!-- Include the user search utility -->
-    <script src="user-search.js"></script>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md pb-20">
         <!-- App Header -->
         <header class="flex justify-between items-center mb-6">
-            <a href="index.html" class="text-primary">
-                <i class="fas fa-arrow-left text-xl"></i>
-            </a>
             <h1 class="text-xl font-bold text-primary">Professional Match</h1>
             <button id="filterBtn" class="text-primary">
                 <i class="fas fa-sliders-h text-xl"></i>
@@ -201,9 +303,93 @@
                 <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
                     Sign In
                 </a>
-                <a href="onboarding.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
+                <a href="register.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
                     Sign Up
                 </a>
+            </div>
+        </div>
+
+        <!-- Filter Panel (Hidden initially) -->
+        <div id="filterPanel" class="fixed inset-0 bg-black/70 z-50 hidden">
+            <div class="absolute right-0 top-0 bottom-0 bg-lightBg p-4 w-full max-w-sm shadow-lg transform transition-transform duration-300 ease-out">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">Filter Matches</h2>
+                    <button id="closeFilterBtn" class="text-textMedium">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Industry Filter -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-2">Industry</h3>
+                        <select id="industryFilter" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="">All Industries</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Education">Education</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Consulting">Consulting</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Location Filter -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-2">Location</h3>
+                        <input type="text" id="locationFilter" placeholder="City, State, or Country" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <!-- Skills Filter -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-2">Skills</h3>
+                        <input type="text" id="skillsFilter" placeholder="e.g. JavaScript, Marketing, Finance" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
+                        <div id="selectedSkills" class="flex flex-wrap gap-2 mt-2">
+                            <!-- Skills tags will appear here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Match Percentage Range -->
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <h3 class="text-lg font-medium">Minimum Match</h3>
+                            <span id="matchPercentLabel">60%</span>
+                        </div>
+                        <input type="range" id="matchPercentRange" min="0" max="100" value="60" class="w-full">
+                    </div>
+                    
+                    <!-- AI Match Priority -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-2">Match Priority</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bg-lightSecondary p-3 rounded-lg cursor-pointer select-priority" data-priority="skills">
+                                <i class="fas fa-code text-primary mb-1"></i>
+                                <p class="font-medium">Skills</p>
+                            </div>
+                            <div class="bg-lightSecondary p-3 rounded-lg cursor-pointer select-priority" data-priority="connections">
+                                <i class="fas fa-users text-primary mb-1"></i>
+                                <p class="font-medium">Connections</p>
+                            </div>
+                            <div class="bg-lightSecondary p-3 rounded-lg cursor-pointer select-priority" data-priority="industry">
+                                <i class="fas fa-building text-primary mb-1"></i>
+                                <p class="font-medium">Industry</p>
+                            </div>
+                            <div class="bg-lightSecondary p-3 rounded-lg cursor-pointer select-priority" data-priority="location">
+                                <i class="fas fa-map-marker-alt text-primary mb-1"></i>
+                                <p class="font-medium">Location</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4 flex justify-between">
+                        <button id="resetFiltersBtn" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
+                            Reset
+                        </button>
+                        <button id="applyFiltersBtn" class="bg-primary text-white px-6 py-2 rounded-lg">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -262,13 +448,20 @@
             <h3 class="text-lg font-semibold mb-2">Grow Your Network</h3>
             <p class="text-textMedium mb-6">There aren't any users to connect with yet. Share ProConnect with colleagues to build your professional network!</p>
             <div class="flex flex-col items-center">
-                <button class="bg-primary text-white px-6 py-2 rounded-lg mb-3 flex items-center">
-                    <i class="fas fa-share-alt mr-2"></i> Invite Colleagues
-                </button>
+                <a href="chat.html" class="bg-primary text-white px-6 py-2 rounded-lg mb-3 flex items-center">
+                    <i class="fas fa-comments mr-2"></i> Go to Messages
+                </a>
                 <button id="createSampleUsersBtn" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg text-sm">
                     Create Sample Users (Demo)
                 </button>
             </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden text-center py-8">
+            <div class="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4 mx-auto"></div>
+            <h3 class="text-lg font-semibold">Finding great matches...</h3>
+            <p class="text-textMedium">Our AI is analyzing your profile</p>
         </div>
         
         <!-- Swipe Limit Reached State -->
@@ -304,10 +497,10 @@
         <!-- Match Success Modal -->
         <div id="matchModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
             <div class="absolute inset-0 bg-black opacity-70"></div>
-            <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4 relative z-10">
+            <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4 relative z-10 fade-in">
                 <div class="text-center">
                     <div class="mb-4">
-                        <div class="rounded-full bg-success/20 p-4 inline-block">
+                        <div class="rounded-full bg-success/20 p-4 inline-block match-glow">
                             <i class="fas fa-handshake text-success text-3xl"></i>
                         </div>
                     </div>
@@ -325,7 +518,10 @@
                         <button id="startChatBtn" class="w-full bg-primary text-white py-2 rounded-lg">
                             <i class="fas fa-comment mr-1"></i> Start a Conversation
                         </button>
-                        <button id="keepSearchingBtn" class="w-full bg-lightTertiary text-textDark py-2 rounded-lg">
+                        <button id="viewProfileBtn" class="w-full bg-lightTertiary text-textDark py-2 rounded-lg">
+                            <i class="fas fa-user mr-1"></i> View Profile
+                        </button>
+                        <button id="keepSearchingBtn" class="w-full text-textMedium py-2">
                             Keep Browsing
                         </button>
                     </div>
@@ -333,11 +529,16 @@
             </div>
         </div>
 
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="toast">
+            Your changes have been saved
+        </div>
+
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
             <a href="index.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-home text-xl"></i>
-                <span class="text-xs mt-1">Home</span>
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Analytics</span>
             </a>
             <a href="chat.html" class="text-textLight flex flex-col items-center">
                 <i class="fas fa-comments text-xl"></i>
@@ -355,15 +556,438 @@
     </div>
 
     <script>
+        // User Search Utility (Simplified version)
+        const ProConnectUsers = {
+            getAllUsers: function() {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                const currentUserId = currentUser ? currentUser.id : null;
+                let allUsers = [];
+                
+                // Scan localStorage for user data
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    
+                    // Skip non-user items
+                    if (key === 'currentUser' || 
+                        key.includes('Conversations') || 
+                        key.startsWith('proconnect_') ||
+                        key.startsWith('swipe_')) {
+                        continue;
+                    }
+                    
+                    try {
+                        const value = JSON.parse(localStorage.getItem(key));
+                        
+                        // Check if this could be a user object
+                        if (value && 
+                            typeof value === 'object' &&
+                            (value.fullName || value.name || value.username) && 
+                            value.id) {
+                            
+                            // Normalize user object format
+                            const user = this.normalizeUserObject(value);
+                            
+                            // Don't include current user
+                            if (user.id !== currentUserId) {
+                                allUsers.push(user);
+                            }
+                        }
+                    } catch (e) {
+                        // Skip invalid JSON entries
+                        continue;
+                    }
+                }
+                
+                // Check for sample users
+                try {
+                    const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
+                    sampleUsers.forEach(user => {
+                        // Check if user already exists in allUsers
+                        if (!allUsers.some(u => u.id == user.id) && user.id !== currentUserId) {
+                            allUsers.push(this.normalizeUserObject(user));
+                        }
+                    });
+                } catch (e) {
+                    console.log("Error loading sample users:", e);
+                }
+                
+                // Also ensure current user's connections are included
+                if (currentUser && currentUser.connections) {
+                    currentUser.connections.forEach(conn => {
+                        if (!allUsers.some(u => u.id == conn.id)) {
+                            // Create a minimal user object if not found elsewhere
+                            allUsers.push({
+                                id: conn.id,
+                                fullName: conn.name || "Unknown User",
+                                profileImage: conn.profileImage || this.getDefaultProfileImage(),
+                                currentRole: conn.role || "",
+                                company: conn.company || "",
+                                industry: "Unknown",
+                                isConnection: true
+                            });
+                        }
+                    });
+                }
+                
+                return allUsers;
+            },
+            
+            normalizeUserObject: function(user) {
+                return {
+                    id: user.id,
+                    fullName: user.fullName || user.name || user.username || "Unknown User",
+                    profileImage: user.profileImage || user.image || this.getDefaultProfileImage(),
+                    currentRole: user.currentRole || user.title || user.role || "",
+                    company: user.company || "",
+                    industry: user.industry || "",
+                    location: user.location || "",
+                    skills: this.normalizeSkills(user.skills),
+                    about: user.about || user.bio || "",
+                    isConnection: !!user.isConnection
+                };
+            },
+            
+            normalizeSkills: function(skills) {
+                if (typeof skills === 'string') {
+                    return skills.split(',').map(s => s.trim()).filter(s => s !== '');
+                } else if (Array.isArray(skills)) {
+                    return skills.filter(s => s);
+                }
+                return [];
+            },
+            
+            getDefaultProfileImage: function() {
+                const defaultImages = [
+                    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                ];
+                return defaultImages[Math.floor(Math.random() * defaultImages.length)];
+            },
+            
+            searchUsers: function(query, filter = 'all') {
+                const allUsers = this.getAllUsers();
+                
+                if (!query || query.trim() === '') {
+                    return allUsers;
+                }
+                
+                const searchTerm = query.toLowerCase().trim();
+                
+                return allUsers.filter(user => {
+                    if (filter === 'all') {
+                        return this.matchesAnyField(user, searchTerm);
+                    } else if (filter === 'skills') {
+                        return this.matchesSkills(user, searchTerm);
+                    } else if (filter === 'company') {
+                        return this.matchesCompany(user, searchTerm);
+                    } else if (filter === 'industry') {
+                        return this.matchesIndustry(user, searchTerm);
+                    } else if (filter === 'location') {
+                        return this.matchesLocation(user, searchTerm);
+                    }
+                    return false;
+                });
+            },
+            
+            matchesAnyField: function(user, term) {
+                return (user.fullName && user.fullName.toLowerCase().includes(term)) ||
+                       (user.currentRole && user.currentRole.toLowerCase().includes(term)) ||
+                       (user.company && user.company.toLowerCase().includes(term)) ||
+                       (user.industry && user.industry.toLowerCase().includes(term)) ||
+                       (user.location && user.location.toLowerCase().includes(term)) ||
+                       (user.about && user.about.toLowerCase().includes(term)) ||
+                       this.matchesSkills(user, term);
+            },
+            
+            matchesSkills: function(user, term) {
+                const skills = user.skills || [];
+                return skills.some(skill => skill.toLowerCase().includes(term));
+            },
+            
+            matchesCompany: function(user, term) {
+                return user.company && user.company.toLowerCase().includes(term);
+            },
+            
+            matchesIndustry: function(user, term) {
+                return user.industry && user.industry.toLowerCase().includes(term);
+            },
+            
+            matchesLocation: function(user, term) {
+                return user.location && user.location.toLowerCase().includes(term);
+            },
+            
+            calculateMatchPercentage: function(user1, user2, priorityFactor = 'skills') {
+                // Base score is 50
+                let matchScore = 50;
+                
+                // Weight factors differently based on priority
+                let weights = {
+                    skills: 30,
+                    industry: 15,
+                    location: 10,
+                    connections: 10
+                };
+                
+                // Boost the priority factor by 50%
+                weights[priorityFactor] *= 1.5;
+                
+                // Normalize weights so they still sum to the same total
+                const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
+                const normalizationFactor = 65 / totalWeight; // 65 points total (50 base + 65 from factors)
+                
+                for (const [key, value] of Object.entries(weights)) {
+                    weights[key] = value * normalizationFactor;
+                }
+                
+                // 1. Skills Match (up to weights.skills points)
+                const skills1 = user1.skills || [];
+                const skills2 = user2.skills || [];
+                
+                if (skills1.length > 0 && skills2.length > 0) {
+                    // Find common skills (case insensitive)
+                    const skills1Lower = skills1.map(s => s.toLowerCase());
+                    const skills2Lower = skills2.map(s => s.toLowerCase());
+                    const commonSkills = skills1Lower.filter(s => skills2Lower.includes(s));
+                    
+                    // Calculate match ratio
+                    const skillRatio = commonSkills.length / Math.max(skills1.length, skills2.length);
+                    matchScore += skillRatio * weights.skills;
+                }
+                
+                // 2. Industry Match (up to weights.industry points)
+                if (user1.industry && user2.industry) {
+                    const industry1 = user1.industry.toLowerCase();
+                    const industry2 = user2.industry.toLowerCase();
+                    
+                    if (industry1 === industry2) {
+                        matchScore += weights.industry; // Exact match
+                    } else if (this.areRelatedIndustries(industry1, industry2)) {
+                        matchScore += weights.industry * 0.5; // Related industries - half points
+                    }
+                }
+                
+                // 3. Location Match (up to weights.location points)
+                if (user1.location && user2.location) {
+                    const location1 = user1.location.toLowerCase();
+                    const location2 = user2.location.toLowerCase();
+                    
+                    if (location1 === location2) {
+                        matchScore += weights.location; // Exact match
+                    } else if (this.areSameRegion(location1, location2)) {
+                        matchScore += weights.location * 0.7; // Same region - 70% points
+                    }
+                }
+                
+                // 4. Connections Network (up to weights.connections points)
+                // Check if they share connections
+                const sharedConnectionFactor = Math.random(); // Simulate shared connections factor (0-1)
+                matchScore += sharedConnectionFactor * weights.connections;
+                
+                // 5. Add small random factor (±3 points) for variety
+                matchScore += (Math.random() * 6 - 3);
+                
+                // Ensure score is between 0-100
+                return Math.min(Math.max(Math.round(matchScore), 0), 100);
+            },
+            
+            areRelatedIndustries: function(industry1, industry2) {
+                const relatedIndustries = {
+                    'technology': ['software', 'it', 'tech', 'computer', 'digital', 'web'],
+                    'finance': ['banking', 'accounting', 'financial', 'investment'],
+                    'healthcare': ['medical', 'health', 'hospital', 'pharma', 'biotech'],
+                    'education': ['teaching', 'academic', 'school', 'university', 'learning'],
+                    'marketing': ['advertising', 'media', 'communications', 'pr']
+                };
+                
+                // Check if industries are related
+                for (const [key, related] of Object.entries(relatedIndustries)) {
+                    if ((industry1.includes(key) || related.some(r => industry1.includes(r))) &&
+                        (industry2.includes(key) || related.some(r => industry2.includes(r)))) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            },
+            
+            areSameRegion: function(location1, location2) {
+                // Simple check - locations contain same region/state/country
+                const location1Parts = location1.split(/[\s,]+/);
+                const location2Parts = location2.split(/[\s,]+/);
+                
+                return location1Parts.some(part => 
+                    location2Parts.includes(part) && part.length > 2
+                );
+            },
+            
+            getRecommendedMatches: function(currentUser, filters = {}) {
+                // Get all available users
+                let allUsers = this.getAllUsers();
+                
+                // Skip already swiped users
+                const swipedUserIds = this.getSwipedUserIds(currentUser.id);
+                allUsers = allUsers.filter(user => !swipedUserIds.includes(user.id));
+                
+                // Apply filters
+                if (filters.industry) {
+                    allUsers = allUsers.filter(user => 
+                        user.industry && user.industry.toLowerCase().includes(filters.industry.toLowerCase())
+                    );
+                }
+                
+                if (filters.location) {
+                    allUsers = allUsers.filter(user => 
+                        user.location && user.location.toLowerCase().includes(filters.location.toLowerCase())
+                    );
+                }
+                
+                if (filters.skills && filters.skills.length > 0) {
+                    allUsers = allUsers.filter(user => {
+                        const userSkills = user.skills.map(s => s.toLowerCase());
+                        return filters.skills.some(skill => 
+                            userSkills.includes(skill.toLowerCase())
+                        );
+                    });
+                }
+                
+                if (filters.minMatch) {
+                    const minMatchValue = parseInt(filters.minMatch);
+                    if (!isNaN(minMatchValue)) {
+                        // Calculate match percentage for remaining users
+                        allUsers.forEach(user => {
+                            user.match = this.calculateMatchPercentage(currentUser, user, filters.priority || 'skills');
+                        });
+                        
+                        // Filter by minimum match percentage
+                        allUsers = allUsers.filter(user => user.match >= minMatchValue);
+                    }
+                }
+                
+                // Calculate match percentages for the remaining users
+                allUsers.forEach(user => {
+                    if (!user.match) {
+                        user.match = this.calculateMatchPercentage(currentUser, user, filters.priority || 'skills');
+                    }
+                });
+                
+                // Sort by match percentage (highest first)
+                allUsers.sort((a, b) => b.match - a.match);
+                
+                return allUsers;
+            },
+            
+            getSwipedUserIds: function(userId) {
+                // Get list of users that have been swiped already
+                try {
+                    const swipeHistory = JSON.parse(localStorage.getItem(`swipe_history_${userId}`)) || [];
+                    return swipeHistory.map(swipe => swipe.userId);
+                } catch (e) {
+                    return [];
+                }
+            },
+            
+            recordSwipe: function(userId, targetUserId, direction) {
+                // Record swipe in history
+                const swipeHistory = JSON.parse(localStorage.getItem(`swipe_history_${userId}`)) || [];
+                
+                swipeHistory.push({
+                    userId: targetUserId,
+                    direction: direction,
+                    timestamp: Date.now()
+                });
+                
+                localStorage.setItem(`swipe_history_${userId}`, JSON.stringify(swipeHistory));
+                
+                // If it's a right swipe, check if it's a match
+                if (direction === 'right') {
+                    return this.checkForMatch(userId, targetUserId);
+                }
+                
+                return false;
+            },
+            
+            checkForMatch: function(userId, targetUserId) {
+                // Check if target user has also swiped right on this user
+                const targetSwipeHistory = JSON.parse(localStorage.getItem(`swipe_history_${targetUserId}`)) || [];
+                
+                const hasMatchingSwipe = targetSwipeHistory.some(swipe => 
+                    swipe.userId === userId && swipe.direction === 'right'
+                );
+                
+                if (hasMatchingSwipe) {
+                    // It's a match! Record in both users' connections
+                    this.createConnection(userId, targetUserId);
+                    return true;
+                }
+                
+                return false;
+            },
+            
+            createConnection: function(userId1, userId2) {
+                // Get user objects
+                const user1 = JSON.parse(localStorage.getItem(`user_${userId1}`)) || JSON.parse(localStorage.getItem(userId1)) || JSON.parse(localStorage.getItem('currentUser'));
+                const user2 = this.getAllUsers().find(u => u.id === userId2);
+                
+                if (!user1 || !user2) return;
+                
+                // Add to user1's connections
+                if (!user1.connections) {
+                    user1.connections = [];
+                }
+                
+                if (!user1.connections.some(c => c.id === userId2)) {
+                    user1.connections.push({
+                        id: userId2,
+                        name: user2.fullName,
+                        timestamp: Date.now(),
+                        profileImage: user2.profileImage
+                    });
+                    
+                    // Save back to storage
+                    if (user1.id === JSON.parse(localStorage.getItem('currentUser')).id) {
+                        localStorage.setItem('currentUser', JSON.stringify(user1));
+                    }
+                    localStorage.setItem(`user_${userId1}`, JSON.stringify(user1));
+                }
+                
+                // Create empty conversation between users
+                this.createEmptyConversation(userId1, userId2, user2.fullName);
+            },
+            
+            createEmptyConversation: function(userId1, userId2, userName2) {
+                // Get existing conversations
+                const conversations = JSON.parse(localStorage.getItem(`userConversations_${userId1}`)) || [];
+                
+                // Check if conversation already exists
+                if (!conversations.some(c => c.userId === userId2)) {
+                    // Create new conversation
+                    conversations.push({
+                        userId: userId2,
+                        messages: [{
+                            sender: 'system',
+                            content: `You matched with ${userName2}! Say hello to start a conversation.`,
+                            timestamp: Date.now(),
+                            read: true
+                        }]
+                    });
+                    
+                    // Save back to storage
+                    localStorage.setItem(`userConversations_${userId1}`, JSON.stringify(conversations));
+                }
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            // DOM Elements
             const authCheck = document.getElementById('authCheck');
             const searchForm = document.getElementById('searchForm');
             const cardDeck = document.getElementById('cardDeck');
             const swipeButtons = document.getElementById('swipeButtons');
             const noResultsState = document.getElementById('noResultsState');
             const noUsersState = document.getElementById('noUsersState');
+            const loadingState = document.getElementById('loadingState');
             const swipeLimitState = document.getElementById('swipeLimitState');
             const swipeCounter = document.getElementById('swipeCounter');
             const swipeProgressBar = document.getElementById('swipeProgressBar');
@@ -378,20 +1002,45 @@
             const matchUserImg = document.getElementById('matchUserImg');
             const matchCurrentUserImg = document.getElementById('matchCurrentUserImg');
             const startChatBtn = document.getElementById('startChatBtn');
+            const viewProfileBtn = document.getElementById('viewProfileBtn');
             const keepSearchingBtn = document.getElementById('keepSearchingBtn');
+            const searchInput = document.getElementById('searchInput');
+            const filterBtn = document.getElementById('filterBtn');
+            const filterPanel = document.getElementById('filterPanel');
+            const closeFilterBtn = document.getElementById('closeFilterBtn');
+            const industryFilter = document.getElementById('industryFilter');
+            const locationFilter = document.getElementById('locationFilter');
+            const skillsFilter = document.getElementById('skillsFilter');
+            const selectedSkills = document.getElementById('selectedSkills');
+            const matchPercentRange = document.getElementById('matchPercentRange');
+            const matchPercentLabel = document.getElementById('matchPercentLabel');
+            const priorityOptions = document.querySelectorAll('.select-priority');
+            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+            const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+            const toastNotification = document.getElementById('toastNotification');
             
             // Constants
             const DAILY_SWIPE_LIMIT = 20;
             const SWIPE_STORAGE_KEY = 'proconnect_daily_swipes';
             
             // Current state
+            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
             let currentCardIndex = 0;
             let filteredUsers = [];
             let currentMatchedUser = null;
             let isAnimating = false;
             let startX, startY, moveX, moveY;
             let dailySwipes = getDailySwipes();
+            let currentFilters = {
+                industry: '',
+                location: '',
+                skills: [],
+                minMatch: 0,
+                priority: 'skills'
+            };
+            let selectedPriority = 'skills';
             
+            // Initialize UI
             if (!currentUser) {
                 // Show auth check message and hide search form
                 authCheck.classList.remove('hidden');
@@ -404,15 +1053,257 @@
                 authCheck.classList.add('hidden');
                 searchForm.classList.remove('hidden');
                 
+                // Show loading state initially
+                loadingState.classList.remove('hidden');
+                
                 // Check if daily swipe limit is reached
                 if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
                     showSwipeLimitState();
                 } else {
-                    initializeCardDeck();
+                    // Load users with a slight delay to show loading effect
+                    setTimeout(() => {
+                        loadingState.classList.add('hidden');
+                        initializeCardDeck();
+                    }, 1500);
                 }
                 
                 // Update swipe counter
                 updateSwipeCounter();
+                
+                // Set current user profile image in match modal
+                if (currentUser.profileImage) {
+                    matchCurrentUserImg.querySelector('img').src = currentUser.profileImage;
+                }
+                
+                // Initialize event listeners
+                initializeEventListeners();
+            }
+            
+            // Function to initialize event listeners
+            function initializeEventListeners() {
+                // Filter button click
+                filterBtn.addEventListener('click', function() {
+                    filterPanel.classList.remove('hidden');
+                });
+                
+                // Close filter button click
+                closeFilterBtn.addEventListener('click', function() {
+                    filterPanel.classList.add('hidden');
+                });
+                
+                // Apply filters button click
+                applyFiltersBtn.addEventListener('click', function() {
+                    applyFilters();
+                    filterPanel.classList.add('hidden');
+                    showToast('Filters applied');
+                });
+                
+                // Reset filters button click
+                resetFiltersBtn.addEventListener('click', function() {
+                    resetFilters();
+                    showToast('Filters reset');
+                });
+                
+                // Match percent range input
+                matchPercentRange.addEventListener('input', function() {
+                    matchPercentLabel.textContent = this.value + '%';
+                });
+                
+                // Priority selection
+                priorityOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Remove selected class from all options
+                        priorityOptions.forEach(opt => {
+                            opt.classList.remove('bg-primary/10');
+                            opt.classList.add('bg-lightSecondary');
+                        });
+                        
+                        // Add selected class to clicked option
+                        this.classList.add('bg-primary/10');
+                        this.classList.remove('bg-lightSecondary');
+                        
+                        // Update selected priority
+                        selectedPriority = this.dataset.priority;
+                    });
+                });
+                
+                // Skills filter input
+                skillsFilter.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        addSkillTag(this.value.trim());
+                        this.value = '';
+                    }
+                });
+                
+                // Search input
+                searchInput.addEventListener('input', function() {
+                    performSearch();
+                });
+                
+                // Filter buttons
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Update active button
+                        filterButtons.forEach(btn => {
+                            btn.classList.remove('bg-primary', 'text-white');
+                            btn.classList.add('bg-lightTertiary', 'text-textDark');
+                        });
+                        this.classList.remove('bg-lightTertiary', 'text-textDark');
+                        this.classList.add('bg-primary', 'text-white');
+                        
+                        // Filter results based on button
+                        performSearch();
+                    });
+                });
+                
+                // View all users button
+                viewAllUsersBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    
+                    // Reset filter to "All"
+                    const filterButtons = document.querySelectorAll('.filter-btn');
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('bg-primary', 'text-white');
+                        btn.classList.add('bg-lightTertiary', 'text-textDark');
+                    });
+                    filterButtons[0].classList.remove('bg-lightTertiary', 'text-textDark');
+                    filterButtons[0].classList.add('bg-primary', 'text-white');
+                    
+                    performSearch();
+                });
+                
+                // Swipe buttons
+                swipeLeftBtn.addEventListener('click', function() {
+                    const currentCard = document.querySelector('.card:not(.card-next):not(.card-next-next)');
+                    if (currentCard && !isAnimating) {
+                        swipeLeft(currentCard);
+                    }
+                });
+                
+                swipeRightBtn.addEventListener('click', function() {
+                    const currentCard = document.querySelector('.card:not(.card-next):not(.card-next-next)');
+                    if (currentCard && !isAnimating) {
+                        swipeRight(currentCard);
+                    }
+                });
+                
+                // Match modal buttons
+                startChatBtn.addEventListener('click', function() {
+                    if (currentMatchedUser) {
+                        window.location.href = 'chat.html';
+                    }
+                    matchModal.classList.add('hidden');
+                });
+                
+                viewProfileBtn.addEventListener('click', function() {
+                    if (currentMatchedUser) {
+                        localStorage.setItem('viewProfileId', currentMatchedUser.id);
+                        window.location.href = `profile.html?view=${currentMatchedUser.id}`;
+                    }
+                    matchModal.classList.add('hidden');
+                });
+                
+                keepSearchingBtn.addEventListener('click', function() {
+                    matchModal.classList.add('hidden');
+                });
+                
+                // Create sample users button
+                createSampleUsersBtn.addEventListener('click', function() {
+                    createSampleUsers();
+                });
+                
+                // Close alert button
+                closeAlertBtn.addEventListener('click', function() {
+                    swipeLimitAlert.style.display = 'none';
+                    showSwipeLimitState();
+                });
+            }
+            
+            // Function to add skill tag to filter
+            function addSkillTag(skill) {
+                if (!skill) return;
+                
+                // Check if skill already exists
+                if (currentFilters.skills.includes(skill)) return;
+                
+                // Create skill tag
+                const tagElement = document.createElement('div');
+                tagElement.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center';
+                tagElement.innerHTML = `
+                    <span>${skill}</span>
+                    <button class="ml-1 text-primary hover:text-primary/50">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                // Add click listener to remove button
+                tagElement.querySelector('button').addEventListener('click', function() {
+                    // Remove from DOM
+                    tagElement.remove();
+                    
+                    // Remove from filters
+                    const skillIndex = currentFilters.skills.indexOf(skill);
+                    if (skillIndex !== -1) {
+                        currentFilters.skills.splice(skillIndex, 1);
+                    }
+                });
+                
+                // Add to DOM
+                selectedSkills.appendChild(tagElement);
+                
+                // Add to filters
+                currentFilters.skills.push(skill);
+            }
+            
+            // Function to apply filters
+            function applyFilters() {
+                // Update current filters
+                currentFilters.industry = industryFilter.value;
+                currentFilters.location = locationFilter.value;
+                currentFilters.minMatch = matchPercentRange.value;
+                currentFilters.priority = selectedPriority;
+                
+                // Reload card deck with filters
+                loadingState.classList.remove('hidden');
+                cardDeck.classList.add('hidden');
+                swipeButtons.classList.add('hidden');
+                
+                setTimeout(() => {
+                    loadingState.classList.add('hidden');
+                    initializeCardDeck();
+                }, 1000);
+            }
+            
+            // Function to reset filters
+            function resetFilters() {
+                // Reset form inputs
+                industryFilter.value = '';
+                locationFilter.value = '';
+                skillsFilter.value = '';
+                matchPercentRange.value = 0;
+                matchPercentLabel.textContent = '0%';
+                selectedSkills.innerHTML = '';
+                
+                // Reset priority options
+                priorityOptions.forEach(opt => {
+                    opt.classList.remove('bg-primary/10');
+                    opt.classList.add('bg-lightSecondary');
+                });
+                priorityOptions[0].classList.add('bg-primary/10'); // Select Skills by default
+                priorityOptions[0].classList.remove('bg-lightSecondary');
+                
+                // Reset filters object
+                currentFilters = {
+                    industry: '',
+                    location: '',
+                    skills: [],
+                    minMatch: 0,
+                    priority: 'skills'
+                };
+                
+                selectedPriority = 'skills';
             }
             
             // Function to get daily swipes from localStorage
@@ -476,9 +1367,10 @@
                 swipeLimitState.classList.remove('hidden');
                 noResultsState.classList.add('hidden');
                 noUsersState.classList.add('hidden');
+                loadingState.classList.add('hidden');
             }
             
-            // Function to create sample users (for demonstration)
+            // Function to create sample users
             function createSampleUsers() {
                 const sampleUsers = [
                     {
@@ -549,29 +1441,40 @@
                     }
                 ];
                 
-                // Register each sample user
+                // Save sample users
+                localStorage.setItem('sampleUsers', JSON.stringify(sampleUsers));
+                
+                // Add each user to localStorage
                 sampleUsers.forEach(user => {
-                    localStorage.setItem('user_' + user.id, JSON.stringify(user));
+                    localStorage.setItem(`user_${user.id}`, JSON.stringify(user));
                 });
                 
-                // Refresh the page to show the new users
-                window.location.reload();
+                // Show success message
+                showToast('Sample users created');
+                
+                // Reload the card deck
+                loadingState.classList.remove('hidden');
+                cardDeck.classList.add('hidden');
+                swipeButtons.classList.add('hidden');
+                noUsersState.classList.add('hidden');
+                
+                setTimeout(() => {
+                    loadingState.classList.add('hidden');
+                    initializeCardDeck();
+                }, 1000);
             }
             
             // Function to initialize card deck
             function initializeCardDeck() {
-                // Get all available users using our utility
-                filteredUsers = ProConnectUsers.getAllUsers();
-                
-                // Calculate match percentages compared to current user
-                if (currentUser) {
-                    filteredUsers.forEach(user => {
-                        user.match = ProConnectUsers.calculateMatchPercentage(currentUser, user);
-                    });
-                    
-                    // Sort by match percentage (highest first)
-                    filteredUsers.sort((a, b) => b.match - a.match);
+                // Get user recommendations using the AI algorithm
+                if (searchInput.value.trim()) {
+                    // If there's a search query, use regular search
+                    performSearch();
+                    return;
                 }
+                
+                // Otherwise use AI recommendations
+                filteredUsers = ProConnectUsers.getRecommendedMatches(currentUser, currentFilters);
                 
                 // Show card deck & swipe buttons if there are users
                 if (filteredUsers.length > 0) {
@@ -585,8 +1488,74 @@
                 } else {
                     cardDeck.classList.add('hidden');
                     swipeButtons.classList.add('hidden');
+                    
+                    // Check if there are any users at all
+                    const allUsers = ProConnectUsers.getAllUsers();
+                    if (allUsers.length === 0) {
+                        noResultsState.classList.add('hidden');
+                        noUsersState.classList.remove('hidden');
+                    } else {
+                        noResultsState.classList.remove('hidden');
+                        noUsersState.classList.add('hidden');
+                    }
+                }
+            }
+            
+            // Function to perform search
+            function performSearch() {
+                if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
+                    // Don't update if swipe limit is reached
+                    return;
+                }
+                
+                const searchTerm = searchInput.value.toLowerCase();
+                const activeFilter = document.querySelector('.filter-btn.bg-primary').getAttribute('data-filter');
+                
+                // Use the ProConnectUsers utility to search
+                filteredUsers = ProConnectUsers.searchUsers(searchTerm, activeFilter);
+                
+                // Filter out users that have been swiped already
+                const swipedUserIds = ProConnectUsers.getSwipedUserIds(currentUser.id);
+                filteredUsers = filteredUsers.filter(user => !swipedUserIds.includes(user.id));
+                
+                // Calculate match percentages with current user
+                filteredUsers.forEach(user => {
+                    user.match = ProConnectUsers.calculateMatchPercentage(currentUser, user, currentFilters.priority);
+                });
+                
+                // Sort by match percentage (highest first)
+                filteredUsers.sort((a, b) => b.match - a.match);
+                
+                // Apply minimum match filter if set
+                if (currentFilters.minMatch > 0) {
+                    filteredUsers = filteredUsers.filter(user => user.match >= currentFilters.minMatch);
+                }
+                
+                // Reset card index and recreate cards
+                currentCardIndex = 0;
+                
+                // Show card deck & swipe buttons if there are users
+                if (filteredUsers.length > 0) {
+                    cardDeck.classList.remove('hidden');
+                    swipeButtons.classList.remove('hidden');
                     noResultsState.classList.add('hidden');
-                    noUsersState.classList.remove('hidden');
+                    noUsersState.classList.add('hidden');
+                    
+                    // Create cards
+                    createCards();
+                } else {
+                    cardDeck.classList.add('hidden');
+                    swipeButtons.classList.add('hidden');
+                    
+                    // Check if it's because there are no users at all
+                    const allUsers = ProConnectUsers.getAllUsers();
+                    if (allUsers.length === 0) {
+                        noResultsState.classList.add('hidden');
+                        noUsersState.classList.remove('hidden');
+                    } else {
+                        noResultsState.classList.remove('hidden');
+                        noUsersState.classList.add('hidden');
+                    }
                 }
             }
             
@@ -594,7 +1563,7 @@
             function createCards() {
                 cardDeck.innerHTML = '';
                 
-                // Add cards for first few users (showing 3 cards at most)
+                // Add cards for first few users (showing max 3 cards at most)
                 const cardsToShow = Math.min(3, filteredUsers.length);
                 
                 for (let i = 0; i < cardsToShow; i++) {
@@ -610,8 +1579,9 @@
             // Function to create a single card
             function createCard(user, index) {
                 const card = document.createElement('div');
-                card.className = `card ${index === 0 ? '' : 'card-next'}`;
+                card.className = `card ${index === 0 ? '' : (index === 1 ? 'card-next' : 'card-next-next')}`;
                 card.style.zIndex = 10 - index;
+                card.dataset.userId = user.id;
                 
                 // Create swipe indicators (hidden initially)
                 const swipeLeftIndicator = document.createElement('div');
@@ -626,22 +1596,28 @@
                 const swipeOverlay = document.createElement('div');
                 swipeOverlay.className = 'swipe-overlay';
                 
-                // Prepare skills display
-                let skillsHtml = '';
-                let skills = [];
-                
-                if (typeof user.skills === 'string') {
-                    skills = user.skills.split(',').map(skill => skill.trim()).filter(s => s);
-                } else if (Array.isArray(user.skills)) {
-                    skills = user.skills.filter(s => s);
+                // Find skills that match with current user
+                const currentUserSkills = currentUser.skills || [];
+                let currentUserSkillsArray = [];
+                if (typeof currentUserSkills === 'string') {
+                    currentUserSkillsArray = currentUserSkills.split(',').map(s => s.trim().toLowerCase());
+                } else if (Array.isArray(currentUserSkills)) {
+                    currentUserSkillsArray = currentUserSkills.map(s => s.toLowerCase());
                 }
                 
-                skillsHtml = skills.map(skill => 
-                    `<span class="bg-lightTertiary px-2 py-0.5 rounded-full text-xs">${skill}</span>`
-                ).join('');
+                // Prepare skills display with matching highlighted
+                let skillsHtml = '';
+                if (user.skills && user.skills.length > 0) {
+                    skillsHtml = user.skills.map(skill => {
+                        const isMatch = currentUserSkillsArray.includes(skill.toLowerCase());
+                        return `<span class="skill-badge ${isMatch ? 'skill-badge-match' : ''}">${skill}${isMatch ? ' <i class="fas fa-check-circle text-success text-xs"></i>' : ''}</span>`;
+                    }).join('');
+                } else {
+                    skillsHtml = '<span class="text-sm text-textLight">No skills listed</span>';
+                }
                 
                 // Format bio/about text
-                const bio = user.about || user.bio || `Professional working in ${user.industry || 'their industry'}.`;
+                const bio = user.about || `Professional working in ${user.industry || 'their industry'}.`;
                 
                 card.innerHTML = `
                     <div class="card-header">
@@ -659,7 +1635,7 @@
                         <div class="mb-3">
                             <h4 class="text-sm font-medium mb-1">Skills</h4>
                             <div class="flex flex-wrap gap-1">
-                                ${skillsHtml || '<span class="text-sm text-textLight">No skills listed</span>'}
+                                ${skillsHtml}
                             </div>
                         </div>
                         <div>
@@ -674,7 +1650,7 @@
                 card.appendChild(swipeRightIndicator);
                 card.appendChild(swipeOverlay);
                 
-                // Add event listeners for touch/mouse events
+                // Add event listeners for touch/mouse events (only for the top card)
                 if (index === 0) {
                     addSwipeEvents(card);
                 }
@@ -759,7 +1735,7 @@
                 moveY = e.clientY - startY;
                 
                 // Get the current card
-                const currentCard = document.querySelector('.card:not(.card-next)');
+                const currentCard = document.querySelector('.card:not(.card-next):not(.card-next-next)');
                 if (currentCard) {
                     // Update card position
                     updateCardPosition(currentCard, moveX, moveY);
@@ -772,7 +1748,7 @@
                 if (isAnimating || !startX) return;
                 
                 // Get the current card
-                const currentCard = document.querySelector('.card:not(.card-next)');
+                const currentCard = document.querySelector('.card:not(.card-next):not(.card-next-next)');
                 if (currentCard) {
                     // Check if it's a swipe
                     if (Math.abs(moveX) > 100) {
@@ -848,6 +1824,10 @@
                 card.style.transition = 'transform 0.5s ease';
                 card.classList.add('card-swipe-left');
                 
+                // Record the swipe
+                const userId = card.dataset.userId;
+                ProConnectUsers.recordSwipe(currentUser.id, userId, 'left');
+                
                 // Increment swipe counter
                 incrementSwipeCounter();
                 
@@ -874,10 +1854,16 @@
                 card.classList.add('card-swipe-right');
                 
                 // Get user that was swiped
-                const user = filteredUsers[currentCardIndex];
+                const userId = card.dataset.userId;
+                const user = filteredUsers.find(u => u.id === userId);
+                
+                // Record the swipe and check for match
+                const isMatch = ProConnectUsers.recordSwipe(currentUser.id, userId, 'right');
                 
                 // Handle successful match
-                handleMatch(user);
+                if (isMatch) {
+                    handleMatch(user);
+                }
                 
                 // Increment swipe counter
                 incrementSwipeCounter();
@@ -891,48 +1877,25 @@
             
             // Function to handle a successful match
             function handleMatch(user) {
-                // In a real app, you would send this to the server
                 console.log(`Matched with ${user.fullName}!`);
                 
-                // For demo purposes, add to current user's connections
-                if (currentUser) {
-                    if (!currentUser.connections) {
-                        currentUser.connections = [];
-                    }
-                    
-                    // Add to connections if not already there
-                    const alreadyConnected = currentUser.connections.some(conn => conn.id === user.id);
-                    if (!alreadyConnected) {
-                        currentUser.connections.push({
-                            id: user.id,
-                            name: user.fullName,
-                            timestamp: new Date().getTime(),
-                            profileImage: user.profileImage
-                        });
-                        
-                        // Update current user in localStorage
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        
-                        // Show match notification
-                        currentMatchedUser = user;
-                        
-                        // Update match modal content
-                        matchUserName.innerHTML = `You and <span class="font-medium text-primary">${user.fullName}</span> have connected!`;
-                        matchUserImg.querySelector('img').src = user.profileImage;
-                        matchCurrentUserImg.querySelector('img').src = currentUser.profileImage || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80";
-                        
-                        // Show match modal after a short delay
-                        setTimeout(() => {
-                            matchModal.classList.remove('hidden');
-                        }, 600);
-                    }
-                }
+                // Store the matched user
+                currentMatchedUser = user;
+                
+                // Update match modal content
+                matchUserName.innerHTML = `You and <span class="font-medium text-primary">${user.fullName}</span> have connected!`;
+                matchUserImg.querySelector('img').src = user.profileImage;
+                
+                // Show match modal after a short delay
+                setTimeout(() => {
+                    matchModal.classList.remove('hidden');
+                }, 600);
             }
             
             // Function to process next card
             function processNextCard() {
                 // Remove the current card
-                const currentCard = document.querySelector('.card:not(.card-next)');
+                const currentCard = document.querySelector('.card:not(.card-next):not(.card-next-next)');
                 if (currentCard) {
                     currentCard.remove();
                 }
@@ -940,11 +1903,17 @@
                 // Move to next card index
                 currentCardIndex++;
                 
-                // Make the next card current
-                const nextCard = document.querySelector('.card.card-next');
+                // Update card classes: next card becomes current, next-next becomes next
+                const nextCard = document.querySelector('.card-next');
                 if (nextCard) {
                     nextCard.classList.remove('card-next');
                     addSwipeEvents(nextCard);
+                }
+                
+                const nextNextCard = document.querySelector('.card-next-next');
+                if (nextNextCard) {
+                    nextNextCard.classList.remove('card-next-next');
+                    nextNextCard.classList.add('card-next');
                 }
                 
                 // Check if we need to add more cards
@@ -962,6 +1931,7 @@
                         cardDeck.classList.add('hidden');
                         swipeButtons.classList.add('hidden');
                         noResultsState.classList.remove('hidden');
+                        showToast('No more matches available');
                     } else {
                         // Add back the current card (this shouldn't normally happen)
                         const newCard = createCard(filteredUsers[currentCardIndex], 0);
@@ -970,215 +1940,16 @@
                 }
             }
             
-            // Search input functionality
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', function() {
-                performSearch();
-            });
-            
-            // Filter buttons functionality
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Update active button
-                    filterButtons.forEach(btn => {
-                        btn.classList.remove('bg-primary', 'text-white');
-                        btn.classList.add('bg-lightTertiary', 'text-textDark');
-                    });
-                    this.classList.remove('bg-lightTertiary', 'text-textDark');
-                    this.classList.add('bg-primary', 'text-white');
-                    
-                    // Filter results based on button
-                    performSearch();
-                });
-            });
-            
-            // Function to perform search
-            function performSearch() {
-                if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
-                    // Don't update if swipe limit is reached
-                    return;
-                }
+            // Function to show toast notification
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.style.opacity = 1;
                 
-                const searchTerm = searchInput.value.toLowerCase();
-                const activeFilter = document.querySelector('.filter-btn.bg-primary').getAttribute('data-filter');
-                
-                // Use the ProConnectUsers utility to search
-                filteredUsers = ProConnectUsers.searchUsers(searchTerm, activeFilter);
-                
-                // Calculate match percentages with current user
-                if (currentUser) {
-                    filteredUsers.forEach(user => {
-                        user.match = ProConnectUsers.calculateMatchPercentage(currentUser, user);
-                    });
-                    
-                    // Sort by match percentage (highest first)
-                    filteredUsers.sort((a, b) => b.match - a.match);
-                }
-                
-                // Reset card index and recreate cards
-                currentCardIndex = 0;
-                
-                // Show card deck & swipe buttons if there are users
-                if (filteredUsers.length > 0) {
-                    cardDeck.classList.remove('hidden');
-                    swipeButtons.classList.remove('hidden');
-                    noResultsState.classList.add('hidden');
-                    noUsersState.classList.add('hidden');
-                    
-                    // Create cards
-                    createCards();
-                } else {
-                    cardDeck.classList.add('hidden');
-                    swipeButtons.classList.add('hidden');
-                    
-                    // Check if it's because there are no users at all
-                    const allUsers = ProConnectUsers.getAllUsers();
-                    if (allUsers.length === 0) {
-                        noResultsState.classList.add('hidden');
-                        noUsersState.classList.remove('hidden');
-                    } else {
-                        noResultsState.classList.remove('hidden');
-                        noUsersState.classList.add('hidden');
-                    }
-                }
+                setTimeout(() => {
+                    toastNotification.style.opacity = 0;
+                }, 3000);
             }
-            
-            // View all users button
-            viewAllUsersBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                
-                // Reset filter to "All"
-                filterButtons.forEach(btn => {
-                    btn.classList.remove('bg-primary', 'text-white');
-                    btn.classList.add('bg-lightTertiary', 'text-textDark');
-                });
-                filterButtons[0].classList.remove('bg-lightTertiary', 'text-textDark');
-                filterButtons[0].classList.add('bg-primary', 'text-white');
-                
-                performSearch();
-            });
-            
-            // Create sample users button
-            createSampleUsersBtn.addEventListener('click', function() {
-                createSampleUsers();
-            });
-            
-            // Swipe buttons functionality
-            swipeLeftBtn.addEventListener('click', function() {
-                const currentCard = document.querySelector('.card:not(.card-next)');
-                if (currentCard && !isAnimating) {
-                    swipeLeft(currentCard);
-                }
-            });
-            
-            swipeRightBtn.addEventListener('click', function() {
-                const currentCard = document.querySelector('.card:not(.card-next)');
-                if (currentCard && !isAnimating) {
-                    swipeRight(currentCard);
-                }
-            });
-            
-            // Match modal buttons
-            startChatBtn.addEventListener('click', function() {
-                if (currentMatchedUser) {
-                    // Check if conversation already exists in localStorage
-                    const conversations = JSON.parse(localStorage.getItem('userConversations_' + currentUser.id)) || [];
-                    
-                    // Find or create conversation
-                    let conversation = conversations.find(c => c.userId == currentMatchedUser.id);
-                    
-                    if (!conversation) {
-                        // Create a new conversation
-                        conversation = {
-                            userId: currentMatchedUser.id,
-                            messages: [{
-                                sender: 'system',
-                                content: `You matched with ${currentMatchedUser.fullName}! Say hello to start the conversation.`,
-                                timestamp: Date.now(),
-                                read: true
-                            }]
-                        };
-                        
-                        conversations.push(conversation);
-                        localStorage.setItem('userConversations_' + currentUser.id, JSON.stringify(conversations));
-                    }
-                    
-                    // Redirect to chat page
-                    window.location.href = 'chat.html';
-                }
-                
-                matchModal.classList.add('hidden');
-            });
-            
-            keepSearchingBtn.addEventListener('click', function() {
-                matchModal.classList.add('hidden');
-            });
-            
-            // Close alert button
-            closeAlertBtn.addEventListener('click', function() {
-                swipeLimitAlert.style.display = 'none';
-                showSwipeLimitState();
-            });
         });
     </script>
 </body>
 </html>
-// Improved swipe handling - add to search.html
-function enhanceSwipeExperience() {
-  // Store swipe decisions for better recommendations
-  function recordSwipeDecision(userId, decision) {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) return;
-    
-    // Initialize swipe history if needed
-    if (!currentUser.swipeHistory) {
-      currentUser.swipeHistory = [];
-    }
-    
-    // Record this swipe
-    currentUser.swipeHistory.push({
-      userId: userId,
-      decision: decision, // 'left' or 'right'
-      timestamp: Date.now()
-    });
-    
-    // Keep only last 100 swipes
-    if (currentUser.swipeHistory.length > 100) {
-      currentUser.swipeHistory = currentUser.swipeHistory.slice(-100);
-    }
-    
-    // Update user data
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-  }
-  
-  // Enhance existing swipe functions
-  const originalSwipeLeft = window.swipeLeft;
-  const originalSwipeRight = window.swipeRight;
-  
-  // Override with enhanced versions if they exist
-  if (typeof originalSwipeLeft === 'function') {
-    window.swipeLeft = function(card) {
-      // Record the decision
-      const userId = filteredUsers[currentCardIndex].id;
-      recordSwipeDecision(userId, 'left');
-      
-      // Call original function
-      return originalSwipeLeft.apply(this, arguments);
-    };
-  }
-  
-  if (typeof originalSwipeRight === 'function') {
-    window.swipeRight = function(card) {
-      // Record the decision
-      const userId = filteredUsers[currentCardIndex].id;
-      recordSwipeDecision(userId, 'right');
-      
-      // Call original function
-      return originalSwipeRight.apply(this, arguments);
-    };
-  }
-}
-
-// Run enhancement when page loads
-document.addEventListener('DOMContentLoaded', enhanceSwipeExperience);
