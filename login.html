@@ -225,7 +225,7 @@
             <form class="space-y-4">
                 <div>
                     <label for="loginEmail" class="block text-sm font-medium mb-1 text-white">Email</label>
-                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:text-white" placeholder="Enter your email" required>
+                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:text-white" placeholder="Enter your email" required value="demo@proconnect.com">
                 </div>
                 
                 <div>
@@ -233,7 +233,7 @@
                         <label for="loginPassword" class="block text-sm font-medium text-white">Password</label>
                         <a href="#" class="text-primary text-sm">Forgot?</a>
                     </div>
-                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:text-white" placeholder="Enter your password" required>
+                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:text-white" placeholder="Enter your password" required value="password123">
                 </div>
                 
                 <div class="flex items-center">
@@ -600,72 +600,122 @@
     </div>
 
     <script>
-        // Global in-memory database for users (replacing localStorage)
-        window.ProConnectDB = {
-            users: [
-                // Sample user
+        // Global app variable to store user data
+        window.proconnectApp = {
+            isDemoUser: true,
+            demoUser: {
+                id: 'user_demo',
+                fullName: 'John Doe',
+                email: 'demo@proconnect.com',
+                password: 'password123',
+                currentRole: 'Product Manager',
+                company: 'TechCorp',
+                industry: 'Technology',
+                location: 'San Francisco, CA',
+                skills: ['Product Management', 'User Research', 'Agile', 'Market Analysis', 'Strategy'],
+                about: 'Experienced Product Manager with a passion for creating user-centered solutions. I specialize in agile methodologies and have a track record of launching successful products that deliver business value while meeting user needs.',
+                profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                networkingProfile: {
+                    importance: 'very',
+                    goals: ['clients', 'partners'],
+                    approach: 'proactive',
+                    challenge: 'finding',
+                    sectors: ['tech', 'finance'],
+                    score: 75,
+                    dateCreated: new Date().toISOString()
+                },
+                connections: [],
+                pendingRequests: [
+                    {
+                        id: 'user_req1',
+                        name: 'Sarah Johnson',
+                        role: 'Marketing Director',
+                        company: 'Digital Solutions',
+                        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
+                    },
+                    {
+                        id: 'user_req2',
+                        name: 'Michael Chen',
+                        role: 'Software Engineer',
+                        company: 'Tech Innovations',
+                        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
+                    }
+                ],
+                sentRequests: [
+                    {
+                        id: 'user_sent1',
+                        name: 'Emma Wilson',
+                        role: 'Data Scientist',
+                        company: 'Analytics Pro',
+                        image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
+                    }
+                ],
+                dateJoined: new Date().toISOString()
+            },
+            // Add other users that will appear in search
+            otherUsers: [
                 {
                     id: 'user_1',
-                    fullName: 'John Doe',
-                    email: 'test@example.com',
-                    password: 'password123',
-                    currentRole: 'Product Manager',
-                    company: 'TechCorp',
+                    fullName: 'Sarah Johnson',
+                    email: 'sarah@example.com',
+                    currentRole: 'Marketing Director',
+                    company: 'Digital Solutions',
+                    industry: 'Marketing',
+                    location: 'New York, NY',
+                    skills: ['Digital Marketing', 'SEO', 'Content Strategy', 'Social Media'],
+                    about: 'Marketing director with 10+ years of experience in digital transformation and brand development.',
+                    profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
+                },
+                {
+                    id: 'user_2',
+                    fullName: 'Michael Chen',
+                    email: 'michael@example.com',
+                    currentRole: 'Software Engineer',
+                    company: 'Tech Innovations',
                     industry: 'Technology',
                     location: 'San Francisco, CA',
-                    skills: ['Product Management', 'User Research', 'Agile', 'Market Analysis', 'Strategy'],
-                    about: 'Experienced Product Manager with a passion for creating user-centered solutions. I specialize in agile methodologies and have a track record of launching successful products that deliver business value while meeting user needs.',
-                    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    networkingProfile: {
-                        importance: 'very',
-                        goals: ['clients', 'partners'],
-                        approach: 'proactive',
-                        challenge: 'finding',
-                        sectors: ['tech', 'finance'],
-                        score: 75,
-                        dateCreated: new Date().toISOString()
-                    },
-                    connections: [],
-                    pendingRequests: [],
-                    sentRequests: [],
-                    dateJoined: new Date().toISOString()
+                    skills: ['JavaScript', 'React', 'Node.js', 'AWS'],
+                    about: 'Full-stack developer with a passion for creating scalable web applications and mentoring junior developers.',
+                    profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
+                },
+                {
+                    id: 'user_3',
+                    fullName: 'Emma Wilson',
+                    email: 'emma@example.com',
+                    currentRole: 'Data Scientist',
+                    company: 'Analytics Pro',
+                    industry: 'Technology',
+                    location: 'Boston, MA',
+                    skills: ['Python', 'Machine Learning', 'Data Visualization', 'Statistics'],
+                    about: 'Data scientist specializing in predictive modeling and business intelligence solutions.',
+                    profileImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
+                },
+                {
+                    id: 'user_4',
+                    fullName: 'David Patel',
+                    email: 'david@example.com',
+                    currentRole: 'Finance Manager',
+                    company: 'Global Investments',
+                    industry: 'Finance',
+                    location: 'Chicago, IL',
+                    skills: ['Financial Analysis', 'Investment Strategy', 'Risk Management', 'Excel'],
+                    about: 'Finance professional with expertise in portfolio management and financial planning.',
+                    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
+                },
+                {
+                    id: 'user_5',
+                    fullName: 'Olivia Rodriguez',
+                    email: 'olivia@example.com',
+                    currentRole: 'UX Designer',
+                    company: 'Creative Solutions',
+                    industry: 'Technology',
+                    location: 'Austin, TX',
+                    skills: ['User Research', 'Wireframing', 'Prototyping', 'Figma'],
+                    about: 'UX designer focused on creating intuitive and accessible digital experiences.',
+                    profileImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80'
                 }
-            ],
-            currentUser: null,
-            tempRegistration: null
+            ]
         };
-
-        // Create session storage to transfer data between pages
-        function setSessionData(key, value) {
-            if (typeof value === 'object') {
-                document.cookie = `${key}=${encodeURIComponent(JSON.stringify(value))};path=/`;
-            } else {
-                document.cookie = `${key}=${encodeURIComponent(value)};path=/`;
-            }
-        }
-
-        function getSessionData(key) {
-            const name = `${key}=`;
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const ca = decodedCookie.split(';');
-            for(let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) === ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) === 0) {
-                    const value = c.substring(name.length, c.length);
-                    try {
-                        // Try to parse as JSON
-                        return JSON.parse(value);
-                    } catch (e) {
-                        // Or return as is if it's not JSON
-                        return value;
-                    }
-                }
-            }
-            return null;
-        }
 
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements - Auth Forms
@@ -727,17 +777,6 @@
                 challenge: '',
                 sectors: []
             };
-
-            // Try to get current user from session
-            const sessionUser = getSessionData('currentUser');
-            if (sessionUser) {
-                window.ProConnectDB.currentUser = sessionUser;
-                // If user is logged in, redirect to profile page
-                window.location.href = 'profile.html';
-            }
-
-            // Initialize quiz option selection
-            initializeQuizOptions();
             
             // Show toast notification
             function showToast(message) {
@@ -747,35 +786,6 @@
                 setTimeout(() => {
                     toastNotification.style.opacity = 0;
                 }, 3000);
-            }
-            
-            // Find user by email
-            function findUserByEmail(email) {
-                if (!email) return null;
-                return window.ProConnectDB.users.find(user => 
-                    user.email && user.email.toLowerCase() === email.toLowerCase()
-                );
-            }
-            
-            // Add new user
-            function addUser(user) {
-                if (!user || !user.email) {
-                    console.error("Invalid user object");
-                    return { success: false, message: 'Invalid user data' };
-                }
-                
-                // Check if email is already in use
-                if (window.ProConnectDB.users.some(u => 
-                    u.email && u.email.toLowerCase() === user.email.toLowerCase())
-                ) {
-                    return { success: false, message: 'Email is already in use' };
-                }
-                
-                // Add user to array
-                window.ProConnectDB.users.push(user);
-                
-                console.log("User added successfully:", user.email);
-                return { success: true };
             }
             
             // Switch to sign in form
@@ -858,7 +868,7 @@
                     
                     if (seconds <= 0) {
                         clearInterval(timer);
-                        // Redirect to home page
+                        // Redirect to profile page
                         window.location.href = 'profile.html';
                     }
                 }, 1000);
@@ -1093,63 +1103,21 @@
                 return score;
             }
             
-            // Handle sign in
+            // Handle sign in for demo
             function handleSignIn() {
-                // Basic validation
-                if (!loginEmail.value.trim()) {
-                    showToast('Please enter your email');
-                    loginEmail.focus();
-                    return;
-                }
+                // For demo purposes we'll just accept the pre-filled credentials
+                // and set isDemoUser flag to true for simulating all features
                 
-                if (!isValidEmail(loginEmail.value.trim())) {
-                    showToast('Please enter a valid email address');
-                    loginEmail.focus();
-                    return;
-                }
-                
-                if (!loginPassword.value) {
-                    showToast('Please enter your password');
-                    loginPassword.focus();
-                    return;
-                }
-                
-                // For demo purposes, allow signing in with the default account
-                if (loginEmail.value.trim() === 'test@example.com' && loginPassword.value === 'password123') {
-                    // Use the first user from our default array
-                    const user = window.ProConnectDB.users[0];
-                    window.ProConnectDB.currentUser = user;
-                    
-                    // Save to session
-                    setSessionData('currentUser', user);
+                if (loginEmail.value.trim() === 'demo@proconnect.com' && loginPassword.value === 'password123') {
+                    window.proconnectApp.isDemoUser = true;
                     
                     // Show success message
                     showSuccess('You have been signed in successfully.');
                     return;
                 }
                 
-                // Find user by email
-                const user = findUserByEmail(loginEmail.value.trim());
-                
-                if (!user) {
-                    showToast('Email not found. Please check your email or sign up.');
-                    return;
-                }
-                
-                // Simplified password check (in a real app, you would use proper hashing)
-                if (user.password !== loginPassword.value) {
-                    showToast('Incorrect password. Please try again.');
-                    return;
-                }
-                
-                // Store current user
-                window.ProConnectDB.currentUser = user;
-                
-                // Save to session
-                setSessionData('currentUser', user);
-                
-                // Show success message
-                showSuccess('You have been signed in successfully.');
+                // If credentials don't match demo account, show error
+                showToast('Invalid credentials. Use demo@proconnect.com / password123');
             }
             
             // Handle continue to quiz
@@ -1169,14 +1137,6 @@
                 
                 if (!isValidEmail(registerEmail.value.trim())) {
                     showToast('Please enter a valid email address');
-                    registerEmail.focus();
-                    return;
-                }
-                
-                // Check if email is already in use
-                const existingUser = findUserByEmail(registerEmail.value.trim());
-                if (existingUser) {
-                    showToast('This email is already in use. Please use a different email or sign in.');
                     registerEmail.focus();
                     return;
                 }
@@ -1211,21 +1171,6 @@
                     return;
                 }
                 
-                // Store registration data temporarily
-                const tempRegistration = {
-                    fullName: registerFullName.value.trim(),
-                    email: registerEmail.value.trim(),
-                    password: registerPassword.value, // In a real app, never store raw passwords
-                    currentRole: registerTitle.value.trim(),
-                    company: registerCompany.value.trim(),
-                    industry: registerIndustry.value,
-                    location: registerLocation.value.trim(),
-                    skills: registerSkills.value.trim() ? registerSkills.value.split(',').map(s => s.trim()) : [],
-                    about: registerAbout.value.trim()
-                };
-                
-                window.ProConnectDB.tempRegistration = tempRegistration;
-                
                 // Reset quiz answers
                 quizAnswers = {
                     importance: '',
@@ -1247,56 +1192,8 @@
             // Handle complete sign up
             function handleCompleteSignUp() {
                 try {
-                    // Get registration data
-                    const tempData = window.ProConnectDB.tempRegistration;
-                    if (!tempData) {
-                        showToast('Registration data not found. Please try again.');
-                        return;
-                    }
-                    
-                    // Calculate score
-                    const networkingScore = calculateAndDisplayNetworkingScore();
-                    
-                    // Create user object with quiz data
-                    const newUser = {
-                        id: 'user_' + Date.now(),
-                        fullName: tempData.fullName,
-                        email: tempData.email,
-                        password: tempData.password, // In a real app, use proper hashing
-                        currentRole: tempData.currentRole,
-                        company: tempData.company,
-                        industry: tempData.industry,
-                        location: tempData.location,
-                        skills: tempData.skills,
-                        about: tempData.about,
-                        profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                        networkingProfile: {
-                            ...quizAnswers,
-                            score: networkingScore,
-                            dateCreated: new Date().toISOString()
-                        },
-                        connections: [],
-                        pendingRequests: [],
-                        sentRequests: [],
-                        dateJoined: new Date().toISOString()
-                    };
-                    
-                    // Add user to database
-                    const result = addUser(newUser);
-                    
-                    if (!result.success) {
-                        showToast(result.message);
-                        return;
-                    }
-                    
-                    // Set as current user
-                    window.ProConnectDB.currentUser = newUser;
-                    
-                    // Save to session
-                    setSessionData('currentUser', newUser);
-                    
-                    // Clear temp registration
-                    window.ProConnectDB.tempRegistration = null;
+                    // In demo mode, always use the demo user
+                    window.proconnectApp.isDemoUser = true;
                     
                     // Show success message
                     showSuccess('Your account has been created! Let\'s start networking.');
@@ -1346,9 +1243,8 @@
             // Set initial state - start with Sign In view
             showSignInForm();
             
-            // Pre-fill for demo purposes
-            loginEmail.value = 'test@example.com';
-            loginPassword.value = 'password123';
+            // Initialize quiz options
+            initializeQuizOptions();
         });
     </script>
 </body>
