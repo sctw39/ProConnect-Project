@@ -343,12 +343,12 @@
         <header class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-bold text-primary">Profile</h1>
             <div class="flex items-center">
-                <a href="settings.html" id="settingsBtn" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition">
+                <a href="#" id="settingsBtn" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition">
                     <i class="fas fa-cog text-xl"></i>
                 </a>
-                <a href="notifications.html" id="notificationsBtn" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition relative">
+                <a href="connections.html" id="notificationsBtn" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition relative">
                     <i class="fas fa-bell text-xl"></i>
-                    <span id="notificationBadge" class="notification-badge hidden">0</span>
+                    <span id="notificationBadge" class="notification-badge">2</span>
                 </a>
                 <button id="shareProfileBtn" class="text-primary block p-2 hover:bg-darkTertiary rounded-full transition">
                     <i class="fas fa-share-alt text-xl"></i>
@@ -399,7 +399,7 @@
         </div>
 
         <!-- Main Profile Content -->
-        <div id="profileContent" class="hidden">
+        <div id="profileContent">
             <!-- Profile Header -->
             <div class="flex flex-col items-center mb-6">
                 <div class="profile-image-container mb-3">
@@ -410,19 +410,19 @@
                 </div>
                 <h2 id="profileName" class="text-xl font-bold mb-1 text-white">John Doe</h2>
                 <p id="profileTitle" class="text-gray-300 mb-2">Product Manager at TechCorp</p>
-                <p id="profileLocation" class="text-gray-300 text-sm mb-3"><i class="fas fa-map-marker-alt mr-1"></i>New York, NY</p>
+                <p id="profileLocation" class="text-gray-300 text-sm mb-3"><i class="fas fa-map-marker-alt mr-1"></i>San Francisco, CA</p>
                 
                 <!-- Profile Completeness -->
                 <div class="w-full max-w-xs mb-2">
                     <div class="flex justify-between text-xs mb-1">
                         <span class="text-gray-400">Profile Completeness</span>
-                        <span id="profileCompletionPercent" class="text-primary font-medium">70%</span>
+                        <span id="profileCompletionPercent" class="text-primary font-medium">85%</span>
                     </div>
                     <div class="profile-progress-track">
-                        <div id="profileCompletionBar" class="profile-progress-bar" style="width: 70%"></div>
+                        <div id="profileCompletionBar" class="profile-progress-bar" style="width: 85%"></div>
                     </div>
                 </div>
-                <p id="profileCompletionHint" class="text-xs text-gray-400 mb-3">Add your skills to improve your profile</p>
+                <p id="profileCompletionHint" class="text-xs text-gray-400 mb-3">Your profile is looking great!</p>
                 
                 <!-- Quick Action Buttons -->
                 <div class="flex space-x-3">
@@ -598,16 +598,18 @@
                     </a>
                 </div>
                 <div id="connectionsList" class="grid grid-cols-2 gap-3">
-                    <!-- Connections will be populated by JavaScript -->
-                </div>
-                
-                <!-- Empty Connections State (Hidden initially) -->
-                <div id="emptyConnectionsState" class="hidden py-4 text-center">
-                    <div class="w-12 h-12 bg-darkTertiary rounded-full mx-auto flex items-center justify-center mb-2 pulse-animation">
-                        <i class="fas fa-users text-gray-400"></i>
+                    <!-- Demo connection 1 -->
+                    <div class="flex flex-col items-center text-center">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover mb-1" alt="Olivia Rodriguez">
+                        <p class="text-sm font-medium truncate w-full text-white">Olivia Rodriguez</p>
+                        <p class="text-xs text-gray-400 truncate w-full">UX Designer</p>
                     </div>
-                    <p class="text-gray-300 text-sm mb-2">No connections yet</p>
-                    <a href="search.html" class="text-primary text-sm font-medium hover:underline">Find professionals to connect with</a>
+                    <!-- Demo connection 2 -->
+                    <div class="flex flex-col items-center text-center">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover mb-1" alt="David Patel">
+                        <p class="text-sm font-medium truncate w-full text-white">David Patel</p>
+                        <p class="text-xs text-gray-400 truncate w-full">Finance Manager</p>
+                    </div>
                 </div>
             </div>
 
@@ -625,7 +627,7 @@
                                 <i class="fas fa-star text-accent text-xs"></i>
                                 <i class="fas fa-star text-accent text-xs"></i>
                                 <i class="fas fa-star text-accent text-xs"></i>
-                                <i class="fas fa-star text-gray-600 text-xs"></i>
+                                <i class="fas fa-star text-accent text-xs"></i>
                                 <i class="fas fa-star text-gray-600 text-xs"></i>
                             </div>
                         </div>
@@ -676,24 +678,24 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium mb-1 text-white">Full Name*</label>
-                            <input type="text" id="fullNameInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. John Doe">
+                            <input type="text" id="fullNameInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. John Doe" value="John Doe">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium mb-1 text-white">Professional Title*</label>
-                            <input type="text" id="titleInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. Product Manager">
+                            <input type="text" id="titleInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. Product Manager" value="Product Manager">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium mb-1 text-white">Company</label>
-                            <input type="text" id="companyInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. TechCorp">
+                            <input type="text" id="companyInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. TechCorp" value="TechCorp">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium mb-1 text-white">Industry</label>
                             <select id="industryInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary">
                                 <option value="">Select Industry</option>
-                                <option value="Technology">Technology</option>
+                                <option value="Technology" selected>Technology</option>
                                 <option value="Finance">Finance</option>
                                 <option value="Healthcare">Healthcare</option>
                                 <option value="Education">Education</option>
@@ -707,7 +709,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium mb-1 text-white">Location</label>
-                            <input type="text" id="locationInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. New York, NY">
+                            <input type="text" id="locationInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base bg-darkTertiary border-darkTertiary" placeholder="e.g. New York, NY" value="San Francisco, CA">
                         </div>
                     </div>
                     
@@ -778,7 +780,7 @@
 
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-darkSecondary border-t border-darkTertiary bottom-nav">
-            <a href="index.html" class="flex flex-col items-center">
+            <a href="analytics.html" class="flex flex-col items-center">
                 <i class="fas fa-chart-line text-xl text-gray-500 nav-icon"></i>
                 <span class="text-xs mt-1 text-gray-500">Analytics</span>
             </a>
@@ -786,9 +788,9 @@
                 <i class="fas fa-search text-xl text-gray-500 nav-icon"></i>
                 <span class="text-xs mt-1 text-gray-500">Find</span>
             </a>
-            <a href="notifications.html" class="flex flex-col items-center relative">
+            <a href="connections.html" class="flex flex-col items-center relative">
                 <i class="fas fa-bell text-xl text-gray-500 nav-icon"></i>
-                <span id="navNotificationBadge" class="notification-badge hidden">0</span>
+                <span id="navNotificationBadge" class="notification-badge">2</span>
                 <span class="text-xs mt-1 text-gray-500">Requests</span>
             </a>
             <a href="profile.html" class="flex flex-col items-center">
@@ -817,7 +819,6 @@
             const profileCompletionHint = document.getElementById('profileCompletionHint');
             const viewAllConnectionsBtn = document.getElementById('viewAllConnectionsBtn');
             const connectionsList = document.getElementById('connectionsList');
-            const emptyConnectionsState = document.getElementById('emptyConnectionsState');
             const signOutButton = document.getElementById('signOutButton');
             const signOutModal = document.getElementById('signOutModal');
             const cancelSignOutBtn = document.getElementById('cancelSignOutBtn');
@@ -843,359 +844,7 @@
             const cancelProfileImageBtn = document.getElementById('cancelProfileImageBtn');
             const saveProfileImageBtn = document.getElementById('saveProfileImageBtn');
             
-            // Current state variables
-            let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-            let tempImageDataUrl = null;
-            
-            // Helper functions for user data management
-            function getAllUsers() {
-                return JSON.parse(localStorage.getItem('proconnect_users') || '[]');
-            }
-            
-            function saveUsers(users) {
-                localStorage.setItem('proconnect_users', JSON.stringify(users));
-            }
-            
-            function updateCurrentUserInSystem() {
-                if (!currentUser || !currentUser.id) return false;
-                
-                const users = getAllUsers();
-                const index = users.findIndex(u => u.id === currentUser.id);
-                
-                if (index !== -1) {
-                    users[index] = currentUser;
-                    saveUsers(users);
-                    // Update current user in local storage
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    return true;
-                }
-                
-                return false;
-            }
-            
-            // Check for pending connection requests
-            function checkForPendingRequests() {
-                if (!currentUser) return;
-                
-                const pendingRequests = currentUser.pendingRequests || [];
-                const requestCount = pendingRequests.length;
-                
-                if (requestCount > 0) {
-                    // Update notification badges
-                    notificationBadge.textContent = requestCount;
-                    notificationBadge.classList.remove('hidden');
-                    
-                    navNotificationBadge.textContent = requestCount;
-                    navNotificationBadge.classList.remove('hidden');
-                } else {
-                    notificationBadge.classList.add('hidden');
-                    navNotificationBadge.classList.add('hidden');
-                }
-            }
-            
-            // Initialize UI
-            if (!currentUser) {
-                // Show auth check message and hide profile content
-                authCheck.classList.remove('hidden');
-                profileContent.classList.add('hidden');
-                loadingState.classList.add('hidden');
-                return;
-            } else {
-                // Show loading initially
-                authCheck.classList.add('hidden');
-                loadingState.classList.remove('hidden');
-                profileContent.classList.add('hidden');
-                
-                // Simulate loading delay
-                setTimeout(() => {
-                    loadingState.classList.add('hidden');
-                    loadProfile();
-                    profileContent.classList.remove('hidden');
-                    
-                    // Check for pending connection requests
-                    checkForPendingRequests();
-                }, 800);
-            }
-            
-            // Load current user's profile
-            function loadProfile() {
-                // Set basic profile info
-                document.getElementById('profileName').textContent = currentUser.fullName || "Your Name";
-                
-                // Set profile title (role at company)
-                let title = "";
-                if (currentUser.currentRole) {
-                    title = currentUser.currentRole;
-                    if (currentUser.company) {
-                        title += " at " + currentUser.company;
-                    }
-                }
-                document.getElementById('profileTitle').textContent = title;
-                
-                // Set profile location
-                document.getElementById('profileLocation').textContent = currentUser.location || "Add your location";
-                if (!currentUser.location) {
-                    document.getElementById('profileLocation').innerHTML = '<i class="fas fa-map-marker-alt mr-1"></i>Add your location';
-                } else {
-                    document.getElementById('profileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${currentUser.location}`;
-                }
-                
-                // Set profile image
-                if (currentUser.profileImage) {
-                    document.getElementById('profileImage').src = currentUser.profileImage;
-                    imagePreview.src = currentUser.profileImage;
-                    uploadImagePreview.src = currentUser.profileImage;
-                }
-                
-                // Set about content
-                document.getElementById('aboutContent').textContent = currentUser.about || "Add a description about yourself";
-                document.getElementById('aboutTextarea').value = currentUser.about || "";
-                
-                // Set skills
-                let skillsHtml = "";
-                if (currentUser.skills && currentUser.skills.length > 0) {
-                    let skillsArray = currentUser.skills;
-                    if (typeof skillsArray === 'string') {
-                        skillsArray = skillsArray.split(',').map(s => s.trim());
-                    }
-                    
-                    skillsHtml = skillsArray.map(skill => {
-                        return `<span class="skill-badge">${skill}</span>`;
-                    }).join('');
-                    
-                    document.getElementById('skillsInput').value = skillsArray.join(', ');
-                }
-                document.getElementById('skillsList').innerHTML = skillsHtml || '<span class="text-gray-400 text-sm">Add your skills</span>';
-                
-                // Set experience
-                let experienceHtml = "";
-                if (currentUser.experience && currentUser.experience.length > 0) {
-                    experienceHtml = currentUser.experience.map((exp, index) => {
-                        const isLast = index === currentUser.experience.length - 1;
-                        return `
-                            <div class="${!isLast ? 'mb-3 pb-3 border-b border-darkTertiary' : ''}">
-                                <h4 class="font-medium text-white">${exp.title}</h4>
-                                <p class="text-gray-300 text-sm">${exp.company}</p>
-                                <p class="text-gray-400 text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
-                                ${exp.description ? `<p class="text-gray-300 text-sm mt-1">${exp.description}</p>` : ''}
-                            </div>
-                        `;
-                    }).join('');
-                }
-                document.getElementById('experienceList').innerHTML = experienceHtml || '<span class="text-gray-400 text-sm">Add your work experience</span>';
-                
-                // Set education
-                let educationHtml = "";
-                if (currentUser.education && currentUser.education.length > 0) {
-                    educationHtml = currentUser.education.map((edu, index) => {
-                        const isLast = index === currentUser.education.length - 1;
-                        const degree = edu.degree + (edu.fieldOfStudy ? ' in ' + edu.fieldOfStudy : '');
-                        return `
-                            <div class="${!isLast ? 'mb-3 pb-3 border-b border-darkTertiary' : ''}">
-                                <h4 class="font-medium text-white">${degree}</h4>
-                                <p class="text-gray-300 text-sm">${edu.school}</p>
-                                <p class="text-gray-400 text-xs">${edu.startYear} - ${edu.endYear || 'Present'}</p>
-                            </div>
-                        `;
-                    }).join('');
-                }
-                document.getElementById('educationList').innerHTML = educationHtml || '<span class="text-gray-400 text-sm">Add your education</span>';
-                
-                // Set connections
-                loadConnections();
-                
-                // Set networking insights section based on quiz data
-                updateNetworkingInsights();
-                
-                // Calculate and update profile completion
-                updateProfileCompletion();
-                
-                // Set edit profile panel input values
-                fullNameInput.value = currentUser.fullName || "";
-                titleInput.value = currentUser.currentRole || "";
-                companyInput.value = currentUser.company || "";
-                locationInput.value = currentUser.location || "";
-                
-                // Set industry dropdown value
-                if (currentUser.industry) {
-                    const option = Array.from(industryInput.options).find(opt => opt.value === currentUser.industry);
-                    if (option) {
-                        option.selected = true;
-                    }
-                }
-            }
-            
-            // Update networking insights section based on quiz answers
-            function updateNetworkingInsights() {
-                // Check if user has networkingProfile data
-                if (!currentUser.networkingProfile) return;
-                
-                // Update potential stars based on importance + approach
-                const importance = currentUser.networkingProfile.importance;
-                const approach = currentUser.networkingProfile.approach;
-                let stars = 3; // Default
-                
-                if (importance === 'critical' && approach === 'proactive') {
-                    stars = 5;
-                } else if ((importance === 'critical' || importance === 'very') && 
-                          (approach === 'proactive' || approach === 'opportunistic')) {
-                    stars = 4;
-                } else if (importance === 'not' || approach === 'avoid') {
-                    stars = 2;
-                }
-                
-                // Update stars display
-                const starsHtml = Array(5).fill(0).map((_, i) => {
-                    return i < stars 
-                        ? '<i class="fas fa-star text-accent text-xs"></i>' 
-                        : '<i class="fas fa-star text-gray-600 text-xs"></i>';
-                }).join('');
-                document.getElementById('businessPotentialStars').innerHTML = starsHtml;
-                
-                // Update focus sectors
-                if (currentUser.networkingProfile.sectors && currentUser.networkingProfile.sectors.length > 0) {
-                    const sectorNames = {
-                        'tech': 'Technology',
-                        'finance': 'Finance',
-                        'healthcare': 'Healthcare',
-                        'ecommerce': 'E-commerce',
-                        'marketing': 'Marketing',
-                        'manufacturing': 'Manufacturing',
-                        'professional': 'Services',
-                        'real-estate': 'Real Estate'
-                    };
-                    
-                    // Get top 3 sectors
-                    const topSectors = currentUser.networkingProfile.sectors.slice(0, 3);
-                    const sectorsHtml = topSectors.map(sector => {
-                        const sectorName = sectorNames[sector] || sector;
-                        return `<span class="inline-block px-2 py-1 bg-primary/10 text-primary rounded text-xs mr-1 mb-1">${sectorName}</span>`;
-                    }).join('');
-                    
-                    // Update DOM
-                    if (focusSectorsList) {
-                        focusSectorsList.innerHTML = sectorsHtml;
-                    }
-                }
-            }
-            
-            // Load connections
-            function loadConnections() {
-                if (!currentUser.connections || currentUser.connections.length === 0) {
-                    // Show empty state
-                    connectionsList.classList.add('hidden');
-                    emptyConnectionsState.classList.remove('hidden');
-                    return;
-                }
-                
-                // Hide empty state
-                connectionsList.classList.remove('hidden');
-                emptyConnectionsState.classList.add('hidden');
-                
-                // Get all users to find connection details
-                const allUsers = getAllUsers();
-                
-                // Get connections with full user data
-                const connectionsWithUserData = currentUser.connections.map(connId => {
-                    const user = allUsers.find(u => u.id === connId);
-                    return user ? {
-                        id: user.id,
-                        name: user.fullName,
-                        title: user.currentRole,
-                        profileImage: user.profileImage
-                    } : null;
-                }).filter(conn => conn !== null);
-                
-                // Limit to 4 connections
-                const connectionsToShow = connectionsWithUserData.slice(0, 4);
-                
-                // Create HTML
-                let connectionsHtml = connectionsToShow.map(conn => {
-                    return `
-                        <div class="flex flex-col items-center text-center">
-                            <img src="${conn.profileImage || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover mb-1" alt="${conn.name}">
-                            <p class="text-sm font-medium truncate w-full text-white">${conn.name}</p>
-                            <p class="text-xs text-gray-400 truncate w-full">${conn.title || ''}</p>
-                        </div>
-                    `;
-                }).join('');
-                
-                connectionsList.innerHTML = connectionsHtml;
-            }
-            
-            // Calculate profile completion percentage
-            function updateProfileCompletion() {
-                let totalScore = 0;
-                let hint = "";
-                
-                // Basic profile (30%)
-                if (currentUser.fullName && currentUser.fullName.trim() !== "") totalScore += 5;
-                if (currentUser.profileImage) totalScore += 5;
-                if (currentUser.currentRole && currentUser.currentRole.trim() !== "") totalScore += 5;
-                if (currentUser.company && currentUser.company.trim() !== "") totalScore += 5;
-                if (currentUser.location && currentUser.location.trim() !== "") totalScore += 5;
-                if (currentUser.industry && currentUser.industry.trim() !== "") totalScore += 5;
-                
-                // About (20%)
-                if (currentUser.about) {
-                    if (currentUser.about.length < 50) {
-                        totalScore += 10;
-                        if (!hint) hint = "Expand your about section for a better profile";
-                    } else {
-                        totalScore += 20;
-                    }
-                } else {
-                    if (!hint) hint = "Add an about section to improve your profile";
-                }
-                
-                // Skills (20%)
-                if (currentUser.skills) {
-                    let skillsCount = 0;
-                    if (typeof currentUser.skills === 'string') {
-                        skillsCount = currentUser.skills.split(',').filter(s => s.trim() !== "").length;
-                    } else if (Array.isArray(currentUser.skills)) {
-                        skillsCount = currentUser.skills.length;
-                    }
-                    
-                    if (skillsCount === 0) {
-                        if (!hint) hint = "Add your skills to improve your profile";
-                    } else if (skillsCount < 3) {
-                        totalScore += 10;
-                        if (!hint) hint = "Add more skills to improve your profile";
-                    } else {
-                        totalScore += 20;
-                    }
-                } else {
-                    if (!hint) hint = "Add your skills to improve your profile";
-                }
-                
-                // Experience (20%)
-                if (currentUser.experience && currentUser.experience.length > 0) {
-                    totalScore += Math.min(currentUser.experience.length * 10, 20);
-                } else {
-                    if (!hint) hint = "Add your work experience to improve your profile";
-                }
-                
-                // Education (10%)
-                if (currentUser.education && currentUser.education.length > 0) {
-                    totalScore += 10;
-                } else {
-                    if (!hint) hint = "Add your education to complete your profile";
-                }
-                
-                // Update UI
-                profileCompletionPercent.textContent = totalScore + '%';
-                profileCompletionBar.style.width = totalScore + '%';
-                
-                // Update hint if profile is complete
-                if (totalScore >= 90) {
-                    hint = "Your profile is looking great!";
-                }
-                
-                profileCompletionHint.textContent = hint;
-            }
-            
-            // Show toast notification
+            // Show success message in toast
             function showToast(message) {
                 toastNotification.textContent = message;
                 toastNotification.style.opacity = 1;
@@ -1205,47 +854,17 @@
                 }, 3000);
             }
             
-            // Function to handle file selection for profile image
-            function handleProfileImageSelect(fileInput, previewElement) {
-                const file = fileInput.files[0];
-                if (!file) return;
-                
-                // Validate file type
-                if (!file.type.startsWith('image/')) {
-                    showToast('Please select an image file');
-                    return;
-                }
-                
-                // Validate file size (5MB max)
-                if (file.size > 5 * 1024 * 1024) {
-                    showToast('Image size should be less than 5MB');
-                    return;
-                }
-                
-                // Create a FileReader to read the image
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    // Preview the image
-                    previewElement.src = e.target.result;
-                    
-                    // Store data URL for later use
-                    tempImageDataUrl = e.target.result;
-                };
-                
-                reader.readAsDataURL(file);
+            // Show success message for demo
+            function profileSuccess() {
+                showToast('Profile updated successfully');
             }
             
             // Event Listeners
             
-            // Settings Button - Navigate to settings page 
+            // Settings Button
             settingsBtn.addEventListener('click', function(e) {
-                // Navigation happens through the <a> tag href
-            });
-            
-            // Notifications Button
-            notificationsBtn.addEventListener('click', function(e) {
-                // Navigation happens through the <a> tag href
+                e.preventDefault();
+                showToast('Settings page will be available in future updates');
             });
             
             // Sign Out Button - Show confirmation modal
@@ -1261,7 +880,7 @@
             // Confirm Sign Out
             confirmSignOutBtn.addEventListener('click', function() {
                 // Sign out user
-                localStorage.removeItem('currentUser');
+                window.proconnectApp = null;
                 showToast('Signing out...');
                 
                 // Redirect to login page after a brief delay
@@ -1275,25 +894,6 @@
                 // Show edit profile panel
                 editProfilePanel.classList.remove('hidden');
                 editProfilePanel.querySelector('.absolute').classList.add('slide-in');
-                
-                // Set form values to current user data
-                fullNameInput.value = currentUser.fullName || "";
-                titleInput.value = currentUser.currentRole || "";
-                companyInput.value = currentUser.company || "";
-                locationInput.value = currentUser.location || "";
-                
-                // Set industry dropdown value
-                if (currentUser.industry) {
-                    const option = Array.from(industryInput.options).find(opt => opt.value === currentUser.industry);
-                    if (option) {
-                        option.selected = true;
-                    }
-                }
-                
-                // Set profile image preview
-                if (currentUser.profileImage) {
-                    imagePreview.src = currentUser.profileImage;
-                }
             });
             
             // Close Edit Profile Panel
@@ -1301,9 +901,6 @@
                 const panelContent = editProfilePanel.querySelector('.absolute');
                 panelContent.classList.remove('slide-in');
                 panelContent.classList.add('slide-out');
-                
-                // Reset temp image data
-                tempImageDataUrl = null;
                 
                 setTimeout(() => {
                     panelContent.classList.remove('slide-out');
@@ -1326,45 +923,6 @@
                     return;
                 }
                 
-                // Update user data
-                currentUser.fullName = fullNameInput.value.trim();
-                currentUser.currentRole = titleInput.value.trim();
-                currentUser.company = companyInput.value.trim();
-                currentUser.industry = industryInput.value;
-                currentUser.location = locationInput.value.trim();
-                
-                // Save profile image if changed
-                if (tempImageDataUrl) {
-                    currentUser.profileImage = tempImageDataUrl;
-                    // Update all previews
-                    document.getElementById('profileImage').src = tempImageDataUrl;
-                    uploadImagePreview.src = tempImageDataUrl;
-                    tempImageDataUrl = null;
-                }
-                
-                // Update user in the system
-                updateCurrentUserInSystem();
-                
-                // Update UI
-                document.getElementById('profileName').textContent = currentUser.fullName;
-                
-                // Update profile title
-                let title = currentUser.currentRole;
-                if (currentUser.company) {
-                    title += " at " + currentUser.company;
-                }
-                document.getElementById('profileTitle').textContent = title;
-                
-                // Update location
-                if (currentUser.location) {
-                    document.getElementById('profileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${currentUser.location}`;
-                } else {
-                    document.getElementById('profileLocation').innerHTML = '<i class="fas fa-map-marker-alt mr-1"></i>Add your location';
-                }
-                
-                // Update profile completion
-                updateProfileCompletion();
-                
                 // Close edit profile panel
                 const panelContent = editProfilePanel.querySelector('.absolute');
                 panelContent.classList.remove('slide-in');
@@ -1375,65 +933,87 @@
                     editProfilePanel.classList.add('hidden');
                 }, 300);
                 
+                // Update visible profile info (just for demo)
+                document.getElementById('profileName').textContent = fullNameInput.value;
+                
+                let title = titleInput.value;
+                if (companyInput.value) {
+                    title += " at " + companyInput.value;
+                }
+                document.getElementById('profileTitle').textContent = title;
+                
+                if (locationInput.value) {
+                    document.getElementById('profileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${locationInput.value}`;
+                }
+                
                 // Show success message
                 showToast('Profile updated successfully');
             });
             
             // Profile Image Input Change
             profileImageInput.addEventListener('change', function() {
-                handleProfileImageSelect(this, imagePreview);
+                const file = this.files[0];
+                if (!file) return;
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showToast('Please select an image file');
+                    return;
+                }
+                
+                // Create a FileReader to read the image
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Preview the image
+                    imagePreview.src = e.target.result;
+                };
+                
+                reader.readAsDataURL(file);
             });
             
             // Edit Profile Image Button
             editProfileImageBtn.addEventListener('click', function() {
                 // Show image upload modal
                 imageUploadModal.classList.remove('hidden');
-                
-                // Set preview image to current profile image
-                if (currentUser.profileImage) {
-                    uploadImagePreview.src = currentUser.profileImage;
-                }
             });
             
             // Upload Profile Image Input Change
             uploadProfileImageInput.addEventListener('change', function() {
-                handleProfileImageSelect(this, uploadImagePreview);
+                const file = this.files[0];
+                if (!file) return;
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showToast('Please select an image file');
+                    return;
+                }
+                
+                // Create a FileReader to read the image
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Preview the image
+                    uploadImagePreview.src = e.target.result;
+                };
+                
+                reader.readAsDataURL(file);
             });
             
             // Cancel Profile Image Button
             cancelProfileImageBtn.addEventListener('click', function() {
                 // Hide image upload modal
                 imageUploadModal.classList.add('hidden');
-                
-                // Reset temp image
-                tempImageDataUrl = null;
             });
             
             // Save Profile Image Button
             saveProfileImageBtn.addEventListener('click', function() {
-                if (!tempImageDataUrl) {
-                    showToast('Please select an image first');
-                    return;
-                }
-                
-                // Update user data
-                currentUser.profileImage = tempImageDataUrl;
-                
-                // Update user in the system
-                updateCurrentUserInSystem();
-                
-                // Update UI
-                document.getElementById('profileImage').src = currentUser.profileImage;
-                imagePreview.src = currentUser.profileImage;
-                
-                // Reset temp image
-                tempImageDataUrl = null;
+                // Update profile image (demo)
+                document.getElementById('profileImage').src = uploadImagePreview.src;
+                imagePreview.src = uploadImagePreview.src;
                 
                 // Hide image upload modal
                 imageUploadModal.classList.add('hidden');
-                
-                // Update profile completion
-                updateProfileCompletion();
                 
                 // Show success message
                 showToast('Profile photo updated');
@@ -1470,16 +1050,13 @@
                 btn.addEventListener('click', function() {
                     const section = this.getAttribute('data-section');
                     
-                    // Get form data and update profile
+                    // Process the form (demo)
                     if (section === 'about') {
                         const aboutText = document.getElementById('aboutTextarea').value.trim();
-                        currentUser.about = aboutText;
                         document.getElementById('aboutContent').textContent = aboutText;
                     } else if (section === 'skills') {
                         const skillsText = document.getElementById('skillsInput').value.trim();
                         const skillsArray = skillsText.split(',').map(s => s.trim()).filter(s => s !== "");
-                        
-                        currentUser.skills = skillsArray;
                         
                         // Update skills display
                         let skillsHtml = skillsArray.map(skill => {
@@ -1487,133 +1064,22 @@
                         }).join('');
                         
                         document.getElementById('skillsList').innerHTML = skillsHtml || '<span class="text-gray-400 text-sm">Add your skills</span>';
-                    } else if (section === 'experience') {
-                        // Get form values
-                        const title = document.getElementById('expTitleInput').value.trim();
-                        const company = document.getElementById('expCompanyInput').value.trim();
-                        const startDate = document.getElementById('expStartInput').value;
-                        const endDate = document.getElementById('expEndInput').value;
-                        const isCurrent = document.getElementById('expCurrentInput').checked;
-                        const description = document.getElementById('expDescriptionInput').value.trim();
-                        
-                        if (!title || !company || !startDate) {
-                            showToast("Please fill in the required fields");
-                            return;
-                        }
-                        
-                        // Format dates
-                        const formattedStartDate = startDate ? formatMonthYear(startDate) : '';
-                        const formattedEndDate = isCurrent ? null : (endDate ? formatMonthYear(endDate) : '');
-                        
-                        // Create new experience object
-                        const newExperience = {
-                            title,
-                            company,
-                            startDate: formattedStartDate,
-                            endDate: formattedEndDate,
-                            description
-                        };
-                        
-                        // Add to user profile
-                        if (!currentUser.experience) {
-                            currentUser.experience = [];
-                        }
-                        
-                        currentUser.experience.unshift(newExperience); // Add to beginning of array
-                        
-                        // Update experience display
-                        let experienceHtml = currentUser.experience.map((exp, index) => {
-                            const isLast = index === currentUser.experience.length - 1;
-                            return `
-                                <div class="${!isLast ? 'mb-3 pb-3 border-b border-darkTertiary' : ''}">
-                                    <h4 class="font-medium text-white">${exp.title}</h4>
-                                    <p class="text-gray-300 text-sm">${exp.company}</p>
-                                    <p class="text-gray-400 text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
-                                    ${exp.description ? `<p class="text-gray-300 text-sm mt-1">${exp.description}</p>` : ''}
-                                </div>
-                            `;
-                        }).join('');
-                        
-                        document.getElementById('experienceList').innerHTML = experienceHtml;
-                        
-                        // Reset form
-                        document.getElementById('expTitleInput').value = '';
-                        document.getElementById('expCompanyInput').value = '';
-                        document.getElementById('expStartInput').value = '';
-                        document.getElementById('expEndInput').value = '';
-                        document.getElementById('expCurrentInput').checked = false;
-                        document.getElementById('expDescriptionInput').value = '';
-                        
-                    } else if (section === 'education') {
-                        // Get form values
-                        const degree = document.getElementById('eduDegreeInput').value.trim();
-                        const fieldOfStudy = document.getElementById('eduFieldInput').value.trim();
-                        const school = document.getElementById('eduSchoolInput').value.trim();
-                        const startYear = document.getElementById('eduStartInput').value.trim();
-                        const endYear = document.getElementById('eduEndInput').value.trim();
-                        
-                        if (!degree || !school || !startYear) {
-                            showToast("Please fill in the required fields");
-                            return;
-                        }
-                        
-                        // Create new education object
-                        const newEducation = {
-                            degree,
-                            fieldOfStudy,
-                            school,
-                            startYear,
-                            endYear
-                        };
-                        
-                        // Add to user profile
-                        if (!currentUser.education) {
-                            currentUser.education = [];
-                        }
-                        
-                        currentUser.education.unshift(newEducation); // Add to beginning of array
-                        
-                        // Update education display
-                        let educationHtml = currentUser.education.map((edu, index) => {
-                            const isLast = index === currentUser.education.length - 1;
-                            const fullDegree = edu.degree + (edu.fieldOfStudy ? ' in ' + edu.fieldOfStudy : '');
-                            return `
-                                <div class="${!isLast ? 'mb-3 pb-3 border-b border-darkTertiary' : ''}">
-                                    <h4 class="font-medium text-white">${fullDegree}</h4>
-                                    <p class="text-gray-300 text-sm">${edu.school}</p>
-                                    <p class="text-gray-400 text-xs">${edu.startYear} - ${edu.endYear || 'Present'}</p>
-                                </div>
-                            `;
-                        }).join('');
-                        
-                        document.getElementById('educationList').innerHTML = educationHtml;
-                        
-                        // Reset form
-                        document.getElementById('eduDegreeInput').value = '';
-                        document.getElementById('eduFieldInput').value = '';
-                        document.getElementById('eduSchoolInput').value = '';
-                        document.getElementById('eduStartInput').value = '';
-                        document.getElementById('eduEndInput').value = '';
+                    } else if (section === 'experience' || section === 'education') {
+                        // In demo mode, just close the form without adding new entries
                     }
-                    
-                    // Update user in the system
-                    updateCurrentUserInSystem();
                     
                     // Hide form
                     const form = this.closest('[id$="EditForm"]');
                     form.classList.add('hidden');
-                    
-                    // Update profile completion
-                    updateProfileCompletion();
                     
                     // Show success message
                     showToast("Profile updated successfully");
                 });
             });
             
-            // View all connections button
-            viewAllConnectionsBtn.addEventListener('click', function() {
-                // Navigation happens through the <a> tag href
+            // View all connections button (search page)
+            viewAllConnectionsBtn.addEventListener('click', function(e) {
+                // Navigate to search page via the href
             });
             
             // Share profile button
@@ -1621,15 +1087,6 @@
                 // Simulate sharing functionality
                 showToast("Profile link copied to clipboard");
             });
-            
-            // Format month and year
-            function formatMonthYear(input) {
-                const date = new Date(input);
-                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-            }
-            
-            // Check for connection requests periodically
-            setInterval(checkForPendingRequests, 10000);
         });
     </script>
 </body>
