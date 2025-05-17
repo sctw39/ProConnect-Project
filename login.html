@@ -134,34 +134,34 @@
             transition: width 1s ease-in-out;
         }
         
-        /* Auth buttons styling */
-        .auth-btn {
-            transition: all 0.3s ease;
-            font-weight: 600;
+        /* Auth tab buttons */
+        .tab-btn {
+            background-color: #0078D4;
+            color: white;
             padding: 0.75rem 0;
+            font-weight: 600;
+            text-align: center;
             border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: block;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
-        .auth-btn:hover {
+        .tab-btn:hover {
+            background-color: #106EBE;
             transform: translateY(-1px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        .auth-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .auth-btn-primary {
-            background-color: #0078D4;
-            color: white;
-        }
-        
-        .auth-btn-secondary {
+        .tab-btn.inactive {
             background-color: white;
             color: #0078D4;
             border: 2px solid #0078D4;
+        }
+        
+        .tab-btn.inactive:hover {
+            background-color: #f8f9fa;
         }
         
         /* Dark mode support */
@@ -217,9 +217,13 @@
             border-color: #0078D4;
         }
         
-        .dark .auth-btn-secondary {
+        .dark .tab-btn.inactive {
             background-color: #202020;
             color: #0078D4;
+        }
+        
+        .dark .tab-btn.inactive:hover {
+            background-color: #2A2A2A;
         }
     </style>
 </head>
@@ -236,12 +240,8 @@
         
         <!-- Authentication Tabs -->
         <div class="flex space-x-4 mb-8">
-            <button id="showSignInBtn" class="auth-btn auth-btn-primary flex-1 rounded-lg shadow-md">
-                Sign In
-            </button>
-            <button id="showSignUpBtn" class="auth-btn auth-btn-secondary flex-1 rounded-lg shadow-md">
-                Sign Up
-            </button>
+            <a href="#" id="showSignInBtn" class="tab-btn">Sign In</a>
+            <a href="#" id="showSignUpBtn" class="tab-btn inactive">Sign Up</a>
         </div>
         
         <!-- Sign In Form -->
@@ -702,11 +702,8 @@
             // Switch to sign in form
             function showSignInForm() {
                 // Update button styles
-                showSignInBtn.classList.add('auth-btn-primary');
-                showSignInBtn.classList.remove('auth-btn-secondary');
-                
-                showSignUpBtn.classList.remove('auth-btn-primary');
-                showSignUpBtn.classList.add('auth-btn-secondary');
+                showSignInBtn.classList.remove('inactive');
+                showSignUpBtn.classList.add('inactive');
                 
                 // Show sign in form, hide others
                 signUpForm.classList.add('hidden');
@@ -721,11 +718,8 @@
             // Switch to sign up form
             function showSignUpForm() {
                 // Update button styles
-                showSignUpBtn.classList.add('auth-btn-primary');
-                showSignUpBtn.classList.remove('auth-btn-secondary');
-                
-                showSignInBtn.classList.remove('auth-btn-primary');
-                showSignInBtn.classList.add('auth-btn-secondary');
+                showSignUpBtn.classList.remove('inactive');
+                showSignInBtn.classList.add('inactive');
                 
                 // Show sign up form, hide others
                 signInForm.classList.add('hidden');
@@ -1167,8 +1161,15 @@
             // Event Listeners
             
             // Auth buttons
-            showSignInBtn.addEventListener('click', showSignInForm);
-            showSignUpBtn.addEventListener('click', showSignUpForm);
+            showSignInBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default link behavior
+                showSignInForm();
+            });
+            
+            showSignUpBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default link behavior
+                showSignUpForm();
+            });
             
             // Sign in button
             signInBtn.addEventListener('click', handleSignIn);
