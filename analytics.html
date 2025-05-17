@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,490 +23,293 @@
                         lightTertiary: '#E9ECEF',
                         textDark: '#212529',
                         textMedium: '#495057',
-                        textLight: '#6C757D'
+                        textLight: '#6C757D',
+                        darkBg: '#181818',
+                        darkSecondary: '#202020',
+                        darkTertiary: '#2A2A2A'
                     }
                 }
-            }
+            },
+            darkMode: 'class'
         }
+        
+        // Force dark mode
+        document.documentElement.classList.add('dark');
     </script>
     <style>
-        /* Animated progress bars */
-        @keyframes growBar {
-            from { width: 0%; }
-            to { width: var(--target-width); }
+        /* General dark mode styling */
+        body {
+            background-color: #181818 !important;
+            color: #F8F9FA !important;
         }
         
-        .animate-grow {
-            animation: growBar 1s ease-out forwards;
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         
-        /* Card hover effect */
-        .stat-card {
-            transition: all 0.3s ease;
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #E74C3C;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        /* Bottom navigation */
+        .bottom-nav {
+            background-color: #202020 !important;
+            border-color: #2A2A2A !important;
         }
         
-        /* Date selector styling */
-        .date-selector button {
-            transition: all 0.2s ease;
+        .nav-icon {
+            color: #6C757D !important;
         }
         
-        .date-selector button.active {
-            background-color: rgba(0, 120, 212, 0.1);
-            color: #0078D4;
-            font-weight: 500;
+        .nav-icon.active {
+            color: #0078D4 !important;
         }
         
-        /* Pulse animation */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        /* Analytics card styling */
+        .analytics-card {
+            background-color: #202020;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
-        .pulse-animation {
-            animation: pulse 2s infinite;
+        .analytics-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Charts */
+        .chart-bar {
+            height: 16px;
+            background-color: #0078D4;
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
         }
     </style>
 </head>
-<body class="bg-lightBg text-textDark min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+<body class="bg-darkBg text-white min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-md pb-20">
         <!-- App Header -->
         <header class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-primary">Analytics</h1>
             <div class="flex items-center">
-                <img src="https://via.placeholder.com/40x40?text=PC" alt="ProConnect" class="w-10 h-10 rounded-lg mr-2">
-                <h1 class="text-xl font-bold text-primary">Analytics</h1>
-            </div>
-            <div>
-                <button class="text-primary p-2 relative">
+                <a href="profile.html" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition">
+                    <i class="fas fa-user text-xl"></i>
+                </a>
+                <a href="connections.html" class="text-primary block p-2 hover:bg-darkTertiary rounded-full transition relative">
                     <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
-                </button>
+                    <span id="notificationBadge" class="notification-badge">2</span>
+                </a>
             </div>
         </header>
-
-        <!-- Date Range Selector -->
-        <div class="date-selector bg-lightSecondary rounded-lg flex justify-between p-2 mb-6 overflow-x-auto">
-            <button class="px-3 py-1 rounded-full text-sm whitespace-nowrap active">30 Days</button>
-            <button class="px-3 py-1 rounded-full text-sm whitespace-nowrap text-textMedium">3 Months</button>
-            <button class="px-3 py-1 rounded-full text-sm whitespace-nowrap text-textMedium">6 Months</button>
-            <button class="px-3 py-1 rounded-full text-sm whitespace-nowrap text-textMedium">1 Year</button>
-        </div>
-
-        <!-- Professional Score -->
-        <div class="bg-primary/10 rounded-lg p-4 mb-6">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-primary font-semibold text-lg">Professional Score</h2>
-                <span class="bg-success/20 text-success text-xs px-2 py-1 rounded-full font-medium">+5%</span>
-            </div>
-            <div class="flex items-center">
-                <div class="text-4xl font-bold text-primary mr-3">84</div>
-                <div class="flex-1">
-                    <div class="w-full bg-white/50 rounded-full h-3">
-                        <div class="bg-primary h-3 rounded-full animate-grow" style="--target-width: 84%"></div>
-                    </div>
-                    <p class="text-xs mt-1 text-textMedium">Based on profile completeness, engagement, and connections</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Key Analytics Metrics -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <!-- Network Growth -->
-            <div class="stat-card bg-white shadow-sm rounded-lg p-4">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-sm font-medium text-textMedium mb-1">Network Growth</h3>
-                        <div class="flex items-baseline">
-                            <span class="text-2xl font-bold mr-1">12%</span>
-                            <span class="text-xs text-success"><i class="fas fa-arrow-up"></i></span>
+        
+        <!-- Profile Overview -->
+        <div class="bg-darkSecondary rounded-lg p-4 mb-6 shadow-sm analytics-card">
+            <h2 class="text-lg font-bold mb-4 text-white">Profile Overview</h2>
+            <div class="flex items-center mb-4">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Profile" class="w-16 h-16 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                <div>
+                    <h3 class="font-medium text-white">John Doe</h3>
+                    <p class="text-sm text-gray-300">Product Manager at TechCorp</p>
+                    <div class="flex items-center mt-1">
+                        <div class="w-32 h-2 bg-darkTertiary rounded-full overflow-hidden">
+                            <div class="h-full bg-primary rounded-full" style="width: 85%"></div>
                         </div>
+                        <span class="text-xs text-gray-400 ml-2">Profile: 85%</span>
                     </div>
-                    <div class="bg-primary/10 p-2 rounded-lg">
-                        <i class="fas fa-user-plus text-primary"></i>
-                    </div>
-                </div>
-                <p class="text-xs text-textLight mt-2">16 new connections</p>
-            </div>
-
-            <!-- Profile Views -->
-            <div class="stat-card bg-white shadow-sm rounded-lg p-4">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-sm font-medium text-textMedium mb-1">Profile Views</h3>
-                        <div class="flex items-baseline">
-                            <span class="text-2xl font-bold mr-1">38</span>
-                            <span class="text-xs text-success"><i class="fas fa-arrow-up"></i></span>
-                        </div>
-                    </div>
-                    <div class="bg-primary/10 p-2 rounded-lg">
-                        <i class="fas fa-eye text-primary"></i>
-                    </div>
-                </div>
-                <p class="text-xs text-textLight mt-2">+8% from last month</p>
-            </div>
-
-            <!-- Response Rate -->
-            <div class="stat-card bg-white shadow-sm rounded-lg p-4">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-sm font-medium text-textMedium mb-1">Response Rate</h3>
-                        <div class="flex items-baseline">
-                            <span class="text-2xl font-bold mr-1">82%</span>
-                            <span class="text-xs text-success"><i class="fas fa-arrow-up"></i></span>
-                        </div>
-                    </div>
-                    <div class="bg-primary/10 p-2 rounded-lg">
-                        <i class="fas fa-reply text-primary"></i>
-                    </div>
-                </div>
-                <p class="text-xs text-textLight mt-2">Avg. time: 4h</p>
-            </div>
-
-            <!-- Engagement -->
-            <div class="stat-card bg-white shadow-sm rounded-lg p-4">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-sm font-medium text-textMedium mb-1">Engagement</h3>
-                        <div class="flex items-baseline">
-                            <span class="text-2xl font-bold mr-1">28</span>
-                            <span class="text-xs text-danger"><i class="fas fa-arrow-down"></i></span>
-                        </div>
-                    </div>
-                    <div class="bg-primary/10 p-2 rounded-lg">
-                        <i class="fas fa-chart-line text-primary"></i>
-                    </div>
-                </div>
-                <p class="text-xs text-textLight mt-2">Interactions/week</p>
-            </div>
-
-            <!-- Expertise Score -->
-            <div class="stat-card bg-white shadow-sm rounded-lg p-4 col-span-2">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h3 class="text-sm font-medium text-textMedium mb-1">Expertise Score</h3>
-                        <div class="flex items-baseline">
-                            <span class="text-2xl font-bold mr-1">78</span>
-                            <span class="text-xs text-success"><i class="fas fa-arrow-up"></i></span>
-                        </div>
-                    </div>
-                    <div class="bg-primary/10 p-2 rounded-lg">
-                        <i class="fas fa-star text-primary"></i>
-                    </div>
-                </div>
-                <div class="mt-2">
-                    <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                        <div class="bg-primary h-1.5 rounded-full animate-grow" style="--target-width: 78%"></div>
-                    </div>
-                </div>
-                <p class="text-xs text-textLight mt-1">+3 points from last month</p>
-            </div>
-        </div>
-
-        <!-- Industry Breakdown -->
-        <div class="bg-white shadow-sm rounded-lg p-4 mb-6">
-            <h2 class="text-lg font-semibold mb-3">Network Distribution</h2>
-            
-            <div class="mb-3">
-                <div class="flex justify-between mb-1">
-                    <span class="text-xs">Technology</span>
-                    <span class="text-xs">45%</span>
-                </div>
-                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                    <div class="bg-primary h-1.5 rounded-full animate-grow" style="--target-width: 45%"></div>
                 </div>
             </div>
-            
-            <div class="mb-3">
-                <div class="flex justify-between mb-1">
-                    <span class="text-xs">Finance</span>
-                    <span class="text-xs">22%</span>
+            <div class="grid grid-cols-2 gap-4 text-center">
+                <div class="bg-darkTertiary rounded-lg p-3">
+                    <div class="text-2xl font-bold text-primary">2</div>
+                    <div class="text-xs text-gray-400">Connections</div>
                 </div>
-                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                    <div class="bg-secondary h-1.5 rounded-full animate-grow" style="--target-width: 22%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="flex justify-between mb-1">
-                    <span class="text-xs">Healthcare</span>
-                    <span class="text-xs">15%</span>
-                </div>
-                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                    <div class="bg-accent h-1.5 rounded-full animate-grow" style="--target-width: 15%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="flex justify-between mb-1">
-                    <span class="text-xs">Marketing</span>
-                    <span class="text-xs">12%</span>
-                </div>
-                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                    <div class="bg-purple-500 h-1.5 rounded-full animate-grow" style="--target-width: 12%"></div>
-                </div>
-            </div>
-            
-            <div>
-                <div class="flex justify-between mb-1">
-                    <span class="text-xs">Other</span>
-                    <span class="text-xs">6%</span>
-                </div>
-                <div class="w-full bg-lightTertiary rounded-full h-1.5">
-                    <div class="bg-gray-500 h-1.5 rounded-full animate-grow" style="--target-width: 6%"></div>
+                <div class="bg-darkTertiary rounded-lg p-3">
+                    <div class="text-2xl font-bold text-primary">5</div>
+                    <div class="text-xs text-gray-400">Profile Views</div>
                 </div>
             </div>
         </div>
-
-        <!-- Top Connections -->
-        <div class="bg-white shadow-sm rounded-lg p-4 mb-6">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-lg font-semibold">Most Valuable Connections</h2>
-                <button class="text-primary text-sm">View All</button>
+        
+        <!-- Networking Stats -->
+        <div class="bg-darkSecondary rounded-lg p-4 mb-6 shadow-sm analytics-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-white">Networking Stats</h2>
+                <div class="text-xs text-gray-400">Last 30 days</div>
             </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-gray-300">Connection Rate</span>
+                        <span class="text-sm text-primary">75%</span>
+                    </div>
+                    <div class="w-full h-4 bg-darkTertiary rounded-full overflow-hidden">
+                        <div class="chart-bar" style="width: 75%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-gray-300">Profile Engagement</span>
+                        <span class="text-sm text-primary">60%</span>
+                    </div>
+                    <div class="w-full h-4 bg-darkTertiary rounded-full overflow-hidden">
+                        <div class="chart-bar" style="width: 60%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-gray-300">Message Response Rate</span>
+                        <span class="text-sm text-primary">90%</span>
+                    </div>
+                    <div class="w-full h-4 bg-darkTertiary rounded-full overflow-hidden">
+                        <div class="chart-bar" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Industry Insights -->
+        <div class="bg-darkSecondary rounded-lg p-4 mb-6 shadow-sm analytics-card">
+            <h2 class="text-lg font-bold mb-4 text-white">Industry Insights</h2>
             
             <div class="space-y-3">
-                <div class="flex items-center">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="Sarah Chen">
-                    <div class="flex-1">
-                        <h4 class="text-sm font-medium">Sarah Chen</h4>
-                        <p class="text-xs text-textMedium">Product Designer at DesignCo</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-300">Technology</span>
+                    <div class="w-32 h-4 bg-darkTertiary rounded-full overflow-hidden">
+                        <div class="chart-bar" style="width: 80%"></div>
                     </div>
-                    <div class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">87%</div>
+                    <span class="text-sm text-primary">80%</span>
                 </div>
                 
-                <div class="flex items-center">
-                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="David Wong">
-                    <div class="flex-1">
-                        <h4 class="text-sm font-medium">David Wong</h4>
-                        <p class="text-xs text-textMedium">Tech Entrepreneur</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-300">Finance</span>
+                    <div class="w-32 h-4 bg-darkTertiary rounded-full overflow-hidden">
+                        <div class="chart-bar" style="width: 65%"></div>
                     </div>
-                    <div class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">82%</div>
+                    <span class="text-sm text-primary">65%</span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-300">Marketing</span>
+                    <div class="w-32 h-4 bg-darkTertiary rounded-full overflow-hidden">
+                        <div class="chart-bar" style="width: 45%"></div>
+                    </div>
+                    <span class="text-sm text-primary">45%</span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-300">Healthcare</span>
+                    <div class="w-32 h-4 bg-darkTertiary rounded-full overflow-hidden">
+                        <div class="chart-bar" style="width: 30%"></div>
+                    </div>
+                    <span class="text-sm text-primary">30%</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Engagement Insights -->
-        <div class="bg-white shadow-sm rounded-lg p-4 mb-6">
-            <h2 class="text-lg font-semibold mb-3">Engagement Insights</h2>
             
-            <div class="space-y-3">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas fa-star text-primary"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm">Your profile is viewed 38% more than similar professionals</p>
+            <div class="mt-4 text-right">
+                <a href="#" class="text-primary text-sm font-medium">View Full Report</a>
+            </div>
+        </div>
+        
+        <!-- Growth Opportunities -->
+        <div class="bg-darkSecondary rounded-lg p-4 mb-6 shadow-sm analytics-card">
+            <h2 class="text-lg font-bold mb-4 text-white">Growth Opportunities</h2>
+            
+            <div class="space-y-4">
+                <div class="bg-darkTertiary rounded-lg p-3">
+                    <div class="flex items-start">
+                        <div class="bg-primary/20 rounded-full p-2 mr-3">
+                            <i class="fas fa-user-plus text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-white text-sm">Expand Your Network</h3>
+                            <p class="text-xs text-gray-400 mt-1">Connect with 5 more professionals in your industry to increase your reach.</p>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas fa-rocket text-success"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm">Add 3 more skills to improve your match rate by 15%</p>
+                <div class="bg-darkTertiary rounded-lg p-3">
+                    <div class="flex items-start">
+                        <div class="bg-primary/20 rounded-full p-2 mr-3">
+                            <i class="fas fa-certificate text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-white text-sm">Add Certifications</h3>
+                            <p class="text-xs text-gray-400 mt-1">Professionals with certifications get 25% more profile views.</p>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                        <i class="fas fa-comment text-accent"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm">Your response rate is among the top 25% of users</p>
+                <div class="bg-darkTertiary rounded-lg p-3">
+                    <div class="flex items-start">
+                        <div class="bg-primary/20 rounded-full p-2 mr-3">
+                            <i class="fas fa-comments text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-white text-sm">Engage More</h3>
+                            <p class="text-xs text-gray-400 mt-1">Professionals who message connections regularly grow their network 3x faster.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
+        
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="toast">
+            Data updated
+        </div>
+        
         <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
-            <a href="index.html" class="text-primary flex flex-col items-center">
-                <i class="fas fa-chart-line text-xl"></i>
-                <span class="text-xs mt-1">Analytics</span>
+        <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-darkSecondary border-t border-darkTertiary bottom-nav">
+            <a href="analytics.html" class="flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl text-primary nav-icon active"></i>
+                <span class="text-xs mt-1 text-primary">Analytics</span>
             </a>
-            <a href="chat.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-comments text-xl"></i>
-                <span class="text-xs mt-1">Chat</span>
+            <a href="search.html" class="flex flex-col items-center">
+                <i class="fas fa-search text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Find</span>
             </a>
-            <a href="search.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-search text-xl"></i>
-                <span class="text-xs mt-1">Find</span>
+            <a href="connections.html" class="flex flex-col items-center relative">
+                <i class="fas fa-bell text-xl text-gray-500 nav-icon"></i>
+                <span id="navNotificationBadge" class="notification-badge">2</span>
+                <span class="text-xs mt-1 text-gray-500">Requests</span>
             </a>
-            <a href="profile.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-user text-xl"></i>
-                <span class="text-xs mt-1">Profile</span>
+            <a href="profile.html" class="flex flex-col items-center">
+                <i class="fas fa-user text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Profile</span>
             </a>
         </nav>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in, if not, redirect to login page
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            
-            if (!currentUser) {
-                // Get the base URL for proper path resolution
-                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-                window.location.href = baseUrl + "login.html";
-                return;
-            }
-            
-            // Set up date range selector
-            const dateButtons = document.querySelectorAll('.date-selector button');
-            dateButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Remove active class from all buttons
-                    dateButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                        btn.classList.add('text-textMedium');
-                    });
-                    
-                    // Add active class to clicked button
-                    this.classList.add('active');
-                    this.classList.remove('text-textMedium');
-                    
-                    // Update analytics based on selected date range
-                    updateAnalytics(this.textContent.trim());
-                });
-            });
-            
-            // Function to update analytics based on date range
-            function updateAnalytics(dateRange) {
-                // In a real app, this would fetch different analytics data
-                // For now, we'll just show a simulated update
-                console.log(`Updating analytics for date range: ${dateRange}`);
-                
-                // Simulate loading
-                const statCards = document.querySelectorAll('.stat-card');
-                statCards.forEach(card => {
-                    card.classList.add('opacity-50');
-                });
-                
-                // Simulate data update after 500ms
-                setTimeout(() => {
-                    statCards.forEach(card => {
-                        card.classList.remove('opacity-50');
-                    });
-                    
-                    // Update with random values based on date range
-                    if (dateRange === '30 Days') {
-                        updateMetrics({
-                            networkGrowth: '12%',
-                            profileViews: '38',
-                            responseRate: '82%',
-                            engagement: '28',
-                            expertiseScore: '78'
-                        });
-                    } else if (dateRange === '3 Months') {
-                        updateMetrics({
-                            networkGrowth: '23%',
-                            profileViews: '112',
-                            responseRate: '79%',
-                            engagement: '31',
-                            expertiseScore: '75'
-                        });
-                    } else if (dateRange === '6 Months') {
-                        updateMetrics({
-                            networkGrowth: '47%',
-                            profileViews: '243',
-                            responseRate: '81%',
-                            engagement: '35',
-                            expertiseScore: '70'
-                        });
-                    } else if (dateRange === '1 Year') {
-                        updateMetrics({
-                            networkGrowth: '86%',
-                            profileViews: '421',
-                            responseRate: '83%',
-                            engagement: '32',
-                            expertiseScore: '65'
-                        });
-                    }
-                }, 500);
-            }
-            
-            // Function to update metrics in the UI
-            function updateMetrics(metrics) {
-                // Update Network Growth
-                if (metrics.networkGrowth) {
-                    const networkGrowthEl = document.querySelector('.stat-card:nth-child(1) .text-2xl');
-                    if (networkGrowthEl) networkGrowthEl.textContent = metrics.networkGrowth;
-                }
-                
-                // Update Profile Views
-                if (metrics.profileViews) {
-                    const profileViewsEl = document.querySelector('.stat-card:nth-child(2) .text-2xl');
-                    if (profileViewsEl) profileViewsEl.textContent = metrics.profileViews;
-                }
-                
-                // Update Response Rate
-                if (metrics.responseRate) {
-                    const responseRateEl = document.querySelector('.stat-card:nth-child(3) .text-2xl');
-                    if (responseRateEl) responseRateEl.textContent = metrics.responseRate;
-                }
-                
-                // Update Engagement
-                if (metrics.engagement) {
-                    const engagementEl = document.querySelector('.stat-card:nth-child(4) .text-2xl');
-                    if (engagementEl) engagementEl.textContent = metrics.engagement;
-                }
-                
-                // Update Expertise Score
-                if (metrics.expertiseScore) {
-                    const expertiseScoreEl = document.querySelector('.stat-card:nth-child(5) .text-2xl');
-                    if (expertiseScoreEl) {
-                        expertiseScoreEl.textContent = metrics.expertiseScore;
-                        
-                        // Update progress bar
-                        const progressBar = document.querySelector('.stat-card:nth-child(5) .bg-primary');
-                        if (progressBar) {
-                            progressBar.style.setProperty('--target-width', `${metrics.expertiseScore}%`);
-                        }
-                    }
-                }
-            }
-            
-            // Initialize with user's actual data if available
-            if (currentUser) {
-                if (currentUser.networkGrowth) {
-                    const networkGrowthEl = document.querySelector('.stat-card:nth-child(1) .text-2xl');
-                    if (networkGrowthEl) networkGrowthEl.textContent = currentUser.networkGrowth;
-                }
-                
-                if (currentUser.profileViews) {
-                    const profileViewsEl = document.querySelector('.stat-card:nth-child(2) .text-2xl');
-                    if (profileViewsEl) profileViewsEl.textContent = currentUser.profileViews;
-                }
-                
-                if (currentUser.responseRate) {
-                    const responseRateEl = document.querySelector('.stat-card:nth-child(3) .text-2xl');
-                    if (responseRateEl) responseRateEl.textContent = currentUser.responseRate;
-                }
-                
-                if (currentUser.engagement) {
-                    const engagementEl = document.querySelector('.stat-card:nth-child(4) .text-2xl');
-                    if (engagementEl) engagementEl.textContent = currentUser.engagement;
-                }
-                
-                if (currentUser.expertiseScore) {
-                    const expertiseScoreEl = document.querySelector('.stat-card:nth-child(5) .text-2xl');
-                    if (expertiseScoreEl) {
-                        expertiseScoreEl.textContent = currentUser.expertiseScore;
-                        
-                        // Update progress bar
-                        const progressBar = document.querySelector('.stat-card:nth-child(5) .bg-primary');
-                        if (progressBar) {
-                            progressBar.style.setProperty('--target-width', `${currentUser.expertiseScore}%`);
-                        }
-                    }
-                }
-            }
+            // This is a simple demo page, no complex functionality needed
         });
     </script>
 </body>
