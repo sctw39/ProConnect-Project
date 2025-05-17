@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,21 +29,12 @@
                         darkTertiary: '#2A2A2A'
                     }
                 }
-            }
+            },
+            darkMode: 'class'
         }
         
-        // Check for dark mode
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
+        // Force dark mode
+        document.documentElement.classList.add('dark');
     </script>
     <style>
         /* Toast notification */
@@ -122,7 +113,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #333;
             transition: .4s;
             border-radius: 34px;
         }
@@ -154,57 +145,91 @@
         /* Animation for settings sections */
         .settings-card {
             transition: transform 0.3s, box-shadow 0.3s;
+            background-color: #202020;
         }
         
         .settings-card:active {
             transform: scale(0.98);
         }
         
-        /* Dark mode support */
-        .dark .bg-lightBg {
+        /* Sign out modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background-color: #202020;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        /* General dark mode styling */
+        body {
             background-color: #181818 !important;
-        }
-        
-        .dark .bg-white, .dark .bg-lightSecondary {
-            background-color: #202020 !important;
-        }
-        
-        .dark .bg-lightTertiary {
-            background-color: #2A2A2A !important;
-        }
-        
-        .dark .text-textDark {
             color: #F8F9FA !important;
         }
         
-        .dark .text-textMedium {
+        .bg-white, .bg-lightSecondary, .bg-lightBg {
+            background-color: #202020 !important;
+        }
+        
+        .bg-lightTertiary {
+            background-color: #2A2A2A !important;
+        }
+        
+        .text-textDark {
+            color: #F8F9FA !important;
+        }
+        
+        .text-textMedium {
             color: #CED4DA !important;
         }
         
-        .dark .border-gray-200 {
+        .border-gray-200, .border-gray-300 {
             border-color: #2A2A2A !important;
         }
         
-        /* Bottom navigation - dark mode */
-        .dark .bottom-nav {
+        input, textarea, select {
+            background-color: #2A2A2A !important;
+            border-color: #3A3A3A !important;
+            color: #E9ECEF !important;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #6C757D !important;
+        }
+        
+        /* Bottom navigation */
+        .bottom-nav {
             background-color: #202020 !important;
             border-color: #2A2A2A !important;
         }
         
-        .dark .nav-icon {
+        .nav-icon {
             color: #6C757D !important;
         }
         
-        .dark .nav-icon.active {
+        .nav-icon.active {
             color: #0078D4 !important;
         }
     </style>
 </head>
-<body class="bg-lightBg text-textDark min-h-screen dark:bg-darkBg">
+<body class="dark:bg-darkBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-6 max-w-md pb-20">
         <!-- App Header with Back Button -->
         <header class="flex justify-between items-center mb-6">
-            <a href="profile.html" class="text-primary p-2 hover:bg-gray-100 dark:hover:bg-darkTertiary rounded-full transition">
+            <a href="profile.html" class="text-primary p-2 hover:bg-darkTertiary rounded-full transition">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <h1 class="text-xl font-bold text-primary">Settings</h1>
@@ -213,29 +238,17 @@
 
         <!-- Settings Content -->
         <div id="settingsContent">
-            <!-- Appearance Settings -->
+            <!-- Appearance Section (Header only since dark mode toggle is removed) -->
             <div class="mb-6">
-                <h2 class="text-lg font-semibold mb-3">Appearance</h2>
-                
-                <!-- Dark Mode Toggle -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center mb-3 settings-card">
-                    <div>
-                        <h3 class="font-medium">Dark Mode</h3>
-                        <p class="text-textMedium text-sm">Use the dark theme</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="darkModeToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
+                <h2 class="text-lg font-semibold mb-3 text-white">Appearance</h2>
                 
                 <!-- Language Selection -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card">
+                <div class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card">
                     <div>
-                        <h3 class="font-medium">Language</h3>
-                        <p class="text-textMedium text-sm">Choose your preferred language</p>
+                        <h3 class="font-medium text-white">Language</h3>
+                        <p class="text-gray-300 text-sm">Choose your preferred language</p>
                     </div>
-                    <select id="languageSelect" class="border border-gray-300 rounded-lg px-3 py-1 text-sm dark:bg-darkTertiary dark:border-darkTertiary">
+                    <select id="languageSelect" class="border border-darkTertiary rounded-lg px-3 py-1 text-sm bg-darkTertiary">
                         <option value="en">English</option>
                         <option value="es">Spanish</option>
                         <option value="fr">French</option>
@@ -247,13 +260,13 @@
             
             <!-- Notification Settings -->
             <div class="mb-6">
-                <h2 class="text-lg font-semibold mb-3">Notifications</h2>
+                <h2 class="text-lg font-semibold mb-3 text-white">Notifications</h2>
                 
                 <!-- Connection Requests -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center mb-3 settings-card">
+                <div class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center mb-3 settings-card">
                     <div>
-                        <h3 class="font-medium">Connection Requests</h3>
-                        <p class="text-textMedium text-sm">Get notified for new connection requests</p>
+                        <h3 class="font-medium text-white">Connection Requests</h3>
+                        <p class="text-gray-300 text-sm">Get notified for new connection requests</p>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="connectionNotifToggle" checked>
@@ -262,10 +275,10 @@
                 </div>
                 
                 <!-- Messages -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center mb-3 settings-card">
+                <div class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center mb-3 settings-card">
                     <div>
-                        <h3 class="font-medium">Messages</h3>
-                        <p class="text-textMedium text-sm">Get notified for new messages</p>
+                        <h3 class="font-medium text-white">Messages</h3>
+                        <p class="text-gray-300 text-sm">Get notified for new messages</p>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="messageNotifToggle" checked>
@@ -274,10 +287,10 @@
                 </div>
                 
                 <!-- Event Invitations -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card">
+                <div class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card">
                     <div>
-                        <h3 class="font-medium">Event Invitations</h3>
-                        <p class="text-textMedium text-sm">Get notified for business event invites</p>
+                        <h3 class="font-medium text-white">Event Invitations</h3>
+                        <p class="text-gray-300 text-sm">Get notified for business event invites</p>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="eventNotifToggle" checked>
@@ -288,39 +301,39 @@
             
             <!-- Privacy Settings -->
             <div class="mb-6">
-                <h2 class="text-lg font-semibold mb-3">Privacy</h2>
+                <h2 class="text-lg font-semibold mb-3 text-white">Privacy</h2>
                 
                 <!-- Profile Visibility -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 settings-card">
+                <div class="bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 settings-card">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-medium">Profile Visibility</h3>
-                        <select id="visibilitySelect" class="border border-gray-300 rounded-lg px-3 py-1 text-sm dark:bg-darkTertiary dark:border-darkTertiary">
+                        <h3 class="font-medium text-white">Profile Visibility</h3>
+                        <select id="visibilitySelect" class="border border-darkTertiary rounded-lg px-3 py-1 text-sm bg-darkTertiary">
                             <option value="public">Public</option>
                             <option value="connections">Connections Only</option>
                             <option value="private">Private</option>
                         </select>
                     </div>
-                    <p class="text-textMedium text-sm">Control who can see your full profile</p>
+                    <p class="text-gray-300 text-sm">Control who can see your full profile</p>
                 </div>
                 
                 <!-- Connection Requests -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 settings-card">
+                <div class="bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 settings-card">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="font-medium">Connection Requests</h3>
-                        <select id="connectionRequestSelect" class="border border-gray-300 rounded-lg px-3 py-1 text-sm dark:bg-darkTertiary dark:border-darkTertiary">
+                        <h3 class="font-medium text-white">Connection Requests</h3>
+                        <select id="connectionRequestSelect" class="border border-darkTertiary rounded-lg px-3 py-1 text-sm bg-darkTertiary">
                             <option value="everyone">Everyone</option>
                             <option value="mutual">Mutual Connections</option>
                             <option value="none">No One</option>
                         </select>
                     </div>
-                    <p class="text-textMedium text-sm">Control who can send you connection requests</p>
+                    <p class="text-gray-300 text-sm">Control who can send you connection requests</p>
                 </div>
                 
                 <!-- Activity Status -->
-                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card">
+                <div class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card">
                     <div>
-                        <h3 class="font-medium">Show Activity Status</h3>
-                        <p class="text-textMedium text-sm">Allow others to see when you're online</p>
+                        <h3 class="font-medium text-white">Show Activity Status</h3>
+                        <p class="text-gray-300 text-sm">Allow others to see when you're online</p>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="activityStatusToggle" checked>
@@ -331,34 +344,43 @@
             
             <!-- Account Settings -->
             <div class="mb-6">
-                <h2 class="text-lg font-semibold mb-3">Account</h2>
+                <h2 class="text-lg font-semibold mb-3 text-white">Account</h2>
                 
                 <!-- Change Email -->
-                <a href="#" id="changeEmailBtn" class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 flex justify-between items-center settings-card block">
+                <a href="#" id="changeEmailBtn" class="bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 flex justify-between items-center settings-card block">
                     <div>
-                        <h3 class="font-medium">Email Address</h3>
-                        <p class="text-textMedium text-sm" id="userEmailDisplay">user@example.com</p>
+                        <h3 class="font-medium text-white">Email Address</h3>
+                        <p class="text-gray-300 text-sm" id="userEmailDisplay">user@example.com</p>
                     </div>
-                    <i class="fas fa-chevron-right text-textLight"></i>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
                 </a>
                 
                 <!-- Change Password -->
-                <a href="#" id="changePasswordBtn" class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 flex justify-between items-center settings-card block">
+                <a href="#" id="changePasswordBtn" class="bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 flex justify-between items-center settings-card block">
                     <div>
-                        <h3 class="font-medium">Change Password</h3>
-                        <p class="text-textMedium text-sm">Update your account password</p>
+                        <h3 class="font-medium text-white">Change Password</h3>
+                        <p class="text-gray-300 text-sm">Update your account password</p>
                     </div>
-                    <i class="fas fa-chevron-right text-textLight"></i>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
                 </a>
                 
                 <!-- Data Export -->
-                <a href="#" id="dataExportBtn" class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card block">
+                <a href="#" id="dataExportBtn" class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card block mb-3">
                     <div>
-                        <h3 class="font-medium">Export Data</h3>
-                        <p class="text-textMedium text-sm">Download a copy of your data</p>
+                        <h3 class="font-medium text-white">Export Data</h3>
+                        <p class="text-gray-300 text-sm">Download a copy of your data</p>
                     </div>
-                    <i class="fas fa-chevron-right text-textLight"></i>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
                 </a>
+                
+                <!-- Sign Out Option -->
+                <button id="signOutBtn" class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card w-full text-left">
+                    <div>
+                        <h3 class="font-medium text-danger">Sign Out</h3>
+                        <p class="text-gray-300 text-sm">Log out of your account</p>
+                    </div>
+                    <i class="fas fa-sign-out-alt text-danger"></i>
+                </button>
             </div>
             
             <!-- Danger Zone -->
@@ -366,29 +388,51 @@
                 <h2 class="text-lg font-semibold mb-3 text-danger">Danger Zone</h2>
                 
                 <!-- Deactivate Account -->
-                <a href="#" id="deactivateAccountBtn" class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 flex justify-between items-center settings-card block">
+                <a href="#" id="deactivateAccountBtn" class="bg-darkSecondary rounded-lg p-4 shadow-sm mb-3 flex justify-between items-center settings-card block">
                     <div>
-                        <h3 class="font-medium text-textDark">Deactivate Account</h3>
-                        <p class="text-textMedium text-sm">Temporarily disable your account</p>
+                        <h3 class="font-medium text-white">Deactivate Account</h3>
+                        <p class="text-gray-300 text-sm">Temporarily disable your account</p>
                     </div>
-                    <i class="fas fa-chevron-right text-textLight"></i>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
                 </a>
                 
                 <!-- Delete Account -->
-                <a href="#" id="deleteAccountBtn" class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card block">
+                <a href="#" id="deleteAccountBtn" class="bg-darkSecondary rounded-lg p-4 shadow-sm flex justify-between items-center settings-card block">
                     <div>
                         <h3 class="font-medium text-danger">Delete Account</h3>
-                        <p class="text-textMedium text-sm">Permanently delete your account and data</p>
+                        <p class="text-gray-300 text-sm">Permanently delete your account and data</p>
                     </div>
-                    <i class="fas fa-chevron-right text-textLight"></i>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
                 </a>
             </div>
             
             <div class="text-center mb-8">
-                <p class="text-textLight text-sm">ProConnect App v1.0.0</p>
+                <p class="text-gray-400 text-sm">ProConnect App v1.0.0</p>
                 <div class="flex justify-center space-x-4 mt-2">
-                    <a href="#" class="text-textMedium text-sm hover:text-primary">Terms of Service</a>
-                    <a href="#" class="text-textMedium text-sm hover:text-primary">Privacy Policy</a>
+                    <a href="#" class="text-gray-300 text-sm hover:text-primary transition">Terms of Service</a>
+                    <a href="#" class="text-gray-300 text-sm hover:text-primary transition">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sign Out Confirmation Modal -->
+        <div id="signOutModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center">
+            <div class="bg-darkSecondary rounded-lg p-6 max-w-xs w-full relative z-10 fade-in">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-danger/10 rounded-full mx-auto flex items-center justify-center mb-4">
+                        <i class="fas fa-sign-out-alt text-danger text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold mb-2 text-white">Sign Out</h2>
+                    <p class="text-gray-300 mb-6">Are you sure you want to sign out of your account?</p>
+                    
+                    <div class="flex justify-center space-x-4">
+                        <button id="cancelSignOutBtn" class="px-6 py-2 border border-darkTertiary rounded-lg text-gray-300 hover:bg-darkTertiary transition duration-300 btn">
+                            Cancel
+                        </button>
+                        <button id="confirmSignOutBtn" class="bg-danger text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300 btn">
+                            Sign Out
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -399,18 +443,18 @@
         </div>
 
         <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-white dark:bg-darkSecondary border-t dark:border-darkTertiary bottom-nav">
+        <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-darkSecondary border-t border-darkTertiary bottom-nav">
             <a href="index.html" class="flex flex-col items-center">
-                <i class="fas fa-chart-line text-xl text-textLight dark:text-gray-500 nav-icon"></i>
-                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Analytics</span>
+                <i class="fas fa-chart-line text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Analytics</span>
             </a>
             <a href="chat.html" class="flex flex-col items-center">
-                <i class="fas fa-comments text-xl text-textLight dark:text-gray-500 nav-icon"></i>
-                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Chat</span>
+                <i class="fas fa-comments text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Chat</span>
             </a>
             <a href="search.html" class="flex flex-col items-center">
-                <i class="fas fa-search text-xl text-textLight dark:text-gray-500 nav-icon"></i>
-                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Find</span>
+                <i class="fas fa-search text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Find</span>
             </a>
             <a href="profile.html" class="flex flex-col items-center">
                 <i class="fas fa-user text-xl text-primary nav-icon active"></i>
@@ -422,7 +466,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
-            const darkModeToggle = document.getElementById('darkModeToggle');
             const languageSelect = document.getElementById('languageSelect');
             const connectionNotifToggle = document.getElementById('connectionNotifToggle');
             const messageNotifToggle = document.getElementById('messageNotifToggle');
@@ -434,20 +477,19 @@
             const changeEmailBtn = document.getElementById('changeEmailBtn');
             const changePasswordBtn = document.getElementById('changePasswordBtn');
             const dataExportBtn = document.getElementById('dataExportBtn');
+            const signOutBtn = document.getElementById('signOutBtn');
             const deactivateAccountBtn = document.getElementById('deactivateAccountBtn');
             const deleteAccountBtn = document.getElementById('deleteAccountBtn');
             const toastNotification = document.getElementById('toastNotification');
+            const signOutModal = document.getElementById('signOutModal');
+            const cancelSignOutBtn = document.getElementById('cancelSignOutBtn');
+            const confirmSignOutBtn = document.getElementById('confirmSignOutBtn');
             
             // Initialize settings based on user preferences or defaults
             function initializeSettings() {
                 // Get current user
                 const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
                 const userSettings = currentUser.settings || {};
-                
-                // Set dark mode toggle based on document class or user preference
-                if (document.documentElement.classList.contains('dark')) {
-                    darkModeToggle.checked = true;
-                }
                 
                 // Set email display
                 if (currentUser.email) {
@@ -483,7 +525,6 @@
                 
                 // Create or update settings object
                 currentUser.settings = {
-                    darkMode: darkModeToggle.checked,
                     language: languageSelect.value,
                     notifications: {
                         connections: connectionNotifToggle.checked,
@@ -515,17 +556,6 @@
             }
             
             // Event Listeners
-            
-            // Dark mode toggle
-            darkModeToggle.addEventListener('change', function() {
-                if (this.checked) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-                
-                saveSettings();
-            });
             
             // Language selection
             languageSelect.addEventListener('change', function() {
@@ -577,6 +607,28 @@
                 document.body.removeChild(a);
                 
                 showToast('Data exported successfully');
+            });
+            
+            // Sign Out Button - Show confirmation modal
+            signOutBtn.addEventListener('click', function() {
+                signOutModal.classList.remove('hidden');
+            });
+            
+            // Cancel Sign Out
+            cancelSignOutBtn.addEventListener('click', function() {
+                signOutModal.classList.add('hidden');
+            });
+            
+            // Confirm Sign Out
+            confirmSignOutBtn.addEventListener('click', function() {
+                // Sign out user
+                localStorage.removeItem('currentUser');
+                showToast('Signing out...');
+                
+                // Redirect to login page after a brief delay
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
             });
             
             // Danger zone buttons
