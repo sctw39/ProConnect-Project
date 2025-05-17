@@ -201,10 +201,10 @@
         
         <!-- Authentication Buttons -->
         <div class="flex space-x-4 mb-8">
-            <button id="showSignInBtn" class="flex-1 py-3 bg-primary text-white rounded-lg font-medium">
+            <button id="showSignInBtn" class="flex-1 py-3 bg-primary text-white rounded-lg font-medium shadow-sm">
                 Sign In
             </button>
-            <button id="showSignUpBtn" class="flex-1 py-3 bg-white dark:bg-darkSecondary text-primary border border-primary rounded-lg font-medium">
+            <button id="showSignUpBtn" class="flex-1 py-3 bg-white text-primary border-2 border-primary rounded-lg font-medium shadow-sm dark:bg-darkSecondary">
                 Sign Up
             </button>
         </div>
@@ -214,7 +214,7 @@
             <form class="space-y-4">
                 <div>
                     <label for="loginEmail" class="block text-sm font-medium mb-1">Email</label>
-                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your email" required>
+                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your email" required>
                 </div>
                 
                 <div>
@@ -222,7 +222,7 @@
                         <label for="loginPassword" class="block text-sm font-medium">Password</label>
                         <a href="#" class="text-primary text-sm">Forgot?</a>
                     </div>
-                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your password" required>
+                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your password" required>
                 </div>
                 
                 <div class="flex items-center">
@@ -230,7 +230,7 @@
                     <label for="rememberMe" class="text-sm">Remember me</label>
                 </div>
                 
-                <button type="button" id="signInBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium">
+                <button type="button" id="signInBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md">
                     Sign In
                 </button>
             </form>
@@ -267,38 +267,38 @@
                 
                 <div>
                     <label for="registerFullName" class="block text-sm font-medium mb-1">Full Name*</label>
-                    <input type="text" id="registerFullName" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your full name" required>
+                    <input type="text" id="registerFullName" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your full name" required>
                 </div>
                 
                 <div>
                     <label for="registerEmail" class="block text-sm font-medium mb-1">Email*</label>
-                    <input type="email" id="registerEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your email" required>
+                    <input type="email" id="registerEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Enter your email" required>
                 </div>
                 
                 <div>
                     <label for="registerPassword" class="block text-sm font-medium mb-1">Password*</label>
-                    <input type="password" id="registerPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Create a password" required>
+                    <input type="password" id="registerPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Create a password" required>
                     <p class="text-xs text-textMedium mt-1">Password must be at least 8 characters long</p>
                 </div>
                 
                 <div>
                     <label for="registerConfirmPassword" class="block text-sm font-medium mb-1">Confirm Password*</label>
-                    <input type="password" id="registerConfirmPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Confirm your password" required>
+                    <input type="password" id="registerConfirmPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="Confirm your password" required>
                 </div>
                 
                 <div>
                     <label for="registerTitle" class="block text-sm font-medium mb-1">Professional Title*</label>
-                    <input type="text" id="registerTitle" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Product Manager" required>
+                    <input type="text" id="registerTitle" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. Product Manager" required>
                 </div>
                 
                 <div>
                     <label for="registerCompany" class="block text-sm font-medium mb-1">Company</label>
-                    <input type="text" id="registerCompany" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. TechCorp">
+                    <input type="text" id="registerCompany" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. TechCorp">
                 </div>
                 
                 <div>
                     <label for="registerIndustry" class="block text-sm font-medium mb-1">Industry</label>
-                    <select id="registerIndustry" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary">
+                    <select id="registerIndustry" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base">
                         <option value="">Select your industry</option>
                         <option value="Technology">Technology</option>
                         <option value="Finance">Finance</option>
@@ -314,18 +314,18 @@
                 
                 <div>
                     <label for="registerLocation" class="block text-sm font-medium mb-1">Location</label>
-                    <input type="text" id="registerLocation" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. New York, NY">
+                    <input type="text" id="registerLocation" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. New York, NY">
                 </div>
                 
                 <div>
                     <label for="registerSkills" class="block text-sm font-medium mb-1">Skills</label>
-                    <input type="text" id="registerSkills" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Marketing, SEO, Analytics (comma separated)">
+                    <input type="text" id="registerSkills" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary text-base" placeholder="e.g. Marketing, SEO, Analytics (comma separated)">
                     <p class="text-xs text-textMedium mt-1">Enter skills separated by commas</p>
                 </div>
                 
                 <div>
                     <label for="registerAbout" class="block text-sm font-medium mb-1">About</label>
-                    <textarea id="registerAbout" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary resize-none" rows="3" placeholder="Tell us about yourself"></textarea>
+                    <textarea id="registerAbout" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary resize-none text-base" rows="3" placeholder="Tell us about yourself"></textarea>
                 </div>
                 
                 <div class="flex items-center">
@@ -333,7 +333,7 @@
                     <label for="termsAgreement" class="text-sm">I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a></label>
                 </div>
                 
-                <button type="button" id="continueToQuizBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium">
+                <button type="button" id="continueToQuizBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md">
                     Continue to Networking Quiz
                 </button>
                 
@@ -566,7 +566,7 @@
                     <p id="networkingRecommendation" class="text-sm">Based on your profile, we recommend focusing on expanding your business connections in the technology sector. ProConnect can help you find potential partners, clients, and mentors to accelerate your business growth.</p>
                 </div>
                 
-                <button id="completeSignUpBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium">
+                <button id="completeSignUpBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md">
                     Complete Sign Up & Start Networking
                 </button>
             </div>
@@ -667,10 +667,10 @@
             // Switch to sign in form
             function showSignInForm() {
                 showSignInBtn.classList.add('bg-primary', 'text-white');
-                showSignInBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
+                showSignInBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
                 
                 showSignUpBtn.classList.remove('bg-primary', 'text-white');
-                showSignUpBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
+                showSignUpBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
                 
                 signUpForm.classList.add('hidden');
                 networkingQuiz.classList.add('hidden');
@@ -681,10 +681,10 @@
             // Switch to sign up form
             function showSignUpForm() {
                 showSignUpBtn.classList.add('bg-primary', 'text-white');
-                showSignUpBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
+                showSignUpBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
                 
                 showSignInBtn.classList.remove('bg-primary', 'text-white');
-                showSignInBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
+                showSignInBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border-2', 'border-primary');
                 
                 signInForm.classList.add('hidden');
                 networkingQuiz.classList.add('hidden');
