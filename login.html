@@ -662,8 +662,65 @@
                 sectors: []
             };
             
+            // Initialize app data
+            initializeAppData();
+            
             // Initialize quiz option selection
             initializeQuizOptions();
+            
+            // Initialize application data if not exists
+            function initializeAppData() {
+                // Check if we have user data stored
+                if (!localStorage.getItem('proconnect_users')) {
+                    localStorage.setItem('proconnect_users', JSON.stringify([]));
+                }
+            }
+            
+            // Get all users
+            function getAllUsers() {
+                return JSON.parse(localStorage.getItem('proconnect_users') || '[]');
+            }
+            
+            // Save users array
+            function saveUsers(users) {
+                localStorage.setItem('proconnect_users', JSON.stringify(users));
+            }
+            
+            // Find user by email
+            function findUserByEmail(email) {
+                const users = getAllUsers();
+                return users.find(user => user.email.toLowerCase() === email.toLowerCase());
+            }
+            
+            // Add new user
+            function addUser(user) {
+                const users = getAllUsers();
+                
+                // Check if email is already in use
+                if (users.some(u => u.email.toLowerCase() === user.email.toLowerCase())) {
+                    return { success: false, message: 'Email is already in use' };
+                }
+                
+                // Add user to array
+                users.push(user);
+                saveUsers(users);
+                
+                return { success: true };
+            }
+            
+            // Update user
+            function updateUser(updatedUser) {
+                const users = getAllUsers();
+                const index = users.findIndex(u => u.id === updatedUser.id);
+                
+                if (index !== -1) {
+                    users[index] = updatedUser;
+                    saveUsers(users);
+                    return true;
+                }
+                
+                return false;
+            }
             
             // Show toast notification
             function showToast(message) {
@@ -1011,22 +1068,21 @@
                     return;
                 }
                 
-                // In a real app, you would authenticate against a server
-                // For demo, just create a user object
-                const user = {
-                    id: 'user_' + Date.now(),
-                    fullName: 'Demo User',
-                    email: loginEmail.value,
-                    currentRole: 'Professional',
-                    company: 'Demo Company',
-                    industry: 'Technology',
-                    location: 'San Francisco, CA',
-                    skills: ['Marketing', 'Management', 'Strategy'],
-                    about: 'Experienced professional with a passion for innovation.',
-                    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
-                };
+                // Find user by email
+                const user = findUserByEmail(loginEmail.value.trim());
                 
-                // Save to localStorage
+                if (!user) {
+                    showToast('Email not found. Please check your email or sign up.');
+                    return;
+                }
+                
+                // Simplified password check (in a real app, you would use proper hashing)
+                if (user.password !== loginPassword.value) {
+                    showToast('Incorrect password. Please try again.');
+                    return;
+                }
+                
+                // Save current user to localStorage
                 localStorage.setItem('currentUser', JSON.stringify(user));
                 
                 // Show success message
@@ -1050,6 +1106,14 @@
                 
                 if (!isValidEmail(registerEmail.value.trim())) {
                     showToast('Please enter a valid email address');
+                    registerEmail.focus();
+                    return;
+                }
+                
+                // Check if email is already in use
+                const existingUser = findUserByEmail(registerEmail.value.trim());
+                if (existingUser) {
+                    showToast('This email is already in use. Please use a different email or sign in.');
                     registerEmail.focus();
                     return;
                 }
@@ -1107,10 +1171,11 @@
                 const registrationData = JSON.parse(localStorage.getItem('tempRegistration') || '{}');
                 
                 // Create user object with quiz data
-                const user = {
+                const newUser = {
                     id: 'user_' + Date.now(),
                     fullName: registrationData.fullName,
                     email: registrationData.email,
+                    password: registrationData.password, // In a real app, use proper hashing
                     currentRole: registrationData.currentRole,
                     company: registrationData.company,
                     industry: registrationData.industry,
@@ -1120,18 +1185,66 @@
                     profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                     networkingProfile: {
                         ...quizAnswers,
+                        score: calculateNetworkingScore(),
                         dateCreated: new Date().toISOString()
-                    }
+                    },
+                    connections: [],
+                    pendingRequests: [],
+                    sentRequests: [],
+                    dateJoined: new Date().toISOString()
                 };
+                
+                // Add user to database
+                const result = addUser(newUser);
+                
+                if (!result.success) {
+                    showToast(result.message);
+                    return;
+                }
                 
                 // Clean up temporary storage
                 localStorage.removeItem('tempRegistration');
                 
-                // Save to localStorage
-                localStorage.setItem('currentUser', JSON.stringify(user));
+                // Save current user to localStorage
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
                 
                 // Show success message
                 showSuccess('Your account has been created! Let\'s start networking.');
+            }
+            
+            // Calculate networking score (simplified version)
+            function calculateNetworkingScore() {
+                let score = 0;
+                
+                // Importance of networking
+                if (quizAnswers.importance === 'critical') score += 25;
+                else if (quizAnswers.importance === 'very') score += 20;
+                else if (quizAnswers.importance === 'somewhat') score += 15;
+                else if (quizAnswers.importance === 'not') score += 5;
+                
+                // Networking goals: more business-focused goals = higher score
+                quizAnswers.goals.forEach(goal => {
+                    if (['clients', 'partners', 'investors'].includes(goal)) score += 10;
+                    else score += 5;
+                });
+                
+                // Approach to networking
+                if (quizAnswers.approach === 'proactive') score += 20;
+                else if (quizAnswers.approach === 'opportunistic') score += 15;
+                else if (quizAnswers.approach === 'selective') score += 10;
+                else if (quizAnswers.approach === 'reactive') score += 5;
+                
+                // Networking challenges
+                if (['finding', 'conversion'].includes(quizAnswers.challenge)) score += 15;
+                else score += 10;
+                
+                // Industry sectors
+                quizAnswers.sectors.forEach(() => {
+                    score += 5;
+                });
+                
+                // Cap score at 100
+                return Math.min(score, 100);
             }
             
             // Event Listeners
