@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - Notifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0078D4',
+                        primaryLight: '#50A0E4',
+                        primaryDark: '#106EBE',
+                        secondary: '#2BC48A',
+                        accent: '#FFB900',
+                        danger: '#E74C3C',
+                        success: '#27AE60',
+                        lightBg: '#FFFFFF',
+                        lightSecondary: '#F8F9FA',
+                        lightTertiary: '#E9ECEF',
+                        textDark: '#212529',
+                        textMedium: '#495057',
+                        textLight: '#6C757D',
+                        darkBg: '#181818',
+                        darkSecondary: '#202020',
+                        darkTertiary: '#2A2A2A'
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+        
+        // Force dark mode
+        document.documentElement.classList.add('dark');
+    </script>
+    <style>
+        /* General dark mode styling */
+        body {
+            background-color: #181818 !important;
+            color: #F8F9FA !important;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Request card animations */
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s forwards;
+        }
+        
+        /* Button styles */
+        .btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+        
+        /* Profile modal animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        /* Bottom navigation */
+        .bottom-nav {
+            background-color: #202020 !important;
+            border-color: #2A2A2A !important;
+        }
+        
+        .nav-icon {
+            color: #6C757D !important;
+        }
+        
+        .nav-icon.active {
+            color: #0078D4 !important;
+        }
+        
+        /* Tab styling */
+        .tab-btn {
+            padding: 0.75rem 0;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            flex: 1;
+            color: #CED4DA;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-btn.active {
+            color: #0078D4;
+            border-bottom: 2px solid #0078D4;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-white min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-md pb-20">
+        <!-- App Header -->
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-primary">Connection Requests</h1>
+            <div class="flex items-center">
+                <a href="profile.html" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition">
+                    <i class="fas fa-user text-xl"></i>
+                </a>
+                <a href="search.html" class="text-primary block p-2 hover:bg-darkTertiary rounded-full transition">
+                    <i class="fas fa-search text-xl"></i>
+                </a>
+            </div>
+        </header>
+        
+        <!-- Tabs -->
+        <div class="flex mb-6 border-b border-darkTertiary">
+            <button id="receivedTab" class="tab-btn active">
+                <span>Received</span>
+                <span id="receivedCount" class="inline-block bg-primary text-white text-xs rounded-full w-5 h-5 ml-1 hidden">0</span>
+            </button>
+            <button id="sentTab" class="tab-btn">
+                <span>Sent</span>
+                <span id="sentCount" class="inline-block bg-gray-500 text-white text-xs rounded-full w-5 h-5 ml-1 hidden">0</span>
+            </button>
+            <button id="connectionsTab" class="tab-btn">Connections</button>
+        </div>
+        
+        <!-- Received Requests Tab Content -->
+        <div id="receivedTabContent" class="space-y-4">
+            <div id="receivedRequestsContainer">
+                <!-- Will be populated by JavaScript -->
+                <div class="flex items-center justify-center py-16">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-spinner fa-spin text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-gray-400">Loading requests...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sent Requests Tab Content (Hidden initially) -->
+        <div id="sentTabContent" class="space-y-4 hidden">
+            <div id="sentRequestsContainer">
+                <!-- Will be populated by JavaScript -->
+                <div class="flex items-center justify-center py-16">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-spinner fa-spin text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-gray-400">Loading sent requests...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Connections Tab Content (Hidden initially) -->
+        <div id="connectionsTabContent" class="space-y-4 hidden">
+            <div id="connectionsContainer">
+                <!-- Will be populated by JavaScript -->
+                <div class="flex items-center justify-center py-16">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-spinner fa-spin text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-gray-400">Loading connections...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Profile Modal (Hidden initially) -->
+        <div id="userProfileModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+            <div class="absolute inset-0 bg-black opacity-70"></div>
+            <div class="bg-darkSecondary rounded-lg p-6 max-w-md w-full relative z-10 fade-in max-h-[90vh] overflow-y-auto">
+                <div class="text-right mb-2">
+                    <button id="closeUserProfileBtn" class="text-gray-300 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="text-center mb-4">
+                    <img id="modalUserImage" src="" alt="User" class="w-24 h-24 rounded-full object-cover mx-auto border-4 border-darkTertiary mb-3">
+                    <h2 id="modalUserName" class="text-xl font-bold text-white">User Name</h2>
+                    <p id="modalUserTitle" class="text-gray-300">Professional Title</p>
+                    <p id="modalUserLocation" class="text-gray-400 text-sm mt-1"><i class="fas fa-map-marker-alt mr-1"></i>Location</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="font-medium text-white mb-2">About</h3>
+                    <p id="modalUserAbout" class="text-gray-300 text-sm">User bio goes here...</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="font-medium text-white mb-2">Skills</h3>
+                    <div id="modalUserSkills" class="flex flex-wrap">
+                        <!-- User skills will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="font-medium text-white mb-2">Experience</h3>
+                    <div id="modalUserExperience">
+                        <!-- User experience will be populated here -->
+                    </div>
+                </div>
+                
+                <div id="modalActionButtons" class="flex justify-center space-x-3">
+                    <!-- Action buttons will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="toast">
+            Connection request accepted
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-darkSecondary border-t border-darkTertiary bottom-nav">
+            <a href="index.html" class="flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Analytics</span>
+            </a>
+            <a href="search.html" class="flex flex-col items-center">
+                <i class="fas fa-search text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Find</span>
+            </a>
+            <a href="notifications.html" class="flex flex-col items-center">
+                <i class="fas fa-bell text-xl text-primary nav-icon active"></i>
+                <span class="text-xs mt-1 text-primary">Requests</span>
+            </a>
+            <a href="profile.html" class="flex flex-col items-center">
+                <i class="fas fa-user text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const receivedTab = document.getElementById('receivedTab');
+            const sentTab = document.getElementById('sentTab');
+            const connectionsTab = document.getElementById('connectionsTab');
+            const receivedCount = document.getElementById('receivedCount');
+            const sentCount = document.getElementById('sentCount');
+            const receivedTabContent = document.getElementById('receivedTabContent');
+            const sentTabContent = document.getElementById('sentTabContent');
+            const connectionsTabContent = document.getElementById('connectionsTabContent');
+            const receivedRequestsContainer = document.getElementById('receivedRequestsContainer');
+            const sentRequestsContainer = document.getElementById('sentRequestsContainer');
+            const connectionsContainer = document.getElementById('connectionsContainer');
+            const userProfileModal = document.getElementById('userProfileModal');
+            const closeUserProfileBtn = document.getElementById('closeUserProfileBtn');
+            const modalUserImage = document.getElementById('modalUserImage');
+            const modalUserName = document.getElementById('modalUserName');
+            const modalUserTitle = document.getElementById('modalUserTitle');
+            const modalUserLocation = document.getElementById('modalUserLocation');
+            const modalUserAbout = document.getElementById('modalUserAbout');
+            const modalUserSkills = document.getElementById('modalUserSkills');
+            const modalUserExperience = document.getElementById('modalUserExperience');
+            const modalActionButtons = document.getElementById('modalActionButtons');
+            const toastNotification = document.getElementById('toastNotification');
+            
+            // State variables
+            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            let allUsers = [];
+            let selectedUserId = null;
+            let currentTab = 'received';  // Tracks which tab is active
+            
+            // Initialize application
+            initializeApp();
+            
+            function initializeApp() {
+                // Check if user is logged in
+                if (!currentUser) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Load all users
+                loadUsers();
+                
+                // Set up event listeners
+                setupEventListeners();
+                
+                // Load initial data
+                loadReceivedRequests();
+            }
+            
+            // Load all users from localStorage
+            function loadUsers() {
+                allUsers = JSON.parse(localStorage.getItem('proconnect_users') || '[]');
+            }
+            
+            // Save all users to localStorage
+            function saveUsers() {
+                localStorage.setItem('proconnect_users', JSON.stringify(allUsers));
+            }
+            
+            // Update current user in local storage and users array
+            function updateCurrentUser() {
+                // Update user in all users array
+                const userIndex = allUsers.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    allUsers[userIndex] = currentUser;
+                    saveUsers();
+                }
+                
+                // Update in local storage
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+            
+            // Set up event listeners
+            function setupEventListeners() {
+                // Tab navigation
+                receivedTab.addEventListener('click', function() {
+                    changeTab('received');
+                });
+                
+                sentTab.addEventListener('click', function() {
+                    changeTab('sent');
+                });
+                
+                connectionsTab.addEventListener('click', function() {
+                    changeTab('connections');
+                });
+                
+                // Close user profile modal
+                closeUserProfileBtn.addEventListener('click', function() {
+                    userProfileModal.classList.add('hidden');
+                });
+            }
+            
+            // Change active tab
+            function changeTab(tabName) {
+                // Hide all tab contents
+                receivedTabContent.classList.add('hidden');
+                sentTabContent.classList.add('hidden');
+                connectionsTabContent.classList.add('hidden');
+                
+                // Remove active class from all tabs
+                receivedTab.classList.remove('active');
+                sentTab.classList.remove('active');
+                connectionsTab.classList.remove('active');
+                
+                // Show selected tab content and add active class to tab
+                switch (tabName) {
+                    case 'received':
+                        receivedTabContent.classList.remove('hidden');
+                        receivedTab.classList.add('active');
+                        loadReceivedRequests();
+                        break;
+                    case 'sent':
+                        sentTabContent.classList.remove('hidden');
+                        sentTab.classList.add('active');
+                        loadSentRequests();
+                        break;
+                    case 'connections':
+                        connectionsTabContent.classList.remove('hidden');
+                        connectionsTab.classList.add('active');
+                        loadConnections();
+                        break;
+                }
+                
+                currentTab = tabName;
+            }
+            
+            // Load received connection requests
+            function loadReceivedRequests() {
+                const pendingRequests = currentUser.pendingRequests || [];
+                
+                // Update counter
+                if (pendingRequests.length > 0) {
+                    receivedCount.textContent = pendingRequests.length;
+                    receivedCount.classList.remove('hidden');
+                } else {
+                    receivedCount.classList.add('hidden');
+                }
+                
+                // If no requests
+                if (pendingRequests.length === 0) {
+                    receivedRequestsContainer.innerHTML = `
+                        <div class="flex items-center justify-center py-16">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-inbox text-gray-400 text-xl"></i>
+                                </div>
+                                <p class="text-gray-400">No connection requests</p>
+                                <a href="search.html" class="text-primary mt-2 inline-block">Find people to connect with</a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Clear container
+                receivedRequestsContainer.innerHTML = '';
+                
+                // Get user details for each request
+                pendingRequests.forEach(requesterId => {
+                    const requester = allUsers.find(user => user.id === requesterId);
+                    if (!requester) return;
+                    
+                    const requestCard = document.createElement('div');
+                    requestCard.classList.add('request-card', 'bg-darkSecondary', 'rounded-lg', 'overflow-hidden', 'shadow-sm', 'mb-4');
+                    requestCard.setAttribute('data-id', requester.id);
+                    
+                    requestCard.innerHTML = `
+                        <div class="p-4">
+                            <div class="flex items-center">
+                                <img src="${requester.profileImage || 'https://via.placeholder.com/50'}" alt="${requester.fullName}" 
+                                    class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                                <div class="flex-1">
+                                    <h3 class="font-medium text-white">${requester.fullName}</h3>
+                                    <p class="text-sm text-gray-300">${requester.currentRole || ''} ${requester.company ? 'at ' + requester.company : ''}</p>
+                                    <p class="text-xs text-gray-400 mt-1">${requester.industry || ''}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-3">
+                                <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="${requester.id}">
+                                    View Profile
+                                </button>
+                                <button class="ignore-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="${requester.id}">
+                                    Ignore
+                                </button>
+                                <button class="accept-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="${requester.id}">
+                                    Accept
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    receivedRequestsContainer.appendChild(requestCard);
+                    
+                    // Add event listeners
+                    const viewProfileBtn = requestCard.querySelector('.view-profile-btn');
+                    const ignoreBtn = requestCard.querySelector('.ignore-btn');
+                    const acceptBtn = requestCard.querySelector('.accept-btn');
+                    
+                    viewProfileBtn.addEventListener('click', function() {
+                        showUserProfile(this.getAttribute('data-id'), 'received');
+                    });
+                    
+                    ignoreBtn.addEventListener('click', function() {
+                        const requesterId = this.getAttribute('data-id');
+                        ignoreConnectionRequest(requesterId);
+                    });
+                    
+                    acceptBtn.addEventListener('click', function() {
+                        const requesterId = this.getAttribute('data-id');
+                        acceptConnectionRequest(requesterId);
+                    });
+                });
+            }
+            
+            // Load sent connection requests
+            function loadSentRequests() {
+                const sentRequests = currentUser.sentRequests || [];
+                
+                // Update counter
+                if (sentRequests.length > 0) {
+                    sentCount.textContent = sentRequests.length;
+                    sentCount.classList.remove('hidden');
+                } else {
+                    sentCount.classList.add('hidden');
+                }
+                
+                // If no requests
+                if (sentRequests.length === 0) {
+                    sentRequestsContainer.innerHTML = `
+                        <div class="flex items-center justify-center py-16">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-paper-plane text-gray-400 text-xl"></i>
+                                </div>
+                                <p class="text-gray-400">No sent requests</p>
+                                <a href="search.html" class="text-primary mt-2 inline-block">Find people to connect with</a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Clear container
+                sentRequestsContainer.innerHTML = '';
+                
+                // Get user details for each request
+                sentRequests.forEach(recipientId => {
+                    const recipient = allUsers.find(user => user.id === recipientId);
+                    if (!recipient) return;
+                    
+                    const requestCard = document.createElement('div');
+                    requestCard.classList.add('request-card', 'bg-darkSecondary', 'rounded-lg', 'overflow-hidden', 'shadow-sm', 'mb-4');
+                    requestCard.setAttribute('data-id', recipient.id);
+                    
+                    requestCard.innerHTML = `
+                        <div class="p-4">
+                            <div class="flex items-center">
+                                <img src="${recipient.profileImage || 'https://via.placeholder.com/50'}" alt="${recipient.fullName}" 
+                                    class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                                <div class="flex-1">
+                                    <h3 class="font-medium text-white">${recipient.fullName}</h3>
+                                    <p class="text-sm text-gray-300">${recipient.currentRole || ''} ${recipient.company ? 'at ' + recipient.company : ''}</p>
+                                    <p class="text-xs text-gray-400 mt-1">${recipient.industry || ''}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-3">
+                                <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="${recipient.id}">
+                                    View Profile
+                                </button>
+                                <button class="cancel-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="${recipient.id}">
+                                    Cancel Request
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    sentRequestsContainer.appendChild(requestCard);
+                    
+                    // Add event listeners
+                    const viewProfileBtn = requestCard.querySelector('.view-profile-btn');
+                    const cancelBtn = requestCard.querySelector('.cancel-btn');
+                    
+                    viewProfileBtn.addEventListener('click', function() {
+                        showUserProfile(this.getAttribute('data-id'), 'sent');
+                    });
+                    
+                    cancelBtn.addEventListener('click', function() {
+                        const recipientId = this.getAttribute('data-id');
+                        cancelConnectionRequest(recipientId);
+                    });
+                });
+            }
+            
+            // Load connections
+            function loadConnections() {
+                const connections = currentUser.connections || [];
+                
+                // If no connections
+                if (connections.length === 0) {
+                    connectionsContainer.innerHTML = `
+                        <div class="flex items-center justify-center py-16">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-users text-gray-400 text-xl"></i>
+                                </div>
+                                <p class="text-gray-400">No connections yet</p>
+                                <a href="search.html" class="text-primary mt-2 inline-block">Find people to connect with</a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Clear container
+                connectionsContainer.innerHTML = '';
+                
+                // Get user details for each connection
+                connections.forEach(connectionId => {
+                    const connection = allUsers.find(user => user.id === connectionId);
+                    if (!connection) return;
+                    
+                    const connectionCard = document.createElement('div');
+                    connectionCard.classList.add('connection-card', 'bg-darkSecondary', 'rounded-lg', 'overflow-hidden', 'shadow-sm', 'mb-4');
+                    connectionCard.setAttribute('data-id', connection.id);
+                    
+                    connectionCard.innerHTML = `
+                        <div class="p-4">
+                            <div class="flex items-center">
+                                <img src="${connection.profileImage || 'https://via.placeholder.com/50'}" alt="${connection.fullName}" 
+                                    class="w-14 h-14 rounded-full object-cover border-2 border-darkTertiary mr-4">
+                                <div class="flex-1">
+                                    <h3 class="font-medium text-white">${connection.fullName}</h3>
+                                    <p class="text-sm text-gray-300">${connection.currentRole || ''} ${connection.company ? 'at ' + connection.company : ''}</p>
+                                    <p class="text-xs text-gray-400 mt-1">${connection.industry || ''}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-3">
+                                <button class="view-profile-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-darkTertiary transition" data-id="${connection.id}">
+                                    View Profile
+                                </button>
+                                <button class="remove-btn px-3 py-1 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-red-500 hover:text-white transition" data-id="${connection.id}">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    connectionsContainer.appendChild(connectionCard);
+                    
+                    // Add event listeners
+                    const viewProfileBtn = connectionCard.querySelector('.view-profile-btn');
+                    const removeBtn = connectionCard.querySelector('.remove-btn');
+                    
+                    viewProfileBtn.addEventListener('click', function() {
+                        showUserProfile(this.getAttribute('data-id'), 'connection');
+                    });
+                    
+                    removeBtn.addEventListener('click', function() {
+                        const connectionId = this.getAttribute('data-id');
+                        removeConnection(connectionId);
+                    });
+                });
+            }
+            
+            // Show user profile in modal
+            function showUserProfile(userId, context) {
+                const user = allUsers.find(u => u.id === userId);
+                if (!user) return;
+                
+                selectedUserId = userId;
+                
+                // Set profile data
+                modalUserImage.src = user.profileImage || 'https://via.placeholder.com/100';
+                modalUserName.textContent = user.fullName;
+                modalUserTitle.textContent = user.currentRole || '';
+                if (user.company) {
+                    modalUserTitle.textContent += ' at ' + user.company;
+                }
+                
+                if (user.location) {
+                    modalUserLocation.innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${user.location}`;
+                    modalUserLocation.classList.remove('hidden');
+                } else {
+                    modalUserLocation.classList.add('hidden');
+                }
+                
+                modalUserAbout.textContent = user.about || 'No bio available';
+                
+                // Format skills
+                const skills = user.skills || [];
+                modalUserSkills.innerHTML = Array.isArray(skills) 
+                    ? skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')
+                    : '<p class="text-gray-400 text-sm">No skills listed</p>';
+                
+                // Format experience
+                if (user.experience && user.experience.length > 0) {
+                    modalUserExperience.innerHTML = user.experience.map(exp => `
+                        <div class="mb-2">
+                            <h4 class="font-medium text-white">${exp.title}</h4>
+                            <p class="text-gray-300 text-sm">${exp.company}</p>
+                            <p class="text-gray-400 text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
+                            ${exp.description ? `<p class="text-gray-300 text-sm mt-1">${exp.description}</p>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    modalUserExperience.innerHTML = '<p class="text-gray-400 text-sm">No experience listed</p>';
+                }
+                
+                // Set action buttons based on context
+                modalActionButtons.innerHTML = '';
+                
+                if (context === 'received') {
+                    modalActionButtons.innerHTML = `
+                        <button id="modalIgnoreBtn" class="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-darkTertiary transition btn">
+                            Ignore
+                        </button>
+                        <button id="modalAcceptBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition btn">
+                            Accept Connection
+                        </button>
+                    `;
+                    
+                    // Add event listeners
+                    document.getElementById('modalIgnoreBtn').addEventListener('click', function() {
+                        ignoreConnectionRequest(selectedUserId);
+                        userProfileModal.classList.add('hidden');
+                    });
+                    
+                    document.getElementById('modalAcceptBtn').addEventListener('click', function() {
+                        acceptConnectionRequest(selectedUserId);
+                        userProfileModal.classList.add('hidden');
+                    });
+                    
+                } else if (context === 'sent') {
+                    modalActionButtons.innerHTML = `
+                        <button id="modalCancelBtn" class="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-red-500 hover:text-white transition btn">
+                            Cancel Request
+                        </button>
+                    `;
+                    
+                    // Add event listener
+                    document.getElementById('modalCancelBtn').addEventListener('click', function() {
+                        cancelConnectionRequest(selectedUserId);
+                        userProfileModal.classList.add('hidden');
+                    });
+                    
+                } else if (context === 'connection') {
+                    modalActionButtons.innerHTML = `
+                        <button id="modalRemoveBtn" class="px-4 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-red-500 hover:text-white transition btn">
+                            Remove Connection
+                        </button>
+                    `;
+                    
+                    // Add event listener
+                    document.getElementById('modalRemoveBtn').addEventListener('click', function() {
+                        removeConnection(selectedUserId);
+                        userProfileModal.classList.add('hidden');
+                    });
+                }
+                
+                // Show modal
+                userProfileModal.classList.remove('hidden');
+            }
+            
+            // Accept connection request
+            function acceptConnectionRequest(requesterId) {
+                // Find request card
+                const requestCard = document.querySelector(`.request-card[data-id="${requesterId}"]`);
+                
+                // Animate card removal
+                if (requestCard) {
+                    requestCard.classList.add('fade-out');
+                    
+                    // Process after animation
+                    setTimeout(() => {
+                        requestCard.remove();
+                    }, 500);
+                }
+                
+                // Find requester user
+                const requesterIndex = allUsers.findIndex(user => user.id === requesterId);
+                if (requesterIndex === -1) {
+                    showToast('Error: User not found');
+                    return;
+                }
+                
+                // Check if request exists
+                if (!currentUser.pendingRequests || !currentUser.pendingRequests.includes(requesterId)) {
+                    showToast('Error: Request not found');
+                    return;
+                }
+                
+                // Initialize connections array if it doesn't exist
+                if (!currentUser.connections) {
+                    currentUser.connections = [];
+                }
+                
+                if (!allUsers[requesterIndex].connections) {
+                    allUsers[requesterIndex].connections = [];
+                }
+                
+                // Add to connections for both users
+                currentUser.connections.push(requesterId);
+                allUsers[requesterIndex].connections.push(currentUser.id);
+                
+                // Remove from pending requests
+                currentUser.pendingRequests = currentUser.pendingRequests.filter(id => id !== requesterId);
+                
+                // Remove from sent requests of the requester
+                if (allUsers[requesterIndex].sentRequests) {
+                    allUsers[requesterIndex].sentRequests = allUsers[requesterIndex].sentRequests.filter(id => id !== currentUser.id);
+                }
+                
+                // Update storage
+                updateCurrentUser();
+                saveUsers();
+                
+                // Update UI
+                updateRequestCounts();
+                
+                // Show toast
+                showToast('Connection request accepted');
+                
+                // If on "received" tab, check if there are any more requests
+                if (currentTab === 'received' && (!currentUser.pendingRequests || currentUser.pendingRequests.length === 0)) {
+                    loadReceivedRequests(); // This will show the empty state
+                }
+            }
+            
+            // Ignore connection request
+            function ignoreConnectionRequest(requesterId) {
+                // Find request card
+                const requestCard = document.querySelector(`.request-card[data-id="${requesterId}"]`);
+                
+                // Animate card removal
+                if (requestCard) {
+                    requestCard.classList.add('fade-out');
+                    
+                    // Process after animation
+                    setTimeout(() => {
+                        requestCard.remove();
+                    }, 500);
+                }
+                
+                // Find requester user
+                const requesterIndex = allUsers.findIndex(user => user.id === requesterId);
+                if (requesterIndex === -1) {
+                    showToast('Error: User not found');
+                    return;
+                }
+                
+                // Remove from pending requests
+                if (currentUser.pendingRequests) {
+                    currentUser.pendingRequests = currentUser.pendingRequests.filter(id => id !== requesterId);
+                }
+                
+                // Remove from sent requests of the requester
+                if (allUsers[requesterIndex].sentRequests) {
+                    allUsers[requesterIndex].sentRequests = allUsers[requesterIndex].sentRequests.filter(id => id !== currentUser.id);
+                }
+                
+                // Update storage
+                updateCurrentUser();
+                saveUsers();
+                
+                // Update UI
+                updateRequestCounts();
+                
+                // Show toast
+                showToast('Connection request ignored');
+                
+                // If on "received" tab, check if there are any more requests
+                if (currentTab === 'received' && (!currentUser.pendingRequests || currentUser.pendingRequests.length === 0)) {
+                    loadReceivedRequests(); // This will show the empty state
+                }
+            }
+            
+            // Cancel connection request
+            function cancelConnectionRequest(recipientId) {
+                // Find request card
+                const requestCard = document.querySelector(`.request-card[data-id="${recipientId}"]`);
+                
+                // Animate card removal
+                if (requestCard) {
+                    requestCard.classList.add('fade-out');
+                    
+                    // Process after animation
+                    setTimeout(() => {
+                        requestCard.remove();
+                    }, 500);
+                }
+                
+                // Find recipient user
+                const recipientIndex = allUsers.findIndex(user => user.id === recipientId);
+                if (recipientIndex === -1) {
+                    showToast('Error: User not found');
+                    return;
+                }
+                
+                // Remove from sent requests
+                if (currentUser.sentRequests) {
+                    currentUser.sentRequests = currentUser.sentRequests.filter(id => id !== recipientId);
+                }
+                
+                // Remove from pending requests of the recipient
+                if (allUsers[recipientIndex].pendingRequests) {
+                    allUsers[recipientIndex].pendingRequests = allUsers[recipientIndex].pendingRequests.filter(id => id !== currentUser.id);
+                }
+                
+                // Update storage
+                updateCurrentUser();
+                saveUsers();
+                
+                // Update UI
+                updateRequestCounts();
+                
+                // Show toast
+                showToast('Connection request canceled');
+                
+                // If on "sent" tab, check if there are any more requests
+                if (currentTab === 'sent' && (!currentUser.sentRequests || currentUser.sentRequests.length === 0)) {
+                    loadSentRequests(); // This will show the empty state
+                }
+            }
+            
+            // Remove connection
+            function removeConnection(connectionId) {
+                // Find connection card
+                const connectionCard = document.querySelector(`.connection-card[data-id="${connectionId}"]`);
+                
+                // Animate card removal
+                if (connectionCard) {
+                    connectionCard.classList.add('fade-out');
+                    
+                    // Process after animation
+                    setTimeout(() => {
+                        connectionCard.remove();
+                    }, 500);
+                }
+                
+                // Find connection user
+                const connectionIndex = allUsers.findIndex(user => user.id === connectionId);
+                if (connectionIndex === -1) {
+                    showToast('Error: User not found');
+                    return;
+                }
+                
+                // Remove from connections for both users
+                if (currentUser.connections) {
+                    currentUser.connections = currentUser.connections.filter(id => id !== connectionId);
+                }
+                
+                if (allUsers[connectionIndex].connections) {
+                    allUsers[connectionIndex].connections = allUsers[connectionIndex].connections.filter(id => id !== currentUser.id);
+                }
+                
+                // Update storage
+                updateCurrentUser();
+                saveUsers();
+                
+                // Show toast
+                showToast('Connection removed');
+                
+                // If on "connections" tab, check if there are any more connections
+                if (currentTab === 'connections' && (!currentUser.connections || currentUser.connections.length === 0)) {
+                    loadConnections(); // This will show the empty state
+                }
+            }
+            
+            // Update request counts in tabs
+            function updateRequestCounts() {
+                const pendingRequests = currentUser.pendingRequests || [];
+                const sentRequests = currentUser.sentRequests || [];
+                
+                // Update received count
+                if (pendingRequests.length > 0) {
+                    receivedCount.textContent = pendingRequests.length;
+                    receivedCount.classList.remove('hidden');
+                } else {
+                    receivedCount.classList.add('hidden');
+                }
+                
+                // Update sent count
+                if (sentRequests.length > 0) {
+                    sentCount.textContent = sentRequests.length;
+                    sentCount.classList.remove('hidden');
+                } else {
+                    sentCount.classList.add('hidden');
+                }
+            }
+            
+            // Show toast notification
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.style.opacity = 1;
+                
+                setTimeout(() => {
+                    toastNotification.style.opacity = 0;
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
