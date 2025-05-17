@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProConnect - My Profile</title>
+    <title>ProConnect - Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -23,786 +23,1317 @@
                         lightTertiary: '#E9ECEF',
                         textDark: '#212529',
                         textMedium: '#495057',
-                        textLight: '#6C757D'
+                        textLight: '#6C757D',
+                        darkBg: '#181818',
+                        darkSecondary: '#202020',
+                        darkTertiary: '#2A2A2A'
                     }
                 }
             }
         }
+        
+        // Check for dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
     </script>
     <style>
-        /* Profile image upload styling */
-        .profile-image-wrapper {
+        /* Profile image styles */
+        .profile-image-container {
             position: relative;
-            width: 8rem;
-            height: 8rem;
-            border-radius: 9999px;
-            border: 4px solid white;
-            overflow: hidden;
+            width: 120px;
+            height: 120px;
             margin: 0 auto;
         }
         
-        .profile-image-upload {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 2.5rem;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .profile-image-wrapper:hover .profile-image-upload {
-            opacity: 1;
-        }
-        
-        .profile-image-wrapper input[type="file"] {
-            position: absolute;
+        .profile-image {
             width: 100%;
             height: 100%;
-            opacity: 0;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .edit-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 32px;
+            height: 32px;
+            background-color: #0078D4;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            top: 0;
-            left: 0;
+            transition: background-color 0.2s;
         }
         
-        /* Editable content styling */
-        [contenteditable="true"] {
-            border: 1px dashed rgba(0, 120, 212, 0.5);
-            padding: 0.25rem;
-            border-radius: 0.25rem;
-            min-height: 1.5rem;
-            position: relative;
+        .edit-icon:hover {
+            background-color: #106EBE;
         }
         
-        [contenteditable="true"]:focus {
-            outline: none;
-            border-color: rgba(0, 120, 212, 1);
-        }
-        
-        [contenteditable="true"]:empty:before {
-            content: attr(data-placeholder);
-            color: #6C757D;
-            cursor: text;
-        }
-        
-        /* Toast notification styling */
-        .toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
+        /* Progress indicators */
+        .profile-progress-track {
+            height: 4px;
+            background-color: #E9ECEF;
             border-radius: 2px;
-            padding: 16px;
+            overflow: hidden;
+        }
+        
+        .profile-progress-bar {
+            height: 100%;
+            background-color: #0078D4;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Section animations */
+        .section-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Skill badge styling */
+        .skill-badge {
+            display: inline-block;
+            background-color: rgba(0, 120, 212, 0.1);
+            color: #0078D4;
+            border-radius: 50px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            white-space: nowrap;
+        }
+        
+        /* Edit form animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        /* Toast notification */
+        .toast {
             position: fixed;
-            z-index: 1;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            bottom: 100px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         
-        .toast.show {
-            visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        /* Empty state animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
-        @keyframes fadein {
-            from {bottom: 0; opacity: 0;}
-            to {bottom: 100px; opacity: 1;}
+        .pulse-animation {
+            animation: pulse 2s infinite ease-in-out;
         }
         
-        @keyframes fadeout {
-            from {bottom: 100px; opacity: 1;}
-            to {bottom: 0; opacity: 0;}
+        /* Profile completion check animation */
+        @keyframes checkmark {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .check-animation {
+            animation: checkmark 0.5s forwards;
+        }
+        
+        /* Dark mode support */
+        .dark .bg-lightBg {
+            background-color: #181818 !important;
+        }
+        
+        .dark .bg-white, .dark .bg-lightSecondary {
+            background-color: #202020 !important;
+        }
+        
+        .dark .bg-lightTertiary {
+            background-color: #2A2A2A !important;
+        }
+        
+        .dark .text-textDark {
+            color: #F8F9FA !important;
+        }
+        
+        .dark .text-textMedium {
+            color: #CED4DA !important;
+        }
+        
+        .dark .border-gray-200 {
+            border-color: #2A2A2A !important;
+        }
+        
+        .dark .profile-progress-track {
+            background-color: #333333;
+        }
+        
+        .dark .skill-badge {
+            background-color: rgba(0, 120, 212, 0.2);
+        }
+        
+        .dark .profile-image {
+            border-color: #202020;
+        }
+        
+        /* Bottom navigation - dark mode */
+        .dark .bottom-nav {
+            background-color: #202020 !important;
+            border-color: #2A2A2A !important;
+        }
+        
+        .dark .nav-icon {
+            color: #6C757D !important;
+        }
+        
+        .dark .nav-icon.active {
+            color: #0078D4 !important;
         }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+    <div class="container mx-auto px-4 py-6 max-w-md pb-20">
         <!-- App Header -->
         <header class="flex justify-between items-center mb-6">
-            <a href="index.html" id="backLink" class="text-primary">
-                <i class="fas fa-arrow-left text-xl"></i>
-            </a>
-            <h1 class="text-xl font-bold text-primary">My Profile</h1>
-            <a href="settings.html" class="text-primary">
-                <i class="fas fa-cog text-xl"></i>
-            </a>
+            <h1 class="text-xl font-bold text-primary">Profile</h1>
+            <div class="flex items-center">
+                <button id="settingsBtn" class="text-primary mr-2">
+                    <i class="fas fa-cog text-xl"></i>
+                </button>
+                <button id="shareProfileBtn" class="text-primary">
+                    <i class="fas fa-share-alt text-xl"></i>
+                </button>
+            </div>
         </header>
-
-        <!-- Edit Mode Toggle Button -->
-        <div class="flex justify-end mb-4">
-            <button id="editToggleBtn" class="bg-primary text-white px-3 py-1 rounded-lg text-sm flex items-center">
-                <i class="fas fa-pen mr-1"></i> Edit Profile
-            </button>
-            <button id="saveProfileBtn" class="bg-success text-white px-3 py-1 rounded-lg text-sm flex items-center hidden">
-                <i class="fas fa-check mr-1"></i> Save Changes
-            </button>
-            <button id="cancelEditBtn" class="bg-danger text-white px-3 py-1 rounded-lg text-sm flex items-center ml-2 hidden">
-                <i class="fas fa-times mr-1"></i> Cancel
-            </button>
-        </div>
-
-        <!-- Profile Banner & Avatar -->
-        <div class="relative mb-20">
-            <div class="h-40 bg-gradient-to-r from-primary to-primaryLight rounded-t-lg"></div>
-            <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-16">
-                <div class="profile-image-wrapper bg-gray-200">
-                    <img id="profileImage" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" class="w-full h-full object-cover" alt="Profile photo">
-                    <div class="profile-image-upload">
-                        <i class="fas fa-camera mr-1"></i> Change Photo
-                        <input type="file" id="profileImageUpload" accept="image/*">
-                    </div>
-                </div>
-                <div class="mt-2 text-center">
-                    <h2 id="fullName" contenteditable="false" data-placeholder="Enter your name" class="text-xl font-bold">Alex Johnson</h2>
-                    <p id="titleCompany" contenteditable="false" data-placeholder="Your title & company" class="text-textMedium">Product Manager at TechCorp</p>
-                </div>
+        
+        <!-- Authentication Check -->
+        <div id="authCheck" class="hidden flex flex-col items-center justify-center py-8">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-lock text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Sign in to view your profile</h3>
+            <p class="text-textMedium mb-4 text-center">Please sign in or create an account to build your professional profile</p>
+            <div class="flex space-x-4">
+                <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                    Sign In
+                </a>
+                <a href="register.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200">
+                    Sign Up
+                </a>
             </div>
         </div>
 
-        <!-- Profile Content -->
-        <div class="mt-6">
-            <!-- Profile Stats -->
-            <div class="flex justify-around bg-lightSecondary p-4 rounded-lg mb-6">
-                <div class="text-center">
-                    <div id="connectionCount" class="text-xl font-bold text-primary">142</div>
-                    <div class="text-xs text-textMedium">Connections</div>
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden">
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 rounded-full bg-gray-200 animate-pulse"></div>
+            </div>
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm mb-6 animate-pulse">
+                <div class="h-6 bg-gray-200 dark:bg-darkTertiary rounded mb-3 w-3/4"></div>
+                <div class="h-4 bg-gray-200 dark:bg-darkTertiary rounded mb-2 w-1/2"></div>
+                <div class="h-4 bg-gray-200 dark:bg-darkTertiary rounded w-full"></div>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm animate-pulse">
+                    <div class="h-5 bg-gray-200 dark:bg-darkTertiary rounded mb-3 w-1/3"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-darkTertiary rounded mb-2 w-full"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-darkTertiary rounded mb-2 w-full"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-darkTertiary rounded w-3/4"></div>
                 </div>
-                <div class="text-center">
-                    <div id="expertiseScore" class="text-xl font-bold text-primary">78</div>
-                    <div class="text-xs text-textMedium">Expertise Score</div>
-                </div>
-                <div class="text-center">
-                    <div id="endorsementCount" class="text-xl font-bold text-primary">23</div>
-                    <div class="text-xs text-textMedium">Endorsements</div>
+                <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 shadow-sm animate-pulse">
+                    <div class="h-5 bg-gray-200 dark:bg-darkTertiary rounded mb-3 w-1/3"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-darkTertiary rounded mb-2 w-full"></div>
+                    <div class="h-4 bg-gray-200 dark:bg-darkTertiary rounded mb-2 w-full"></div>
                 </div>
             </div>
+        </div>
 
-            <!-- About Section -->
-            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <h3 class="font-semibold mb-2">About</h3>
-                <div id="aboutText" contenteditable="false" data-placeholder="Write something about yourself..." class="text-sm text-textMedium">
-                    Product manager with 8+ years of experience in technology companies. Passionate about creating user-centric solutions that solve real problems. Currently focused on AI-powered healthcare applications.
-                </div>
-            </div>
-
-            <!-- Skills Section -->
-            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-semibold">Skills</h3>
-                    <a href="index.html#skillsScreen" class="text-primary text-sm">View All</a>
-                </div>
-                
-                <!-- Skills View Mode -->
-                <div id="skillsViewContainer" class="flex flex-wrap gap-2">
-                    <!-- Skills will be populated by JavaScript -->
-                </div>
-                
-                <!-- Skills Edit Mode -->
-                <div id="skillsEditContainer" class="hidden">
-                    <input type="text" id="skillsInput" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary mb-2" placeholder="Enter skills separated by commas">
-                    <div id="skillsPreviewContainer" class="flex flex-wrap gap-2 mt-2">
-                        <!-- Skills preview will be populated by JavaScript -->
+        <!-- Main Profile Content -->
+        <div id="profileContent" class="hidden">
+            <!-- Profile Header -->
+            <div class="flex flex-col items-center mb-6">
+                <div class="profile-image-container mb-3">
+                    <img id="profileImage" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Profile photo" class="profile-image">
+                    <div id="editProfileImageBtn" class="edit-icon">
+                        <i class="fas fa-camera"></i>
                     </div>
                 </div>
-            </div>
-
-            <!-- Experience Section -->
-            <div class="bg-lightSecondary p-4 rounded-lg mb-6">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-semibold">Experience</h3>
-                    <button id="addExperienceBtn" class="text-primary text-sm hidden">
-                        <i class="fas fa-plus"></i> Add
+                <h2 id="profileName" class="text-xl font-bold mb-1">John Doe</h2>
+                <p id="profileTitle" class="text-textMedium mb-2">Product Manager at TechCorp</p>
+                <p id="profileLocation" class="text-textMedium text-sm mb-3"><i class="fas fa-map-marker-alt mr-1"></i>New York, NY</p>
+                
+                <!-- Profile Completeness -->
+                <div class="w-full max-w-xs mb-2">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-textMedium">Profile Completeness</span>
+                        <span id="profileCompletionPercent" class="text-primary font-medium">70%</span>
+                    </div>
+                    <div class="profile-progress-track">
+                        <div id="profileCompletionBar" class="profile-progress-bar" style="width: 70%"></div>
+                    </div>
+                </div>
+                <p id="profileCompletionHint" class="text-xs text-textMedium mb-3">Add your skills to improve your profile</p>
+                
+                <!-- Quick Action Buttons -->
+                <div class="flex space-x-3">
+                    <button id="editProfileBtn" class="bg-primary text-white px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-pen mr-2"></i> Edit Profile
+                    </button>
+                    <button id="viewAnalyticsBtn" class="bg-lightTertiary text-textDark px-4 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200">
+                        <i class="fas fa-chart-line mr-2"></i> Analytics
                     </button>
                 </div>
-                
-                <!-- Experience View Mode -->
-                <div id="experienceViewContainer" class="space-y-3">
-                    <!-- Experience will be populated by JavaScript -->
+            </div>
+            
+            <!-- About Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm section-card">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-medium">About</h3>
+                    <button class="edit-section-btn text-primary" data-section="about">
+                        <i class="fas fa-pen"></i>
+                    </button>
                 </div>
+                <p id="aboutContent" class="text-textMedium text-sm">Experienced Product Manager with a passion for creating user-centered solutions. I specialize in agile methodologies and have a track record of launching successful products that deliver business value while meeting user needs.</p>
                 
-                <!-- Experience Edit Mode -->
-                <div id="experienceEditContainer" class="hidden space-y-4">
-                    <!-- Experience edit forms will be populated by JavaScript -->
+                <!-- About Edit Form (Hidden initially) -->
+                <div id="aboutEditForm" class="hidden mt-3">
+                    <textarea id="aboutTextarea" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none text-sm" rows="5" placeholder="Tell people about yourself, your experience, and what you're looking for"></textarea>
+                    <div class="flex justify-end mt-2 space-x-2">
+                        <button class="cancel-edit-btn px-3 py-1 text-sm text-textMedium">Cancel</button>
+                        <button class="save-edit-btn px-3 py-1 bg-primary text-white text-sm rounded-lg" data-section="about">Save</button>
+                    </div>
                 </div>
             </div>
-
-            <!-- Looking For Section -->
-            <div class="bg-gradient-to-r from-primary to-primaryLight text-white p-4 rounded-lg mb-6">
-                <h3 class="font-semibold mb-2">Looking For</h3>
-                
-                <!-- Looking For View Mode -->
-                <div id="lookingForViewContainer" class="space-y-2">
-                    <!-- Looking For items will be populated by JavaScript -->
+            
+            <!-- Experience Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm section-card">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-medium">Experience</h3>
+                    <button class="edit-section-btn text-primary" data-section="experience">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="experienceList">
+                    <div class="mb-3 pb-3 border-b dark:border-darkTertiary">
+                        <h4 class="font-medium">Product Manager</h4>
+                        <p class="text-textMedium text-sm">TechCorp</p>
+                        <p class="text-textLight text-xs">Jan 2020 - Present</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium">Associate Product Manager</h4>
+                        <p class="text-textMedium text-sm">StartupInc</p>
+                        <p class="text-textLight text-xs">Mar 2018 - Dec 2019</p>
+                    </div>
                 </div>
                 
-                <!-- Looking For Edit Mode -->
-                <div id="lookingForEditContainer" class="hidden space-y-2">
-                    <!-- Looking For edit inputs will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Activity Feed Preview -->
-            <div class="bg-lightSecondary p-4 rounded-lg">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-semibold">Recent Activity</h3>
-                    <a href="#" class="text-primary text-sm">View All</a>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                            <i class="fas fa-certificate text-primary"></i>
+                <!-- Experience Edit Form (Hidden initially) -->
+                <div id="experienceEditForm" class="hidden mt-3 fade-in">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Title</label>
+                            <input type="text" id="expTitleInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="e.g. Product Manager">
                         </div>
                         <div>
-                            <p class="text-sm">You were endorsed for <span class="font-medium">Product Management</span> by <span class="text-primary">Sarah Chen</span></p>
-                            <p class="text-xs text-textMedium">2 days ago</p>
+                            <label class="block text-sm font-medium mb-1">Company</label>
+                            <input type="text" id="expCompanyInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="e.g. TechCorp">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Start Date</label>
+                                <input type="month" id="expStartInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">End Date</label>
+                                <input type="month" id="expEndInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                                <div class="flex items-center mt-1">
+                                    <input type="checkbox" id="expCurrentInput" class="mr-1">
+                                    <label for="expCurrentInput" class="text-xs">Current position</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Description</label>
+                            <textarea id="expDescriptionInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm resize-none" rows="3" placeholder="Describe your responsibilities and achievements"></textarea>
                         </div>
                     </div>
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                            <i class="fas fa-user-plus text-primary"></i>
+                    <div class="flex justify-end mt-3 space-x-2">
+                        <button class="cancel-edit-btn px-3 py-1 text-sm text-textMedium">Cancel</button>
+                        <button class="save-edit-btn px-3 py-1 bg-primary text-white text-sm rounded-lg" data-section="experience">Save</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Skills Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm section-card">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-medium">Skills</h3>
+                    <button class="edit-section-btn text-primary" data-section="skills">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+                <div id="skillsList" class="flex flex-wrap">
+                    <span class="skill-badge">Product Management</span>
+                    <span class="skill-badge">User Research</span>
+                    <span class="skill-badge">Agile</span>
+                    <span class="skill-badge">Market Analysis</span>
+                    <span class="skill-badge">Strategy</span>
+                </div>
+                
+                <!-- Skills Edit Form (Hidden initially) -->
+                <div id="skillsEditForm" class="hidden mt-3">
+                    <input type="text" id="skillsInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="Add skills (comma separated)">
+                    <p class="text-xs text-textLight mt-1">Enter skills separated by commas, e.g. "Product Management, Agile, UX Design"</p>
+                    <div class="flex justify-end mt-2 space-x-2">
+                        <button class="cancel-edit-btn px-3 py-1 text-sm text-textMedium">Cancel</button>
+                        <button class="save-edit-btn px-3 py-1 bg-primary text-white text-sm rounded-lg" data-section="skills">Save</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Education Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm section-card">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-medium">Education</h3>
+                    <button class="edit-section-btn text-primary" data-section="education">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="educationList">
+                    <div>
+                        <h4 class="font-medium">Bachelor of Science in Computer Science</h4>
+                        <p class="text-textMedium text-sm">University of Technology</p>
+                        <p class="text-textLight text-xs">2014 - 2018</p>
+                    </div>
+                </div>
+                
+                <!-- Education Edit Form (Hidden initially) -->
+                <div id="educationEditForm" class="hidden mt-3 fade-in">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Degree</label>
+                            <input type="text" id="eduDegreeInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="e.g. Bachelor of Science">
                         </div>
                         <div>
-                            <p class="text-sm">You connected with <span class="text-primary">David Wong</span></p>
-                            <p class="text-xs text-textMedium">5 days ago</p>
+                            <label class="block text-sm font-medium mb-1">Field of Study</label>
+                            <input type="text" id="eduFieldInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="e.g. Computer Science">
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">School</label>
+                            <input type="text" id="eduSchoolInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="e.g. University of Technology">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Start Year</label>
+                                <input type="number" id="eduStartInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="e.g. 2014">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">End Year</label>
+                                <input type="number" id="eduEndInput" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm" placeholder="e.g. 2018">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-3 space-x-2">
+                        <button class="cancel-edit-btn px-3 py-1 text-sm text-textMedium">Cancel</button>
+                        <button class="save-edit-btn px-3 py-1 bg-primary text-white text-sm rounded-lg" data-section="education">Save</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connections Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm section-card">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-medium">Connections</h3>
+                    <button id="viewAllConnectionsBtn" class="text-primary text-sm font-medium">
+                        View All
+                    </button>
+                </div>
+                <div id="connectionsList" class="grid grid-cols-2 gap-3">
+                    <!-- Connections will be populated by JavaScript -->
+                </div>
+                
+                <!-- Empty Connections State (Hidden initially) -->
+                <div id="emptyConnectionsState" class="hidden py-4 text-center">
+                    <div class="w-12 h-12 bg-lightTertiary dark:bg-darkTertiary rounded-full mx-auto flex items-center justify-center mb-2 pulse-animation">
+                        <i class="fas fa-users text-textMedium"></i>
+                    </div>
+                    <p class="text-textMedium text-sm mb-2">No connections yet</p>
+                    <a href="search.html" class="text-primary text-sm font-medium">Find professionals to connect with</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- View Profile State (Hidden initially) -->
+        <div id="viewProfileState" class="hidden">
+            <!-- Profile Header -->
+            <div class="flex flex-col items-center mb-6">
+                <div class="profile-image-container mb-3">
+                    <img id="viewProfileImage" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Profile photo" class="profile-image">
+                </div>
+                <h2 id="viewProfileName" class="text-xl font-bold mb-1">Sarah Chen</h2>
+                <p id="viewProfileTitle" class="text-textMedium mb-2">Senior Developer at CodeLabs</p>
+                <p id="viewProfileLocation" class="text-textMedium text-sm mb-4"><i class="fas fa-map-marker-alt mr-1"></i>San Francisco, CA</p>
+                
+                <!-- Connection Status -->
+                <div id="connectionStatus" class="mb-3">
+                    <div id="notConnectedState" class="hidden">
+                        <button id="connectBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-user-plus mr-2"></i> Connect
+                        </button>
+                    </div>
+                    <div id="connectionPendingState" class="hidden">
+                        <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-sm">Connection Pending</span>
+                    </div>
+                    <div id="connectedState" class="hidden">
+                        <span class="bg-success/10 text-success px-3 py-1 rounded-full text-sm mr-2">Connected</span>
+                        <button id="messageBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-comment mr-2"></i> Message
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Match Score -->
+                <div class="bg-primary/10 rounded-lg p-3 mb-4 w-full max-w-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="text-primary font-medium">Match Score</span>
+                        <span id="matchScore" class="text-primary font-bold text-lg">78%</span>
+                    </div>
+                    <div class="profile-progress-track mt-1">
+                        <div id="matchScoreBar" class="profile-progress-bar" style="width: 78%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- About Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
+                <h3 class="font-medium mb-3">About</h3>
+                <p id="viewAboutContent" class="text-textMedium text-sm">Full-stack developer with 7+ years of experience building scalable web applications. Passionate about clean code, performance optimization, and mentoring junior developers.</p>
+            </div>
+            
+            <!-- Experience Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
+                <h3 class="font-medium mb-3">Experience</h3>
+                <div id="viewExperienceList">
+                    <div class="mb-3 pb-3 border-b dark:border-darkTertiary">
+                        <h4 class="font-medium">Senior Developer</h4>
+                        <p class="text-textMedium text-sm">CodeLabs</p>
+                        <p class="text-textLight text-xs">Mar 2020 - Present</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium">Full-Stack Developer</h4>
+                        <p class="text-textMedium text-sm">WebTech Solutions</p>
+                        <p class="text-textLight text-xs">Jun 2016 - Feb 2020</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Skills Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
+                <h3 class="font-medium mb-3">Skills</h3>
+                <div id="viewSkillsList" class="flex flex-wrap">
+                    <!-- Skills with highlighting of matches -->
+                </div>
+            </div>
+            
+            <!-- Education Section -->
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
+                <h3 class="font-medium mb-3">Education</h3>
+                <div id="viewEducationList">
+                    <div>
+                        <h4 class="font-medium">Master of Computer Science</h4>
+                        <p class="text-textMedium text-sm">Stanford University</p>
+                        <p class="text-textLight text-xs">2014 - 2016</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Toast Notification -->
-        <div id="toastNotification" class="toast rounded-lg">This is a notification</div>
+        <div id="toastNotification" class="toast">
+            Profile updated successfully
+        </div>
 
         <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
-            <a href="index.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-chart-line text-xl"></i>
-                <span class="text-xs mt-1">Analytics</span>
+        <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-white dark:bg-darkSecondary border-t dark:border-darkTertiary bottom-nav">
+            <a href="index.html" class="flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl text-textLight dark:text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Analytics</span>
             </a>
-            <a href="chat.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-comments text-xl"></i>
-                <span class="text-xs mt-1">Chat</span>
+            <a href="chat.html" class="flex flex-col items-center">
+                <i class="fas fa-comments text-xl text-textLight dark:text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Chat</span>
             </a>
-            <a href="search.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-search text-xl"></i>
-                <span class="text-xs mt-1">Find</span>
+            <a href="search.html" class="flex flex-col items-center">
+                <i class="fas fa-search text-xl text-textLight dark:text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-textLight dark:text-gray-500">Find</span>
             </a>
-            <a href="profile.html" class="text-primary flex flex-col items-center">
-                <i class="fas fa-user text-xl"></i>
-                <span class="text-xs mt-1">Profile</span>
+            <a href="profile.html" class="flex flex-col items-center">
+                <i class="fas fa-user text-xl text-primary nav-icon active"></i>
+                <span class="text-xs mt-1 text-primary">Profile</span>
             </a>
         </nav>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in, if not, redirect to login page
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            // DOM Elements
+            const authCheck = document.getElementById('authCheck');
+            const loadingState = document.getElementById('loadingState');
+            const profileContent = document.getElementById('profileContent');
+            const viewProfileState = document.getElementById('viewProfileState');
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const viewAnalyticsBtn = document.getElementById('viewAnalyticsBtn');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const shareProfileBtn = document.getElementById('shareProfileBtn');
+            const editProfileImageBtn = document.getElementById('editProfileImageBtn');
+            const toastNotification = document.getElementById('toastNotification');
+            const profileCompletionBar = document.getElementById('profileCompletionBar');
+            const profileCompletionPercent = document.getElementById('profileCompletionPercent');
+            const profileCompletionHint = document.getElementById('profileCompletionHint');
+            const viewAllConnectionsBtn = document.getElementById('viewAllConnectionsBtn');
+            const connectionsList = document.getElementById('connectionsList');
+            const emptyConnectionsState = document.getElementById('emptyConnectionsState');
+            const connectBtn = document.getElementById('connectBtn');
+            const messageBtn = document.getElementById('messageBtn');
+            const notConnectedState = document.getElementById('notConnectedState');
+            const connectionPendingState = document.getElementById('connectionPendingState');
+            const connectedState = document.getElementById('connectedState');
             
-            if (!currentUser) {
-                // Get the base URL for proper path resolution
-                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-                window.location.href = baseUrl + "index.html";
-                return;
+            // Current state variables
+            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            let isViewMode = false;
+            let viewUserId = null;
+            
+            // Check URL for view parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('view')) {
+                viewUserId = urlParams.get('view');
+                isViewMode = true;
+            } else if (localStorage.getItem('viewProfileId')) {
+                viewUserId = localStorage.getItem('viewProfileId');
+                localStorage.removeItem('viewProfileId'); // Clear after use
+                isViewMode = true;
             }
             
-            // DOM elements
-            const editToggleBtn = document.getElementById('editToggleBtn');
-            const saveProfileBtn = document.getElementById('saveProfileBtn');
-            const cancelEditBtn = document.getElementById('cancelEditBtn');
-            const profileImageUpload = document.getElementById('profileImageUpload');
-            const profileImage = document.getElementById('profileImage');
-            const fullName = document.getElementById('fullName');
-            const titleCompany = document.getElementById('titleCompany');
-            const aboutText = document.getElementById('aboutText');
-            const addExperienceBtn = document.getElementById('addExperienceBtn');
+            // Initialize UI
+            if (!currentUser) {
+                // Show auth check message and hide profile content
+                authCheck.classList.remove('hidden');
+                profileContent.classList.add('hidden');
+                viewProfileState.classList.add('hidden');
+                loadingState.classList.add('hidden');
+                return;
+            } else {
+                // Show loading initially
+                authCheck.classList.add('hidden');
+                loadingState.classList.remove('hidden');
+                profileContent.classList.add('hidden');
+                viewProfileState.classList.add('hidden');
+                
+                // Simulate loading delay
+                setTimeout(() => {
+                    loadingState.classList.add('hidden');
+                    
+                    if (isViewMode) {
+                        // Load and show other user's profile
+                        loadUserProfile(viewUserId);
+                    } else {
+                        // Load and show current user's profile
+                        loadProfile();
+                        profileContent.classList.remove('hidden');
+                    }
+                }, 1000);
+            }
             
-            // View and edit containers
-            const skillsViewContainer = document.getElementById('skillsViewContainer');
-            const skillsEditContainer = document.getElementById('skillsEditContainer');
-            const skillsInput = document.getElementById('skillsInput');
-            const skillsPreviewContainer = document.getElementById('skillsPreviewContainer');
-            const experienceViewContainer = document.getElementById('experienceViewContainer');
-            const experienceEditContainer = document.getElementById('experienceEditContainer');
-            const lookingForViewContainer = document.getElementById('lookingForViewContainer');
-            const lookingForEditContainer = document.getElementById('lookingForEditContainer');
-            
-            // Initialize the profile
-            initializeProfile();
-            
-            // Event listeners
-            setupEventListeners();
-            
-            // Function to initialize the profile with user data
-            function initializeProfile() {
+            // Load current user's profile
+            function loadProfile() {
+                // Set basic profile info
+                document.getElementById('profileName').textContent = currentUser.fullName || "Your Name";
+                
+                // Set profile title (role at company)
+                let title = "";
+                if (currentUser.currentRole) {
+                    title = currentUser.currentRole;
+                    if (currentUser.company) {
+                        title += " at " + currentUser.company;
+                    }
+                }
+                document.getElementById('profileTitle').textContent = title;
+                
+                // Set profile location
+                document.getElementById('profileLocation').textContent = currentUser.location || "Add your location";
+                if (!currentUser.location) {
+                    document.getElementById('profileLocation').innerHTML = '<i class="fas fa-map-marker-alt mr-1"></i>Add your location';
+                } else {
+                    document.getElementById('profileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${currentUser.location}`;
+                }
+                
                 // Set profile image
                 if (currentUser.profileImage) {
-                    profileImage.src = currentUser.profileImage;
+                    document.getElementById('profileImage').src = currentUser.profileImage;
                 }
                 
-                // Set name and title
-                fullName.textContent = currentUser.fullName || 'Alex Johnson';
-                titleCompany.textContent = `${currentUser.currentRole || 'Product Manager'} at ${currentUser.company || 'TechCorp'}`;
-                
-                // Set about text
-                aboutText.textContent = currentUser.about || 'Product manager with 8+ years of experience in technology companies.';
-                
-                // Set stats
-                document.getElementById('connectionCount').textContent = currentUser.connections?.length || (currentUser.networkSize || '142');
-                document.getElementById('expertiseScore').textContent = currentUser.expertiseScore || '78';
-                document.getElementById('endorsementCount').textContent = currentUser.endorsements || '23';
+                // Set about content
+                document.getElementById('aboutContent').textContent = currentUser.about || "Add a description about yourself";
+                document.getElementById('aboutTextarea').value = currentUser.about || "";
                 
                 // Set skills
-                displaySkills();
+                let skillsHtml = "";
+                if (currentUser.skills && currentUser.skills.length > 0) {
+                    let skillsArray = currentUser.skills;
+                    if (typeof skillsArray === 'string') {
+                        skillsArray = skillsArray.split(',').map(s => s.trim());
+                    }
+                    
+                    skillsHtml = skillsArray.map(skill => {
+                        return `<span class="skill-badge">${skill}</span>`;
+                    }).join('');
+                    
+                    document.getElementById('skillsInput').value = skillsArray.join(', ');
+                }
+                document.getElementById('skillsList').innerHTML = skillsHtml || '<span class="text-textLight text-sm">Add your skills</span>';
                 
                 // Set experience
-                displayExperience();
+                let experienceHtml = "";
+                if (currentUser.experience && currentUser.experience.length > 0) {
+                    experienceHtml = currentUser.experience.map((exp, index) => {
+                        const isLast = index === currentUser.experience.length - 1;
+                        return `
+                            <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                <h4 class="font-medium">${exp.title}</h4>
+                                <p class="text-textMedium text-sm">${exp.company}</p>
+                                <p class="text-textLight text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
+                                ${exp.description ? `<p class="text-textMedium text-sm mt-1">${exp.description}</p>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                }
+                document.getElementById('experienceList').innerHTML = experienceHtml || '<span class="text-textLight text-sm">Add your work experience</span>';
                 
-                // Set looking for
-                displayLookingFor();
+                // Set education
+                let educationHtml = "";
+                if (currentUser.education && currentUser.education.length > 0) {
+                    educationHtml = currentUser.education.map((edu, index) => {
+                        const isLast = index === currentUser.education.length - 1;
+                        const degree = edu.degree + (edu.fieldOfStudy ? ' in ' + edu.fieldOfStudy : '');
+                        return `
+                            <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                <h4 class="font-medium">${degree}</h4>
+                                <p class="text-textMedium text-sm">${edu.school}</p>
+                                <p class="text-textLight text-xs">${edu.startYear} - ${edu.endYear || 'Present'}</p>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                document.getElementById('educationList').innerHTML = educationHtml || '<span class="text-textLight text-sm">Add your education</span>';
+                
+                // Set connections
+                loadConnections();
+                
+                // Calculate and update profile completion
+                updateProfileCompletion();
             }
             
-            // Function to display skills
-            function displaySkills() {
-                skillsViewContainer.innerHTML = '';
+            // Load connections
+            function loadConnections() {
+                if (!currentUser.connections || currentUser.connections.length === 0) {
+                    // Show empty state
+                    connectionsList.classList.add('hidden');
+                    emptyConnectionsState.classList.remove('hidden');
+                    return;
+                }
                 
-                let skills = [];
+                // Hide empty state
+                connectionsList.classList.remove('hidden');
+                emptyConnectionsState.classList.add('hidden');
                 
-                if (typeof currentUser.skills === 'string') {
-                    skills = currentUser.skills.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
-                } else if (Array.isArray(currentUser.skills)) {
-                    skills = currentUser.skills;
+                // Limit to 4 connections
+                const connectionsToShow = currentUser.connections.slice(0, 4);
+                
+                // Create HTML
+                let connectionsHtml = connectionsToShow.map(conn => {
+                    return `
+                        <div class="flex flex-col items-center text-center">
+                            <img src="${conn.profileImage || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover mb-1" alt="${conn.name}">
+                            <p class="text-sm font-medium truncate w-full">${conn.name}</p>
+                        </div>
+                    `;
+                }).join('');
+                
+                connectionsList.innerHTML = connectionsHtml;
+            }
+            
+            // Load user profile
+            function loadUserProfile(userId) {
+                // Get user data
+                let userData;
+                
+                try {
+                    // Try different possible storage keys
+                    userData = JSON.parse(localStorage.getItem(`user_${userId}`));
+                    
+                    if (!userData) {
+                        userData = JSON.parse(localStorage.getItem(userId));
+                    }
+                    
+                    if (!userData) {
+                        // Try to find in sample users
+                        const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
+                        userData = sampleUsers.find(u => u.id === userId);
+                    }
+                    
+                    if (!userData) {
+                        // Check if it's in the current user's connections
+                        const connection = currentUser.connections.find(c => c.id === userId);
+                        if (connection) {
+                            userData = {
+                                id: connection.id,
+                                fullName: connection.name,
+                                profileImage: connection.profileImage
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading user data:", e);
+                }
+                
+                if (!userData) {
+                    // User not found, show error
+                    showToast("User not found");
+                    setTimeout(() => {
+                        window.location.href = "profile.html";
+                    }, 2000);
+                    return;
+                }
+                
+                // Set basic profile info
+                document.getElementById('viewProfileName').textContent = userData.fullName || userData.name || "User";
+                
+                // Set profile title
+                let title = "";
+                if (userData.currentRole) {
+                    title = userData.currentRole;
+                    if (userData.company) {
+                        title += " at " + userData.company;
+                    }
+                }
+                document.getElementById('viewProfileTitle').textContent = title;
+                
+                // Set profile location
+                if (!userData.location) {
+                    document.getElementById('viewProfileLocation').classList.add('hidden');
                 } else {
-                    skills = ['Product Management', 'User Research', 'Data Analysis', 'Strategic Planning', 'Team Leadership'];
+                    document.getElementById('viewProfileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${userData.location}`;
                 }
                 
-                // Display skills in view mode
-                skills.forEach(skill => {
-                    const skillSpan = document.createElement('span');
-                    skillSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs';
-                    skillSpan.textContent = skill;
-                    skillsViewContainer.appendChild(skillSpan);
-                });
+                // Set profile image
+                if (userData.profileImage) {
+                    document.getElementById('viewProfileImage').src = userData.profileImage;
+                }
                 
-                // Set skills input for edit mode
-                skillsInput.value = skills.join(', ');
-                updateSkillsPreview(skills.join(', '));
-            }
-            
-            // Function to update skills preview in edit mode
-            function updateSkillsPreview(skillsString) {
-                skillsPreviewContainer.innerHTML = '';
+                // Set about content
+                document.getElementById('viewAboutContent').textContent = userData.about || "No information provided";
                 
-                if (!skillsString.trim()) return;
-                
-                const skills = skillsString.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
-                
-                skills.forEach(skill => {
-                    const skillSpan = document.createElement('span');
-                    skillSpan.className = 'bg-primary/10 text-primary px-2 py-1 rounded-full text-xs';
-                    skillSpan.textContent = skill;
-                    skillsPreviewContainer.appendChild(skillSpan);
-                });
-            }
-            
-            // Function to display experience
-            function displayExperience() {
-                experienceViewContainer.innerHTML = '';
-                
-                const experience = currentUser.experience || [
-                    {
-                        title: "Product Manager",
-                        company: "TechCorp",
-                        period: "2019 - Present",
-                        description: "Leading product development for healthcare AI solutions"
-                    },
-                    {
-                        title: "Senior Product Analyst",
-                        company: "Innovate Inc",
-                        period: "2016 - 2019",
-                        description: "Data-driven product strategy and roadmap development"
-                    }
-                ];
-                
-                // Display experience in view mode
-                experience.forEach(exp => {
-                    const expDiv = document.createElement('div');
-                    expDiv.className = 'flex';
-                    expDiv.innerHTML = `
-                        <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                            <i class="fas fa-building text-primary"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">${exp.title}</h4>
-                            <p class="text-sm text-textMedium">${exp.company} • ${exp.period}</p>
-                            <p class="text-xs text-textMedium mt-1">${exp.description}</p>
-                        </div>
-                    `;
-                    experienceViewContainer.appendChild(expDiv);
-                });
-            }
-            
-            // Function to create experience editor forms
-            function createExperienceEditors() {
-                experienceEditContainer.innerHTML = '';
-                
-                const experience = currentUser.experience || [
-                    {
-                        title: "Product Manager",
-                        company: "TechCorp",
-                        period: "2019 - Present",
-                        description: "Leading product development for healthcare AI solutions"
-                    },
-                    {
-                        title: "Senior Product Analyst",
-                        company: "Innovate Inc",
-                        period: "2016 - 2019",
-                        description: "Data-driven product strategy and roadmap development"
-                    }
-                ];
-                
-                // Create edit forms for each experience
-                experience.forEach((exp, index) => {
-                    const expDiv = document.createElement('div');
-                    expDiv.className = 'p-3 border border-gray-200 rounded-lg exp-editor';
-                    expDiv.dataset.index = index;
-                    
-                    expDiv.innerHTML = `
-                        <div class="space-y-2">
-                            <div>
-                                <label class="block mb-1 text-xs font-medium">Title</label>
-                                <input type="text" class="exp-title w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" value="${exp.title}" placeholder="Job Title">
-                            </div>
-                            <div>
-                                <label class="block mb-1 text-xs font-medium">Company</label>
-                                <input type="text" class="exp-company w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" value="${exp.company}" placeholder="Company Name">
-                            </div>
-                            <div>
-                                <label class="block mb-1 text-xs font-medium">Period</label>
-                                <input type="text" class="exp-period w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" value="${exp.period}" placeholder="e.g., 2019 - Present">
-                            </div>
-                            <div>
-                                <label class="block mb-1 text-xs font-medium">Description</label>
-                                <textarea class="exp-description w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Brief description of your role">${exp.description}</textarea>
-                            </div>
-                            <div class="flex justify-end">
-                                <button type="button" class="remove-experience text-danger text-sm">
-                                    <i class="fas fa-trash-alt mr-1"></i> Remove
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    experienceEditContainer.appendChild(expDiv);
-                    
-                    // Add event listener for remove button
-                    expDiv.querySelector('.remove-experience').addEventListener('click', function() {
-                        expDiv.remove();
-                    });
-                });
-            }
-            
-            // Function to add a new experience form
-            function addExperienceForm() {
-                const expDiv = document.createElement('div');
-                expDiv.className = 'p-3 border border-gray-200 rounded-lg exp-editor';
-                
-                expDiv.innerHTML = `
-                    <div class="space-y-2">
-                        <div>
-                            <label class="block mb-1 text-xs font-medium">Title</label>
-                            <input type="text" class="exp-title w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Job Title">
-                        </div>
-                        <div>
-                            <label class="block mb-1 text-xs font-medium">Company</label>
-                            <input type="text" class="exp-company w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Company Name">
-                        </div>
-                        <div>
-                            <label class="block mb-1 text-xs font-medium">Period</label>
-                            <input type="text" class="exp-period w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g., 2019 - Present">
-                        </div>
-                        <div>
-                            <label class="block mb-1 text-xs font-medium">Description</label>
-                            <textarea class="exp-description w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Brief description of your role"></textarea>
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="button" class="remove-experience text-danger text-sm">
-                                <i class="fas fa-trash-alt mr-1"></i> Remove
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                experienceEditContainer.appendChild(expDiv);
-                
-                // Add event listener for remove button
-                expDiv.querySelector('.remove-experience').addEventListener('click', function() {
-                    expDiv.remove();
-                });
-                
-                // Focus on the title field
-                expDiv.querySelector('.exp-title').focus();
-            }
-            
-            // Function to display looking for
-            function displayLookingFor() {
-                lookingForViewContainer.innerHTML = '';
-                
-                const lookingFor = currentUser.lookingFor || [
-                    "Technical co-founder for healthcare startup",
-                    "Mentorship opportunities with junior PMs",
-                    "Consulting projects in healthcare technology"
-                ];
-                
-                // Display looking for in view mode
-                lookingFor.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'flex items-center';
-                    itemDiv.innerHTML = `
-                        <i class="fas fa-search mr-2"></i>
-                        <span class="text-sm">${item}</span>
-                    `;
-                    lookingForViewContainer.appendChild(itemDiv);
-                });
-            }
-            
-            // Function to create looking for editors
-            function createLookingForEditors() {
-                lookingForEditContainer.innerHTML = '';
-                
-                const lookingFor = currentUser.lookingFor || [
-                    "Technical co-founder for healthcare startup",
-                    "Mentorship opportunities with junior PMs",
-                    "Consulting projects in healthcare technology"
-                ];
-                
-                // Create at least 3 input fields
-                for (let i = 0; i < Math.max(3, lookingFor.length); i++) {
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.className = 'looking-for-input w-full px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white';
-                    input.placeholder = `What are you looking for? #${i + 1}`;
-                    
-                    if (i < lookingFor.length) {
-                        input.value = lookingFor[i];
+                // Set skills with highlighting of matches
+                let skillsHtml = "";
+                if (userData.skills && userData.skills.length > 0) {
+                    let userSkillsArray = userData.skills;
+                    if (typeof userSkillsArray === 'string') {
+                        userSkillsArray = userSkillsArray.split(',').map(s => s.trim());
                     }
                     
-                    lookingForEditContainer.appendChild(input);
+                    // Get current user skills for comparison
+                    let currentUserSkillsArray = [];
+                    if (currentUser.skills) {
+                        if (typeof currentUser.skills === 'string') {
+                            currentUserSkillsArray = currentUser.skills.split(',').map(s => s.trim().toLowerCase());
+                        } else if (Array.isArray(currentUser.skills)) {
+                            currentUserSkillsArray = currentUser.skills.map(s => s.toLowerCase());
+                        }
+                    }
+                    
+                    skillsHtml = userSkillsArray.map(skill => {
+                        const isMatch = currentUserSkillsArray.includes(skill.toLowerCase());
+                        return `<span class="skill-badge ${isMatch ? 'bg-success/10 text-success' : ''}">${skill}${isMatch ? ' <i class="fas fa-check-circle text-xs"></i>' : ''}</span>`;
+                    }).join('');
+                }
+                document.getElementById('viewSkillsList').innerHTML = skillsHtml || '<span class="text-textLight text-sm">No skills listed</span>';
+                
+                // Set experience
+                let experienceHtml = "";
+                if (userData.experience && userData.experience.length > 0) {
+                    experienceHtml = userData.experience.map((exp, index) => {
+                        const isLast = index === userData.experience.length - 1;
+                        return `
+                            <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                <h4 class="font-medium">${exp.title}</h4>
+                                <p class="text-textMedium text-sm">${exp.company}</p>
+                                <p class="text-textLight text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
+                                ${exp.description ? `<p class="text-textMedium text-sm mt-1">${exp.description}</p>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                }
+                document.getElementById('viewExperienceList').innerHTML = experienceHtml || '<span class="text-textLight text-sm">No experience listed</span>';
+                
+                // Set education
+                let educationHtml = "";
+                if (userData.education && userData.education.length > 0) {
+                    educationHtml = userData.education.map((edu, index) => {
+                        const isLast = index === userData.education.length - 1;
+                        const degree = edu.degree + (edu.fieldOfStudy ? ' in ' + edu.fieldOfStudy : '');
+                        return `
+                            <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                <h4 class="font-medium">${degree}</h4>
+                                <p class="text-textMedium text-sm">${edu.school}</p>
+                                <p class="text-textLight text-xs">${edu.startYear} - ${edu.endYear || 'Present'}</p>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                document.getElementById('viewEducationList').innerHTML = educationHtml || '<span class="text-textLight text-sm">No education listed</span>';
+                
+                // Calculate and display match score
+                calculateMatchScore(userData);
+                
+                // Check connection status and update UI
+                updateConnectionStatus(userId);
+                
+                // Show view profile state
+                viewProfileState.classList.remove('hidden');
+            }
+            
+            // Calculate match score between current user and viewed user
+            function calculateMatchScore(userData) {
+                // Simple match algorithm (for demo purposes)
+                let score = 50; // Base score
+                
+                // 1. Skills match (up to 25 points)
+                const currentUserSkills = currentUser.skills || [];
+                const viewedUserSkills = userData.skills || [];
+                
+                let currentUserSkillsArray = [];
+                if (typeof currentUserSkills === 'string') {
+                    currentUserSkillsArray = currentUserSkills.split(',').map(s => s.trim().toLowerCase());
+                } else if (Array.isArray(currentUserSkills)) {
+                    currentUserSkillsArray = currentUserSkills.map(s => s.toLowerCase());
+                }
+                
+                let viewedUserSkillsArray = [];
+                if (typeof viewedUserSkills === 'string') {
+                    viewedUserSkillsArray = viewedUserSkills.split(',').map(s => s.trim().toLowerCase());
+                } else if (Array.isArray(viewedUserSkills)) {
+                    viewedUserSkillsArray = viewedUserSkills.map(s => s.toLowerCase());
+                }
+                
+                if (currentUserSkillsArray.length > 0 && viewedUserSkillsArray.length > 0) {
+                    const commonSkills = currentUserSkillsArray.filter(skill => viewedUserSkillsArray.includes(skill));
+                    const skillMatchRatio = commonSkills.length / Math.max(currentUserSkillsArray.length, viewedUserSkillsArray.length);
+                    
+                    score += skillMatchRatio * 25;
+                }
+                
+                // 2. Industry match (up to 15 points)
+                if (currentUser.industry && userData.industry && 
+                    currentUser.industry.toLowerCase() === userData.industry.toLowerCase()) {
+                    score += 15;
+                }
+                
+                // 3. Location match (up to 10 points)
+                if (currentUser.location && userData.location) {
+                    if (currentUser.location.toLowerCase() === userData.location.toLowerCase()) {
+                        score += 10;
+                    } else if (currentUser.location.toLowerCase().includes(userData.location.toLowerCase()) ||
+                              userData.location.toLowerCase().includes(currentUser.location.toLowerCase())) {
+                        score += 5;
+                    }
+                }
+                
+                // Update UI
+                const matchScore = Math.round(score);
+                document.getElementById('matchScore').textContent = matchScore + '%';
+                document.getElementById('matchScoreBar').style.width = matchScore + '%';
+            }
+            
+            // Update connection status
+            function updateConnectionStatus(userId) {
+                let isConnected = false;
+                let isPending = false;
+                
+                // Check if they're already connected
+                if (currentUser.connections) {
+                    isConnected = currentUser.connections.some(conn => conn.id === userId);
+                }
+                
+                // Check if connection is pending (in a real app, this would check a pending connections list)
+                if (currentUser.pendingConnections) {
+                    isPending = currentUser.pendingConnections.some(conn => conn.id === userId);
+                }
+                
+                // Update UI based on connection status
+                if (isConnected) {
+                    notConnectedState.classList.add('hidden');
+                    connectionPendingState.classList.add('hidden');
+                    connectedState.classList.remove('hidden');
+                } else if (isPending) {
+                    notConnectedState.classList.add('hidden');
+                    connectionPendingState.classList.remove('hidden');
+                    connectedState.classList.add('hidden');
+                } else {
+                    notConnectedState.classList.remove('hidden');
+                    connectionPendingState.classList.add('hidden');
+                    connectedState.classList.add('hidden');
                 }
             }
             
-            // Function to set up event listeners
-            function setupEventListeners() {
-                // Profile image upload
-                profileImageUpload.addEventListener('change', function(e) {
-                    if (this.files && this.files[0]) {
-                        const reader = new FileReader();
+            // Calculate profile completion percentage
+            function updateProfileCompletion() {
+                let totalScore = 0;
+                let hint = "";
+                
+                // Basic profile (30%)
+                if (currentUser.fullName && currentUser.fullName.trim() !== "") totalScore += 5;
+                if (currentUser.profileImage) totalScore += 5;
+                if (currentUser.currentRole && currentUser.currentRole.trim() !== "") totalScore += 5;
+                if (currentUser.company && currentUser.company.trim() !== "") totalScore += 5;
+                if (currentUser.location && currentUser.location.trim() !== "") totalScore += 5;
+                if (currentUser.industry && currentUser.industry.trim() !== "") totalScore += 5;
+                
+                // About (20%)
+                if (currentUser.about) {
+                    if (currentUser.about.length < 50) {
+                        totalScore += 10;
+                        if (!hint) hint = "Expand your about section for a better profile";
+                    } else {
+                        totalScore += 20;
+                    }
+                } else {
+                    if (!hint) hint = "Add an about section to improve your profile";
+                }
+                
+                // Skills (20%)
+                if (currentUser.skills) {
+                    let skillsCount = 0;
+                    if (typeof currentUser.skills === 'string') {
+                        skillsCount = currentUser.skills.split(',').filter(s => s.trim() !== "").length;
+                    } else if (Array.isArray(currentUser.skills)) {
+                        skillsCount = currentUser.skills.length;
+                    }
+                    
+                    if (skillsCount === 0) {
+                        if (!hint) hint = "Add your skills to improve your profile";
+                    } else if (skillsCount < 3) {
+                        totalScore += 10;
+                        if (!hint) hint = "Add more skills to improve your profile";
+                    } else {
+                        totalScore += 20;
+                    }
+                } else {
+                    if (!hint) hint = "Add your skills to improve your profile";
+                }
+                
+                // Experience (20%)
+                if (currentUser.experience && currentUser.experience.length > 0) {
+                    totalScore += Math.min(currentUser.experience.length * 10, 20);
+                } else {
+                    if (!hint) hint = "Add your work experience to improve your profile";
+                }
+                
+                // Education (10%)
+                if (currentUser.education && currentUser.education.length > 0) {
+                    totalScore += 10;
+                } else {
+                    if (!hint) hint = "Add your education to complete your profile";
+                }
+                
+                // Update UI
+                profileCompletionPercent.textContent = totalScore + '%';
+                profileCompletionBar.style.width = totalScore + '%';
+                
+                // Update hint if profile is complete
+                if (totalScore >= 90) {
+                    hint = "Your profile is looking great!";
+                }
+                
+                profileCompletionHint.textContent = hint;
+            }
+            
+            // Show toast notification
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.style.opacity = 1;
+                
+                setTimeout(() => {
+                    toastNotification.style.opacity = 0;
+                }, 3000);
+            }
+            
+            // Event Listeners
+            
+            // Edit section buttons
+            const editSectionBtns = document.querySelectorAll('.edit-section-btn');
+            
+            editSectionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    const formId = section + 'EditForm';
+                    
+                    // Show edit form
+                    document.getElementById(formId).classList.remove('hidden');
+                });
+            });
+            
+            // Cancel edit buttons
+            const cancelEditBtns = document.querySelectorAll('.cancel-edit-btn');
+            
+            cancelEditBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Find the parent form
+                    const form = this.closest('[id$="EditForm"]');
+                    form.classList.add('hidden');
+                });
+            });
+            
+            // Save edit buttons
+            const saveEditBtns = document.querySelectorAll('.save-edit-btn');
+            
+            saveEditBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    
+                    // Get form data and update profile
+                    if (section === 'about') {
+                        const aboutText = document.getElementById('aboutTextarea').value.trim();
+                        currentUser.about = aboutText;
+                        document.getElementById('aboutContent').textContent = aboutText;
+                    } else if (section === 'skills') {
+                        const skillsText = document.getElementById('skillsInput').value.trim();
+                        const skillsArray = skillsText.split(',').map(s => s.trim()).filter(s => s !== "");
                         
-                        reader.onload = function(e) {
-                            profileImage.src = e.target.result;
-                            showToast("Profile picture updated");
-                        };
+                        currentUser.skills = skillsArray;
                         
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
-                
-                // Edit mode toggle
-                editToggleBtn.addEventListener('click', function() {
-                    enableEditMode();
-                });
-                
-                // Save profile
-                saveProfileBtn.addEventListener('click', function() {
-                    saveProfile();
-                });
-                
-                // Cancel edit
-                cancelEditBtn.addEventListener('click', function() {
-                    disableEditMode();
-                    initializeProfile(); // Reset changes
-                    showToast("Changes canceled");
-                });
-                
-                // Skills input event
-                skillsInput.addEventListener('input', function() {
-                    updateSkillsPreview(this.value);
-                });
-                
-                // Add experience button
-                addExperienceBtn.addEventListener('click', function() {
-                    addExperienceForm();
-                });
-            }
-            
-            // Function to enable edit mode
-            function enableEditMode() {
-                // Show/hide edit buttons
-                editToggleBtn.classList.add('hidden');
-                saveProfileBtn.classList.remove('hidden');
-                cancelEditBtn.classList.remove('hidden');
-                addExperienceBtn.classList.remove('hidden');
-                
-                // Make content editable
-                fullName.contentEditable = true;
-                titleCompany.contentEditable = true;
-                aboutText.contentEditable = true;
-                
-                // Show edit containers, hide view containers
-                skillsViewContainer.classList.add('hidden');
-                skillsEditContainer.classList.remove('hidden');
-                experienceViewContainer.classList.add('hidden');
-                experienceEditContainer.classList.remove('hidden');
-                lookingForViewContainer.classList.add('hidden');
-                lookingForEditContainer.classList.remove('hidden');
-                
-                // Create experience editors
-                createExperienceEditors();
-                
-                // Create looking for editors
-                createLookingForEditors();
-                
-                // Add styling to editable content
-                document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-                    if (!el.textContent.trim()) {
-                        el.classList.add('empty');
-                    }
-                });
-                
-                showToast("Edit mode enabled");
-            }
-            
-            // Function to disable edit mode
-            function disableEditMode() {
-                // Show/hide edit buttons
-                editToggleBtn.classList.remove('hidden');
-                saveProfileBtn.classList.add('hidden');
-                cancelEditBtn.classList.add('hidden');
-                addExperienceBtn.classList.add('hidden');
-                
-                // Disable editing
-                fullName.contentEditable = false;
-                titleCompany.contentEditable = false;
-                aboutText.contentEditable = false;
-                
-                // Show view containers, hide edit containers
-                skillsViewContainer.classList.remove('hidden');
-                skillsEditContainer.classList.add('hidden');
-                experienceViewContainer.classList.remove('hidden');
-                experienceEditContainer.classList.add('hidden');
-                lookingForViewContainer.classList.remove('hidden');
-                lookingForEditContainer.classList.add('hidden');
-                
-                // Remove styling from editable content
-                document.querySelectorAll('[contenteditable]').forEach(el => {
-                    el.classList.remove('empty');
-                });
-            }
-            
-            // Function to save profile
-            function saveProfile() {
-                // Get values from editable fields
-                const nameValue = fullName.textContent.trim();
-                const titleCompanyValue = titleCompany.textContent.trim();
-                const aboutValue = aboutText.textContent.trim();
-                
-                // Parse title and company
-                let currentRole = titleCompanyValue;
-                let company = '';
-                
-                if (titleCompanyValue.includes('at')) {
-                    const parts = titleCompanyValue.split('at');
-                    currentRole = parts[0].trim();
-                    company = parts[1].trim();
-                }
-                
-                // Get skills
-                const skillsValue = skillsInput.value;
-                const skills = skillsValue.split(',').map(skill => skill.trim()).filter(skill => skill);
-                
-                // Get experience
-                const experience = [];
-                const expEditors = document.querySelectorAll('.exp-editor');
-                
-                expEditors.forEach(editor => {
-                    const title = editor.querySelector('.exp-title').value.trim();
-                    const company = editor.querySelector('.exp-company').value.trim();
-                    const period = editor.querySelector('.exp-period').value.trim();
-                    const description = editor.querySelector('.exp-description').value.trim();
-                    
-                    if (title && company) {
-                        experience.push({
+                        // Update skills display
+                        let skillsHtml = skillsArray.map(skill => {
+                            return `<span class="skill-badge">${skill}</span>`;
+                        }).join('');
+                        
+                        document.getElementById('skillsList').innerHTML = skillsHtml || '<span class="text-textLight text-sm">Add your skills</span>';
+                    } else if (section === 'experience') {
+                        // Get form values
+                        const title = document.getElementById('expTitleInput').value.trim();
+                        const company = document.getElementById('expCompanyInput').value.trim();
+                        const startDate = document.getElementById('expStartInput').value;
+                        const endDate = document.getElementById('expEndInput').value;
+                        const isCurrent = document.getElementById('expCurrentInput').checked;
+                        const description = document.getElementById('expDescriptionInput').value.trim();
+                        
+                        if (!title || !company || !startDate) {
+                            showToast("Please fill in the required fields");
+                            return;
+                        }
+                        
+                        // Format dates
+                        const formattedStartDate = startDate ? formatMonthYear(startDate) : '';
+                        const formattedEndDate = isCurrent ? null : (endDate ? formatMonthYear(endDate) : '');
+                        
+                        // Create new experience object
+                        const newExperience = {
                             title,
                             company,
-                            period,
+                            startDate: formattedStartDate,
+                            endDate: formattedEndDate,
                             description
-                        });
+                        };
+                        
+                        // Add to user profile
+                        if (!currentUser.experience) {
+                            currentUser.experience = [];
+                        }
+                        
+                        currentUser.experience.unshift(newExperience); // Add to beginning of array
+                        
+                        // Update experience display
+                        let experienceHtml = currentUser.experience.map((exp, index) => {
+                            const isLast = index === currentUser.experience.length - 1;
+                            return `
+                                <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                    <h4 class="font-medium">${exp.title}</h4>
+                                    <p class="text-textMedium text-sm">${exp.company}</p>
+                                    <p class="text-textLight text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
+                                    ${exp.description ? `<p class="text-textMedium text-sm mt-1">${exp.description}</p>` : ''}
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        document.getElementById('experienceList').innerHTML = experienceHtml;
+                        
+                        // Reset form
+                        document.getElementById('expTitleInput').value = '';
+                        document.getElementById('expCompanyInput').value = '';
+                        document.getElementById('expStartInput').value = '';
+                        document.getElementById('expEndInput').value = '';
+                        document.getElementById('expCurrentInput').checked = false;
+                        document.getElementById('expDescriptionInput').value = '';
+                        
+                    } else if (section === 'education') {
+                        // Get form values
+                        const degree = document.getElementById('eduDegreeInput').value.trim();
+                        const fieldOfStudy = document.getElementById('eduFieldInput').value.trim();
+                        const school = document.getElementById('eduSchoolInput').value.trim();
+                        const startYear = document.getElementById('eduStartInput').value.trim();
+                        const endYear = document.getElementById('eduEndInput').value.trim();
+                        
+                        if (!degree || !school || !startYear) {
+                            showToast("Please fill in the required fields");
+                            return;
+                        }
+                        
+                        // Create new education object
+                        const newEducation = {
+                            degree,
+                            fieldOfStudy,
+                            school,
+                            startYear,
+                            endYear
+                        };
+                        
+                        // Add to user profile
+                        if (!currentUser.education) {
+                            currentUser.education = [];
+                        }
+                        
+                        currentUser.education.unshift(newEducation); // Add to beginning of array
+                        
+                        // Update education display
+                        let educationHtml = currentUser.education.map((edu, index) => {
+                            const isLast = index === currentUser.education.length - 1;
+                            const fullDegree = edu.degree + (edu.fieldOfStudy ? ' in ' + edu.fieldOfStudy : '');
+                            return `
+                                <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                    <h4 class="font-medium">${fullDegree}</h4>
+                                    <p class="text-textMedium text-sm">${edu.school}</p>
+                                    <p class="text-textLight text-xs">${edu.startYear} - ${edu.endYear || 'Present'}</p>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        document.getElementById('educationList').innerHTML = educationHtml;
+                        
+                        // Reset form
+                        document.getElementById('eduDegreeInput').value = '';
+                        document.getElementById('eduFieldInput').value = '';
+                        document.getElementById('eduSchoolInput').value = '';
+                        document.getElementById('eduStartInput').value = '';
+                        document.getElementById('eduEndInput').value = '';
                     }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    // Hide form
+                    const form = this.closest('[id$="EditForm"]');
+                    form.classList.add('hidden');
+                    
+                    // Update profile completion
+                    updateProfileCompletion();
+                    
+                    // Show success message
+                    showToast("Profile updated successfully");
                 });
-                
-                // Get looking for
-                const lookingFor = [];
-                const lookingForInputs = document.querySelectorAll('.looking-for-input');
-                
-                lookingForInputs.forEach(input => {
-                    const value = input.value.trim();
-                    if (value) {
-                        lookingFor.push(value);
+            });
+            
+            // Connect button
+            if (connectBtn) {
+                connectBtn.addEventListener('click', function() {
+                    // Add to connections (in a real app this would be a connection request)
+                    if (!currentUser.connections) {
+                        currentUser.connections = [];
                     }
+                    
+                    // Get user data
+                    let userData;
+                    
+                    try {
+                        userData = JSON.parse(localStorage.getItem(`user_${viewUserId}`));
+                        
+                        if (!userData) {
+                            userData = JSON.parse(localStorage.getItem(viewUserId));
+                        }
+                        
+                        if (!userData) {
+                            const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
+                            userData = sampleUsers.find(u => u.id === viewUserId);
+                        }
+                    } catch (e) {
+                        console.error("Error loading user data:", e);
+                    }
+                    
+                    if (!userData) return;
+                    
+                    // Add to connections
+                    currentUser.connections.push({
+                        id: viewUserId,
+                        name: userData.fullName || userData.name,
+                        timestamp: Date.now(),
+                        profileImage: userData.profileImage
+                    });
+                    
+                    // Save to localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    // Update UI
+                    updateConnectionStatus(viewUserId);
+                    
+                    // Show success message
+                    showToast("Connection added");
                 });
-                
-                // Validation
-                if (!nameValue) {
-                    showToast("Please enter your name");
-                    fullName.focus();
-                    return;
-                }
-                
-                if (!currentRole) {
-                    showToast("Please enter your job title");
-                    titleCompany.focus();
-                    return;
-                }
-                
-                // Update currentUser object
-                currentUser.fullName = nameValue;
-                currentUser.currentRole = currentRole;
-                currentUser.company = company;
-                currentUser.about = aboutValue;
-                currentUser.skills = skills;
-                currentUser.experience = experience;
-                currentUser.lookingFor = lookingFor;
-                currentUser.profileImage = profileImage.src;
-                
-                // Save to localStorage
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                localStorage.setItem(`user_${currentUser.id}`, JSON.stringify(currentUser));
-                
-                // Disable edit mode
-                disableEditMode();
-                
-                // Refresh display
-                initializeProfile();
-                
-                showToast("Profile saved successfully!");
             }
             
-            // Function to show toast notification
-            function showToast(message) {
-                const toast = document.getElementById('toastNotification');
-                toast.textContent = message;
-                toast.className = "toast show rounded-lg";
-                
-                setTimeout(function() {
-                    toast.className = toast.className.replace("show", "");
-                }, 3000);
+            // Message button
+            if (messageBtn) {
+                messageBtn.addEventListener('click', function() {
+                    // Redirect to chat page
+                    window.location.href = "chat.html";
+                });
+            }
+            
+            // View analytics button
+            viewAnalyticsBtn.addEventListener('click', function() {
+                window.location.href = "index.html";
+            });
+            
+            // Format month and year
+            function formatMonthYear(input) {
+                const date = new Date(input);
+                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
             }
         });
     </script>
