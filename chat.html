@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProConnect - Messages</title>
+    <title>ProConnect - Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -23,1974 +23,881 @@
                         lightTertiary: '#E9ECEF',
                         textDark: '#212529',
                         textMedium: '#495057',
-                        textLight: '#6C757D'
+                        textLight: '#6C757D',
+                        darkBg: '#181818',
+                        darkSecondary: '#202020',
+                        darkTertiary: '#2A2A2A'
                     }
                 }
-            }
+            },
+            darkMode: 'class'
         }
         
-        // Check for dark mode
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
+        // Force dark mode
+        document.documentElement.classList.add('dark');
     </script>
     <style>
-        .chat-bubble-received {
-            border-radius: 18px 18px 18px 4px;
-        }
-        .chat-bubble-sent {
-            border-radius: 18px 18px 4px 18px;
-        }
-        
-        /* User search panel animation */
-        .slide-in {
-            animation: slideIn 0.3s forwards;
+        /* General dark mode styling */
+        body {
+            background-color: #181818 !important;
+            color: #F8F9FA !important;
         }
         
-        .slide-out {
-            animation: slideOut 0.3s forwards;
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
+        /* Message bubbles */
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            position: relative;
+            word-wrap: break-word;
         }
         
-        @keyframes slideOut {
-            from { transform: translateX(0); }
-            to { transform: translateX(100%); }
+        .message-sent {
+            background-color: #0078D4;
+            color: white;
+            margin-left: auto;
+            border-top-right-radius: 4px;
         }
         
-        /* Empty state animations */
-        .pulse {
-            animation: pulse 2s infinite;
+        .message-received {
+            background-color: #2A2A2A;
+            color: #F8F9FA;
+            margin-right: auto;
+            border-top-left-radius: 4px;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+        /* Chat input styling */
+        .chat-input {
+            background-color: #2A2A2A;
+            border: 1px solid #3A3A3A;
+            color: #F8F9FA;
+            border-radius: 24px;
+            padding: 10px 16px;
+            outline: none;
+            resize: none;
         }
         
-        /* User list styling */
-        .user-list-item {
-            transition: all 0.2s ease;
+        .chat-input:focus {
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
         }
         
-        .user-list-item:active {
-            background-color: rgba(0, 120, 212, 0.1);
-        }
-        
-        /* Typing indicator */
-        .typing-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #6C757D;
-            margin-right: 3px;
-        }
-        
-        .typing-dot:nth-child(1) {
-            animation: typingAnimation 1.4s infinite;
-        }
-        
-        .typing-dot:nth-child(2) {
-            animation: typingAnimation 1.4s infinite;
-            animation-delay: 0.2s;
-        }
-        
-        .typing-dot:nth-child(3) {
-            animation: typingAnimation 1.4s infinite;
-            animation-delay: 0.4s;
-        }
-        
-        @keyframes typingAnimation {
-            0% { opacity: 0.3; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-3px); }
-            100% { opacity: 0.3; transform: translateY(0); }
-        }
-        
-        /* Message fade in animation */
-        @keyframes fadeIn {
+        /* Animation for messages */
+        @keyframes messageAppear {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .message-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+        .message-appear {
+            animation: messageAppear 0.3s forwards;
         }
         
-        /* Quick reactions popup */
-        .reaction-popup {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 5px 10px;
-            z-index: 10;
+        /* Contact list item */
+        .contact-item {
+            transition: background-color 0.2s;
+            border-left: 3px solid transparent;
         }
         
-        .reaction-popup.show {
+        .contact-item:hover {
+            background-color: #2A2A2A;
+        }
+        
+        .contact-item.active {
+            background-color: rgba(0, 120, 212, 0.1);
+            border-left: 3px solid #0078D4;
+        }
+        
+        /* Typing indicator */
+        .typing-indicator {
             display: flex;
+            align-items: center;
         }
         
-        .reaction-btn {
-            font-size: 16px;
-            padding: 5px;
-            cursor: pointer;
-            transition: transform 0.2s;
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #CED4DA;
+            border-radius: 50%;
+            margin: 0 2px;
         }
         
-        .reaction-btn:hover {
-            transform: scale(1.2);
+        .typing-dot:nth-child(1) {
+            animation: typing 1.2s infinite ease-in-out;
         }
         
-        /* Online status */
-        .status-dot {
-            width: 8px;
-            height: 8px;
+        .typing-dot:nth-child(2) {
+            animation: typing 1.2s infinite ease-in-out 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation: typing 1.2s infinite ease-in-out 0.4s;
+        }
+        
+        @keyframes typing {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #E74C3C;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Bottom navigation */
+        .bottom-nav {
+            background-color: #202020 !important;
+            border-color: #2A2A2A !important;
+        }
+        
+        .nav-icon {
+            color: #6C757D !important;
+        }
+        
+        .nav-icon.active {
+            color: #0078D4 !important;
+        }
+        
+        /* Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #2A2A2A;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3A3A3A;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4A4A4A;
+        }
+        
+        /* Message status */
+        .message-status {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
+            text-align: right;
+        }
+        
+        /* New message indicator */
+        .unread-indicator {
+            background-color: #0078D4;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 4px;
-        }
-        
-        .status-online {
-            background-color: #27AE60;
-        }
-        
-        .status-offline {
-            background-color: #E9ECEF;
-        }
-        
-        .status-away {
-            background-color: #FFB900;
-        }
-        
-        /* Loading shimmer effect */
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        
-        .loading-shimmer {
-            background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
-        }
-        
-        /* Connection limit alert */
-        .connection-limit-alert {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 1000;
-            max-width: 300px;
-        }
-        
-        /* Progress bar */
-        .connection-progress {
-            height: 6px;
-            border-radius: 3px;
-            background-color: #E9ECEF;
-            margin-bottom: 1rem;
-        }
-        
-        .connection-progress-bar {
-            height: 100%;
-            border-radius: 3px;
-            background-color: #0078D4;
-            transition: width 0.3s ease;
-        }
-        
-        /* Dark mode overrides */
-        .dark .bg-white {
-            background-color: #1E1E1E;
-        }
-        
-        .dark .bg-lightBg {
-            background-color: #121212;
-        }
-        
-        .dark .bg-lightSecondary {
-            background-color: #2A2A2A;
-        }
-        
-        .dark .text-textDark {
-            color: #E9ECEF;
-        }
-        
-        .dark .text-textMedium {
-            color: #ADB5BD;
-        }
-        
-        .dark .text-textLight {
-            color: #6C757D;
-        }
-        
-        .dark .border-gray-200 {
-            border-color: #2A2A2A;
-        }
-        
-        .dark .chat-bubble-received {
-            background-color: #2A2A2A;
-        }
-        
-        .dark .loading-shimmer {
-            background: linear-gradient(to right, #2A2A2A 8%, #3A3A3A 18%, #2A2A2A 33%);
-        }
-        
-        .dark .reaction-popup {
-            background-color: #2A2A2A;
         }
     </style>
 </head>
-<body class="bg-lightBg text-textDark min-h-screen">
-    <div class="container mx-auto px-4 py-6 max-w-md pb-20">
+<body class="bg-darkBg text-white min-h-screen">
+    <div class="container mx-auto px-0 sm:px-4 py-0 max-w-4xl min-h-screen pb-20 flex flex-col">
         <!-- App Header -->
-        <header class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold text-primary">Messages</h1>
-            <button id="newMessageBtn" class="text-primary">
-                <i class="fas fa-edit text-xl"></i>
-            </button>
-        </header>
-
-        <!-- Main Content -->
-        <main>
-            <!-- Tabs -->
-            <div class="flex border-b mb-4">
-                <button id="conversationsTab" class="text-primary border-b-2 border-primary pb-2 px-4 font-medium">Conversations</button>
-                <button id="connectionsTab" class="text-textMedium pb-2 px-4 font-medium">Connections</button>
+        <header class="flex justify-between items-center px-4 py-4 bg-darkSecondary sticky top-0 z-10">
+            <div class="flex items-center">
+                <a href="profile.html" class="mr-3 block md:hidden text-gray-300 hover:text-white">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1 class="text-xl font-bold text-primary">Chat</h1>
             </div>
-
-            <!-- Connection Counter -->
-            <div id="connectionCounter" class="mb-4">
-                <div class="flex justify-between mb-1">
-                    <span class="text-xs text-textMedium">Today's Connections</span>
-                    <span id="connectionCount" class="text-xs text-textMedium">0/10</span>
-                </div>
-                <div class="connection-progress">
-                    <div id="connectionProgressBar" class="connection-progress-bar" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <!-- Search Box -->
-            <div class="mb-4">
-                <div class="relative">
-                    <input type="text" id="conversationSearch" placeholder="Search conversations" class="w-full px-4 py-2 pl-10 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
-                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-textLight">
-                        <i class="fas fa-search"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Authentication Check -->
-            <div id="authCheck" class="hidden flex flex-col items-center justify-center py-8">
-                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-lock text-primary text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Sign in to view messages</h3>
-                <p class="text-textMedium mb-4 text-center">Please sign in or create an account to access your messages</p>
-                <div class="flex space-x-4">
-                    <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-lg">
-                        Sign In
-                    </a>
-                    <a href="register.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
-                        Sign Up
-                    </a>
-                </div>
-            </div>
-
-            <!-- Empty State (When no messages) -->
-            <div id="emptyState" class="hidden flex flex-col items-center justify-center py-8">
-                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 pulse">
-                    <i class="fas fa-comments text-primary text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">No messages yet</h3>
-                <p class="text-textMedium mb-4 text-center">Start a conversation with your connections</p>
-                <button id="startConversationBtn" class="bg-primary text-white px-6 py-2 rounded-lg flex items-center">
-                    <i class="fas fa-plus mr-2"></i> New Message
-                </button>
-            </div>
-
-            <!-- Loading State -->
-            <div id="loadingState" class="hidden">
-                <!-- Shimmer loading for conversations -->
-                <div class="space-y-3">
-                    <div class="bg-lightSecondary p-3 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 rounded-full loading-shimmer mr-3"></div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <div class="w-24 h-5 loading-shimmer rounded-md"></div>
-                                    <div class="w-10 h-4 loading-shimmer rounded-md"></div>
-                                </div>
-                                <div class="w-32 h-4 loading-shimmer rounded-md mt-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-lightSecondary p-3 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 rounded-full loading-shimmer mr-3"></div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <div class="w-24 h-5 loading-shimmer rounded-md"></div>
-                                    <div class="w-10 h-4 loading-shimmer rounded-md"></div>
-                                </div>
-                                <div class="w-32 h-4 loading-shimmer rounded-md mt-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-lightSecondary p-3 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 rounded-full loading-shimmer mr-3"></div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <div class="w-24 h-5 loading-shimmer rounded-md"></div>
-                                    <div class="w-10 h-4 loading-shimmer rounded-md"></div>
-                                </div>
-                                <div class="w-32 h-4 loading-shimmer rounded-md mt-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- No Connections State -->
-            <div id="noConnectionsState" class="hidden flex flex-col items-center justify-center py-8">
-                <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4 pulse">
-                    <i class="fas fa-user-plus text-accent text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">No connections yet</h3>
-                <p class="text-textMedium mb-4 text-center">Find and connect with professionals to start messaging</p>
-                <a href="search.html" class="bg-primary text-white px-6 py-2 rounded-lg flex items-center">
-                    <i class="fas fa-search mr-2"></i> Find Connections
+            <div class="flex items-center">
+                <a href="profile.html" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition">
+                    <i class="fas fa-user text-xl"></i>
+                </a>
+                <a href="connections.html" class="text-primary block p-2 hover:bg-darkTertiary rounded-full transition relative">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span id="notificationBadge" class="notification-badge">2</span>
                 </a>
             </div>
-
-            <!-- Connection Limit Reached State -->
-            <div id="connectionLimitState" class="hidden flex flex-col items-center justify-center py-8">
-                <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-clock text-accent text-2xl"></i>
+        </header>
+        
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Contacts Sidebar (hidden on mobile) -->
+            <div id="contactsSidebar" class="hidden md:block md:w-1/3 bg-darkSecondary border-r border-darkTertiary overflow-hidden flex flex-col">
+                <div class="p-3 border-b border-darkTertiary sticky top-0 bg-darkSecondary z-10">
+                    <div class="relative">
+                        <input type="text" placeholder="Search chats" class="w-full p-2 pl-8 bg-darkTertiary border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
                 </div>
-                <h3 class="text-lg font-semibold mb-2">Daily Connection Limit Reached</h3>
-                <p class="text-textMedium mb-4 text-center">You've used all 10 connections for today. Come back tomorrow for more networking!</p>
-                <button id="viewExistingConnectionsBtn" class="bg-primary text-white px-6 py-2 rounded-lg">
-                    View Existing Connections
-                </button>
-            </div>
-
-            <!-- Messages List (Shown only if authenticated and has messages) -->
-            <div id="messagesList" class="space-y-2">
-                <!-- Messages will be populated here -->
-            </div>
-            
-            <!-- Connections List (Hidden initially) -->
-            <div id="connectionsList" class="space-y-2 hidden">
-                <!-- Connections will be populated here -->
-            </div>
-        </main>
-
-        <!-- Active Chat View (Hidden initially, shown when a chat is clicked) -->
-        <div id="chatView" class="fixed inset-0 bg-lightBg z-50 hidden">
-            <div class="h-full flex flex-col">
-                <!-- Chat Header -->
-                <div class="bg-white p-4 border-b flex items-center">
-                    <button id="backToChats" class="text-primary mr-3">
-                        <i class="fas fa-arrow-left text-xl"></i>
-                    </button>
-                    <img id="chatUserImage" src="" class="w-10 h-10 rounded-full object-cover mr-3" alt="Profile photo">
-                    <div>
-                        <h3 id="chatUserName" class="font-medium"></h3>
-                        <div class="flex items-center">
-                            <span id="chatUserStatusDot" class="status-dot"></span>
-                            <p id="chatUserStatus" class="text-xs text-textMedium"></p>
+                
+                <div class="overflow-y-auto custom-scrollbar flex-1">
+                    <!-- Contact list -->
+                    <div class="contact-item active p-3 flex items-center border-b border-darkTertiary" data-contact="olivia">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Olivia Rodriguez">
+                            <span class="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-darkSecondary"></span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Olivia Rodriguez</h3>
+                                <span class="text-xs text-gray-400">2m ago</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-sm text-gray-300 truncate pr-4">I'd love to collaborate on the new project...</p>
+                                <span class="unread-indicator"></span>
+                            </div>
                         </div>
                     </div>
-                    <div class="ml-auto flex space-x-4">
-                        <button id="viewProfileBtn" class="text-primary">
-                            <i class="fas fa-user"></i>
+                    
+                    <div class="contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="david">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="David Patel">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">David Patel</h3>
+                                <span class="text-xs text-gray-400">Yesterday</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">Thanks for the introduction!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="sarah">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Sarah Johnson">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Sarah Johnson</h3>
+                                <span class="text-xs text-gray-400">2d ago</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">Let's catch up next week!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="michael">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Michael Chen">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Michael Chen</h3>
+                                <span class="text-xs text-gray-400">3d ago</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">I'll send you more details about the conference</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="emma">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Emma Wilson">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Emma Wilson</h3>
+                                <span class="text-xs text-gray-400">1w ago</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">Are you attending the industry meetup?</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-t border-darkTertiary">
+                    <button id="newMessageBtn" class="w-full py-2 bg-primary text-white rounded-lg font-medium shadow-sm hover:bg-primaryDark transition duration-300">
+                        <i class="fas fa-pen mr-2"></i> New Chat
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile contacts button -->
+            <button id="showContactsBtn" class="md:hidden fixed bottom-20 left-4 w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shadow-lg z-20">
+                <i class="fas fa-user-friends"></i>
+            </button>
+            
+            <!-- Chat Area -->
+            <div class="flex-1 flex flex-col bg-darkBg">
+                <!-- Chat Header -->
+                <div class="p-3 border-b border-darkTertiary flex items-center sticky top-0 bg-darkBg z-10">
+                    <div class="relative mr-3">
+                        <img id="currentChatImage" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover" alt="Olivia Rodriguez">
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-success rounded-full border-2 border-darkBg"></span>
+                    </div>
+                    <div>
+                        <h3 id="currentChatName" class="font-medium text-white">Olivia Rodriguez</h3>
+                        <p id="currentChatStatus" class="text-xs text-green-500">Online</p>
+                    </div>
+                    <div class="ml-auto flex">
+                        <button class="p-2 text-gray-300 hover:text-white">
+                            <i class="fas fa-phone"></i>
                         </button>
-                        <button id="chatOptionsBtn" class="text-primary">
-                            <i class="fas fa-ellipsis-v"></i>
+                        <button class="p-2 text-gray-300 hover:text-white">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="p-2 text-gray-300 hover:text-white">
+                            <i class="fas fa-info-circle"></i>
                         </button>
                     </div>
                 </div>
                 
-                <!-- Chat Options Dropdown (Hidden initially) -->
-                <div id="chatOptionsDropdown" class="absolute right-4 top-16 bg-white shadow-lg rounded-lg p-2 z-10 hidden">
-                    <button id="clearChatBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
-                        <i class="fas fa-trash-alt mr-2 text-danger"></i> Clear Chat
-                    </button>
-                    <button id="blockUserBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
-                        <i class="fas fa-ban mr-2 text-danger"></i> Block User
-                    </button>
-                    <button id="muteNotificationsBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
-                        <i class="fas fa-bell-slash mr-2"></i> Mute Notifications
-                    </button>
-                </div>
-                
-                <!-- Chat Messages -->
-                <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
-                    <!-- Messages will be populated by JavaScript -->
-                </div>
-                
-                <!-- Typing Indicator -->
-                <div id="typingIndicator" class="px-4 py-2 hidden">
-                    <div class="flex items-center">
+                <!-- Messages Container -->
+                <div id="messagesContainer" class="flex-1 p-4 overflow-y-auto custom-scrollbar">
+                    <!-- Date Marker -->
+                    <div class="text-center mb-4">
+                        <span class="inline-block px-3 py-1 bg-darkTertiary rounded-full text-gray-300 text-xs">Today</span>
+                    </div>
+                    
+                    <!-- Message Thread -->
+                    <div class="message-bubble message-received message-appear">
+                        <p>Hi John! I just checked out your profile and I'm really impressed with your work at TechCorp.</p>
+                    </div>
+                    
+                    <div class="message-bubble message-sent message-appear">
+                        <p>Thanks Olivia! I appreciate that. I checked out your UX work as well and it's really impressive.</p>
+                        <div class="message-status">Delivered • 10:34 AM</div>
+                    </div>
+                    
+                    <div class="message-bubble message-received message-appear">
+                        <p>I'm currently working on a new project that requires some product management expertise.</p>
+                    </div>
+                    
+                    <div class="message-bubble message-received message-appear">
+                        <p>I'd love to collaborate on the new project if you're interested. We should set up a call to discuss the details.</p>
+                    </div>
+                    
+                    <div class="message-bubble message-sent message-appear">
+                        <p>That sounds great! I'd be happy to collaborate. What kind of project is it?</p>
+                        <div class="message-status">Delivered • 10:38 AM</div>
+                    </div>
+                    
+                    <!-- Typing indicator -->
+                    <div class="typing-indicator message-bubble message-received py-3 px-4 message-appear">
                         <div class="typing-dot"></div>
                         <div class="typing-dot"></div>
                         <div class="typing-dot"></div>
-                        <span class="text-xs text-textMedium ml-2">typing...</span>
                     </div>
                 </div>
                 
                 <!-- Message Input -->
-                <div class="bg-white p-3 border-t">
-                    <div class="flex items-center">
-                        <button id="attachmentBtn" class="text-primary p-2 relative">
-                            <i class="fas fa-plus"></i>
-                            
-                            <!-- Attachment Menu (Hidden initially) -->
-                            <div id="attachmentMenu" class="absolute bottom-full left-0 bg-white shadow-lg rounded-lg p-2 hidden">
-                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
-                                    <i class="fas fa-image mr-2 text-secondary"></i> Photo
-                                </button>
-                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
-                                    <i class="fas fa-file mr-2 text-primary"></i> Document
-                                </button>
-                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
-                                    <i class="fas fa-map-marker-alt mr-2 text-danger"></i> Location
-                                </button>
-                            </div>
+                <div class="p-3 border-t border-darkTertiary bg-darkBg sticky bottom-0">
+                    <div class="flex items-end">
+                        <button class="text-gray-300 hover:text-white p-2">
+                            <i class="fas fa-paperclip"></i>
                         </button>
-                        <input type="text" id="messageInput" placeholder="Type a message..." class="flex-1 px-4 py-2 rounded-full border focus:outline-none focus:ring-2 focus:ring-primary">
-                        <button id="emojiBtn" class="text-primary p-2">
-                            <i class="fas fa-smile"></i>
-                        </button>
-                        <button id="sendMessageBtn" class="bg-primary text-white p-2 rounded-full ml-2 disabled:opacity-50" disabled>
+                        <div class="flex-1 mx-2">
+                            <textarea id="messageInput" class="chat-input w-full" placeholder="Type a message..." rows="1"></textarea>
+                        </div>
+                        <button id="sendMessageBtn" class="bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-primaryDark transition">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- New Message Panel (Hidden initially) -->
-        <div id="newMessagePanel" class="fixed inset-0 bg-lightBg z-50 hidden">
-            <div class="h-full flex flex-col">
-                <!-- Panel Header -->
-                <div class="bg-white p-4 border-b flex items-center">
-                    <button id="closeNewMessageBtn" class="text-primary mr-3">
-                        <i class="fas fa-arrow-left text-xl"></i>
+        
+        <!-- Mobile Contacts Sidebar (hidden by default) -->
+        <div id="mobileContactsSidebar" class="fixed inset-0 bg-black/70 z-50 hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-3/4 max-w-xs bg-darkSecondary shadow-lg transform transition-transform duration-300 ease-out h-full flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b border-darkTertiary">
+                    <h2 class="text-lg font-bold text-white">Chats</h2>
+                    <button id="closeContactsBtn" class="text-gray-300 p-2 hover:bg-darkTertiary rounded-full transition">
+                        <i class="fas fa-times"></i>
                     </button>
-                    <h3 class="font-medium">New Message</h3>
-                    <div class="ml-auto">
-                        <span id="newMessageConnectionCount" class="text-xs text-textMedium">Connections: 0/10</span>
+                </div>
+                
+                <div class="p-3 border-b border-darkTertiary">
+                    <div class="relative">
+                        <input type="text" placeholder="Search chats" class="w-full p-2 pl-8 bg-darkTertiary border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                     </div>
                 </div>
                 
-                <!-- Search Users -->
-                <div class="p-4 border-b">
-                    <div class="relative">
-                        <input type="text" id="userSearchInput" placeholder="Search users..." class="w-full px-4 py-2 pl-10 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
-                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-textLight">
-                            <i class="fas fa-search"></i>
+                <div class="overflow-y-auto custom-scrollbar flex-1">
+                    <!-- Mobile Contact list (duplicate of the desktop list) -->
+                    <div class="mobile-contact-item active p-3 flex items-center border-b border-darkTertiary" data-contact="olivia">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Olivia Rodriguez">
+                            <span class="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-darkSecondary"></span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Olivia Rodriguez</h3>
+                                <span class="text-xs text-gray-400">2m ago</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-sm text-gray-300 truncate pr-4">I'd love to collaborate on the new project...</p>
+                                <span class="unread-indicator"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="david">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="David Patel">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">David Patel</h3>
+                                <span class="text-xs text-gray-400">Yesterday</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">Thanks for the introduction!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="sarah">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Sarah Johnson">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Sarah Johnson</h3>
+                                <span class="text-xs text-gray-400">2d ago</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">Let's catch up next week!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="michael">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Michael Chen">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Michael Chen</h3>
+                                <span class="text-xs text-gray-400">3d ago</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">I'll send you more details about the conference</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-contact-item p-3 flex items-center border-b border-darkTertiary" data-contact="emma">
+                        <div class="relative mr-3">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-12 h-12 rounded-full object-cover" alt="Emma Wilson">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-medium text-white">Emma Wilson</h3>
+                                <span class="text-xs text-gray-400">1w ago</span>
+                            </div>
+                            <p class="text-sm text-gray-400 truncate">Are you attending the industry meetup?</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- User Search Results -->
-                <div id="userSearchResults" class="flex-1 overflow-y-auto p-4">
-                    <!-- User search results will be populated here -->
-                    <div class="text-center text-textMedium py-10">
-                        Search for users to start a conversation
+                <div class="p-3 border-t border-darkTertiary">
+                    <button id="mobileNewMessageBtn" class="w-full py-2 bg-primary text-white rounded-lg font-medium shadow-sm hover:bg-primaryDark transition duration-300">
+                        <i class="fas fa-pen mr-2"></i> New Chat
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Message Modal (Hidden initially) -->
+        <div id="newMessageModal" class="fixed inset-0 bg-black/70 z-50 hidden">
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="bg-darkSecondary rounded-lg p-6 max-w-md w-full fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-white">New Chat</h2>
+                        <button id="closeNewMessageBtn" class="text-gray-300 hover:text-white">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1 text-white">To:</label>
+                        <input type="text" class="w-full p-2 bg-darkTertiary border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base" placeholder="Search for a connection...">
+                    </div>
+                    
+                    <div class="mb-4 max-h-60 overflow-y-auto custom-scrollbar">
+                        <h3 class="text-sm font-medium text-gray-400 mb-2">Suggested</h3>
+                        
+                        <div class="contact-option p-2 flex items-center hover:bg-darkTertiary rounded-lg cursor-pointer mb-1">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="Emma Wilson">
+                            <div>
+                                <h4 class="font-medium text-white">Emma Wilson</h4>
+                                <p class="text-xs text-gray-400">Data Scientist</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-option p-2 flex items-center hover:bg-darkTertiary rounded-lg cursor-pointer mb-1">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="Michael Chen">
+                            <div>
+                                <h4 class="font-medium text-white">Michael Chen</h4>
+                                <p class="text-xs text-gray-400">Software Engineer</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-option p-2 flex items-center hover:bg-darkTertiary rounded-lg cursor-pointer mb-1">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="Sarah Johnson">
+                            <div>
+                                <h4 class="font-medium text-white">Sarah Johnson</h4>
+                                <p class="text-xs text-gray-400">Marketing Director</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-option p-2 flex items-center hover:bg-darkTertiary rounded-lg cursor-pointer mb-1">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" class="w-10 h-10 rounded-full object-cover mr-3" alt="David Patel">
+                            <div>
+                                <h4 class="font-medium text-white">David Patel</h4>
+                                <p class="text-xs text-gray-400">Finance Manager</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-darkTertiary pt-4">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1 text-white">Message:</label>
+                            <textarea class="w-full p-2 bg-darkTertiary border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-base resize-none" rows="3" placeholder="Type your message..."></textarea>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button id="sendNewMessageBtn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
+                                Start Chat
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Connection Limit Alert -->
-        <div id="connectionLimitAlert" class="connection-limit-alert">
-            <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
-            <h3 class="text-lg font-bold mb-2">Connection Limit Reached</h3>
-            <p class="mb-4">You've used all your connections for today. Come back tomorrow for more networking!</p>
-            <button id="closeAlertBtn" class="bg-white text-black px-4 py-2 rounded-lg">Got it</button>
-        </div>
-
+        
         <!-- Toast Notification -->
-        <div id="toastNotification" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-textDark text-white px-4 py-2 rounded-lg opacity-0 transition-opacity duration-300 z-50">
-            Message notification
+        <div id="toastNotification" class="toast">
+            Message sent
         </div>
-
+        
         <!-- Bottom Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
-            <a href="index.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-chart-line text-xl"></i>
-                <span class="text-xs mt-1">Analytics</span>
+        <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-darkSecondary border-t border-darkTertiary bottom-nav">
+            <a href="analytics.html" class="flex flex-col items-center">
+                <i class="fas fa-chart-line text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Analytics</span>
             </a>
-            <a href="chat.html" class="text-primary flex flex-col items-center">
-                <i class="fas fa-comments text-xl"></i>
-                <span class="text-xs mt-1">Chat</span>
+            <a href="search.html" class="flex flex-col items-center">
+                <i class="fas fa-search text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Find</span>
             </a>
-            <a href="search.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-search text-xl"></i>
-                <span class="text-xs mt-1">Find</span>
+            <a href="connections.html" class="flex flex-col items-center relative">
+                <i class="fas fa-bell text-xl text-gray-500 nav-icon"></i>
+                <span id="navNotificationBadge" class="notification-badge">2</span>
+                <span class="text-xs mt-1 text-gray-500">Requests</span>
             </a>
-            <a href="profile.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-user text-xl"></i>
-                <span class="text-xs mt-1">Profile</span>
+            <a href="chat.html" class="flex flex-col items-center">
+                <i class="fas fa-comment-alt text-xl text-primary nav-icon active"></i>
+                <span class="text-xs mt-1 text-primary">Chat</span>
+            </a>
+            <a href="profile.html" class="flex flex-col items-center">
+                <i class="fas fa-user text-xl text-gray-500 nav-icon"></i>
+                <span class="text-xs mt-1 text-gray-500">Profile</span>
             </a>
         </nav>
     </div>
 
     <script>
-        // User Search Utility 
-        const ProConnectUsers = {
-            getAllUsers: function() {
-                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-                const currentUserId = currentUser ? currentUser.id : null;
-                let allUsers = [];
-                
-                // Scan localStorage for user data
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    
-                    // Skip non-user items
-                    if (key === 'currentUser' || 
-                        key.includes('Conversations') || 
-                        key.startsWith('proconnect_') ||
-                        key.startsWith('swipe_')) {
-                        continue;
-                    }
-                    
-                    try {
-                        const value = JSON.parse(localStorage.getItem(key));
-                        
-                        // Check if this could be a user object
-                        if (value && 
-                            typeof value === 'object' &&
-                            (value.fullName || value.name || value.username) && 
-                            value.id) {
-                            
-                            // Normalize user object format
-                            const user = this.normalizeUserObject(value);
-                            
-                            // Don't include current user
-                            if (user.id !== currentUserId) {
-                                allUsers.push(user);
-                            }
-                        }
-                    } catch (e) {
-                        // Skip invalid JSON entries
-                        continue;
-                    }
-                }
-                
-                // Check for sample users
-                try {
-                    const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
-                    sampleUsers.forEach(user => {
-                        // Check if user already exists in allUsers
-                        if (!allUsers.some(u => u.id == user.id) && user.id !== currentUserId) {
-                            allUsers.push(this.normalizeUserObject(user));
-                        }
-                    });
-                } catch (e) {
-                    console.log("Error loading sample users:", e);
-                }
-                
-                // Also ensure current user's connections are included
-                if (currentUser && currentUser.connections) {
-                    currentUser.connections.forEach(conn => {
-                        if (!allUsers.some(u => u.id == conn.id)) {
-                            // Create a minimal user object if not found elsewhere
-                            allUsers.push({
-                                id: conn.id,
-                                fullName: conn.name || "Unknown User",
-                                profileImage: conn.profileImage || this.getDefaultProfileImage(),
-                                currentRole: conn.role || "",
-                                company: conn.company || "",
-                                industry: "Unknown",
-                                isConnection: true
-                            });
-                        }
-                    });
-                }
-                
-                return allUsers;
-            },
-            
-            normalizeUserObject: function(user) {
-                return {
-                    id: user.id,
-                    fullName: user.fullName || user.name || user.username || "Unknown User",
-                    profileImage: user.profileImage || user.image || this.getDefaultProfileImage(),
-                    currentRole: user.currentRole || user.title || user.role || "",
-                    company: user.company || "",
-                    industry: user.industry || "",
-                    location: user.location || "",
-                    skills: this.normalizeSkills(user.skills),
-                    about: user.about || user.bio || "",
-                    isConnection: !!user.isConnection
-                };
-            },
-            
-            normalizeSkills: function(skills) {
-                if (typeof skills === 'string') {
-                    return skills.split(',').map(s => s.trim()).filter(s => s !== '');
-                } else if (Array.isArray(skills)) {
-                    return skills.filter(s => s);
-                }
-                return [];
-            },
-            
-            getDefaultProfileImage: function() {
-                const defaultImages = [
-                    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
-                ];
-                return defaultImages[Math.floor(Math.random() * defaultImages.length)];
-            },
-            
-            searchUsers: function(query) {
-                const allUsers = this.getAllUsers();
-                
-                if (!query || query.trim() === '') {
-                    return allUsers;
-                }
-                
-                const searchTerm = query.toLowerCase().trim();
-                
-                return allUsers.filter(user => {
-                    return user.fullName.toLowerCase().includes(searchTerm) ||
-                           (user.currentRole && user.currentRole.toLowerCase().includes(searchTerm)) ||
-                           (user.company && user.company.toLowerCase().includes(searchTerm));
-                });
-            },
-            
-            getUserById: function(userId) {
-                const allUsers = this.getAllUsers();
-                return allUsers.find(user => user.id == userId);
-            }
-        };
-
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
-            const authCheck = document.getElementById('authCheck');
-            const messagesList = document.getElementById('messagesList');
-            const connectionsList = document.getElementById('connectionsList');
-            const emptyState = document.getElementById('emptyState');
-            const loadingState = document.getElementById('loadingState');
-            const noConnectionsState = document.getElementById('noConnectionsState');
-            const connectionLimitState = document.getElementById('connectionLimitState');
-            const connectionCount = document.getElementById('connectionCount');
-            const connectionProgressBar = document.getElementById('connectionProgressBar');
-            const newMessageConnectionCount = document.getElementById('newMessageConnectionCount');
-            const connectionLimitAlert = document.getElementById('connectionLimitAlert');
-            const closeAlertBtn = document.getElementById('closeAlertBtn');
-            const chatView = document.getElementById('chatView');
-            const newMessagePanel = document.getElementById('newMessagePanel');
-            const newMessageBtn = document.getElementById('newMessageBtn');
-            const startConversationBtn = document.getElementById('startConversationBtn');
-            const closeNewMessageBtn = document.getElementById('closeNewMessageBtn');
-            const backToChats = document.getElementById('backToChats');
-            const sendMessageBtn = document.getElementById('sendMessageBtn');
+            const messagesContainer = document.getElementById('messagesContainer');
             const messageInput = document.getElementById('messageInput');
-            const userSearchInput = document.getElementById('userSearchInput');
-            const userSearchResults = document.getElementById('userSearchResults');
-            const conversationSearch = document.getElementById('conversationSearch');
-            const viewProfileBtn = document.getElementById('viewProfileBtn');
-            const conversationsTab = document.getElementById('conversationsTab');
-            const connectionsTab = document.getElementById('connectionsTab');
-            const typingIndicator = document.getElementById('typingIndicator');
-            const chatOptionsBtn = document.getElementById('chatOptionsBtn');
-            const chatOptionsDropdown = document.getElementById('chatOptionsDropdown');
-            const clearChatBtn = document.getElementById('clearChatBtn');
-            const blockUserBtn = document.getElementById('blockUserBtn');
-            const muteNotificationsBtn = document.getElementById('muteNotificationsBtn');
-            const attachmentBtn = document.getElementById('attachmentBtn');
-            const attachmentMenu = document.getElementById('attachmentMenu');
+            const sendMessageBtn = document.getElementById('sendMessageBtn');
             const toastNotification = document.getElementById('toastNotification');
-            const viewExistingConnectionsBtn = document.getElementById('viewExistingConnectionsBtn');
-            const connectionCounter = document.getElementById('connectionCounter');
+            const showContactsBtn = document.getElementById('showContactsBtn');
+            const mobileContactsSidebar = document.getElementById('mobileContactsSidebar');
+            const closeContactsBtn = document.getElementById('closeContactsBtn');
+            const contactItems = document.querySelectorAll('.contact-item');
+            const mobileContactItems = document.querySelectorAll('.mobile-contact-item');
+            const newMessageBtn = document.getElementById('newMessageBtn');
+            const mobileNewMessageBtn = document.getElementById('mobileNewMessageBtn');
+            const newMessageModal = document.getElementById('newMessageModal');
+            const closeNewMessageBtn = document.getElementById('closeNewMessageBtn');
+            const contactOptions = document.querySelectorAll('.contact-option');
+            const sendNewMessageBtn = document.getElementById('sendNewMessageBtn');
             
-            // Constants
-            const DAILY_CONNECTION_LIMIT = 10;
-            const CONNECTION_STORAGE_KEY = 'proconnect_daily_connections';
-            
-            // Current state
-            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            let currentChatUserId = null;
-            let registeredUsers = [];
-            let conversations = [];
-            let isLoading = true;
-            let isTyping = false;
-            let typingTimeout;
-            let messageCheckInterval;
-            let userOnlineStates = {};
-            let dailyConnections = getDailyConnections();
-            
-            // Check if user is logged in
-            if (!currentUser) {
-                // Show auth check message and hide messages list
-                authCheck.classList.remove('hidden');
-                messagesList.classList.add('hidden');
-                emptyState.classList.add('hidden');
-                loadingState.classList.add('hidden');
-                noConnectionsState.classList.add('hidden');
-                connectionLimitState.classList.add('hidden');
-                connectionCounter.classList.add('hidden');
-                return;
-            } else {
-                // Hide auth check message, show loading
-                authCheck.classList.add('hidden');
-                loadingState.classList.remove('hidden');
-                
-                // Check if daily connection limit is reached
-                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
-                    connectionCounter.classList.remove('hidden');
-                    updateConnectionCounter();
-                } else {
-                    connectionCounter.classList.remove('hidden');
-                    updateConnectionCounter();
+            // Contacts data (for demo purposes)
+            const contacts = {
+                olivia: {
+                    name: 'Olivia Rodriguez',
+                    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80',
+                    status: 'Online',
+                    statusClass: 'text-green-500'
+                },
+                david: {
+                    name: 'David Patel',
+                    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80',
+                    status: 'Last seen 3h ago',
+                    statusClass: 'text-gray-400'
+                },
+                sarah: {
+                    name: 'Sarah Johnson',
+                    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80',
+                    status: 'Last seen yesterday',
+                    statusClass: 'text-gray-400'
+                },
+                michael: {
+                    name: 'Michael Chen',
+                    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80',
+                    status: 'Online',
+                    statusClass: 'text-green-500'
+                },
+                emma: {
+                    name: 'Emma Wilson',
+                    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80',
+                    status: 'Last seen 2d ago',
+                    statusClass: 'text-gray-400'
                 }
+            };
+            
+            // Show toast notification
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.style.opacity = 1;
                 
-                // Load conversations and registered users
                 setTimeout(() => {
-                    loadConversations();
-                    loadUsers();
-                    
-                    // Set up online status simulation
-                    setupOnlineStatusSimulation();
-                    
-                    // Update UI after loading
-                    isLoading = false;
-                    loadingState.classList.add('hidden');
-                    
-                    // Display conversations or empty state
-                    displayConversations();
-                    
-                    // Set up polling for new messages
-                    setupMessagePolling();
-                }, 800); // Simulate loading time
-            }
-            
-            // Function to get daily connections from localStorage
-            function getDailyConnections() {
-                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-                const storedConnections = JSON.parse(localStorage.getItem(CONNECTION_STORAGE_KEY)) || { date: today, count: 0 };
-                
-                // Reset counter if it's a new day
-                if (storedConnections.date !== today) {
-                    storedConnections.date = today;
-                    storedConnections.count = 0;
-                    localStorage.setItem(CONNECTION_STORAGE_KEY, JSON.stringify(storedConnections));
-                }
-                
-                return storedConnections;
-            }
-            
-            // Function to update connection counter
-            function updateConnectionCounter() {
-                dailyConnections = getDailyConnections();
-                connectionCount.textContent = `${dailyConnections.count}/${DAILY_CONNECTION_LIMIT}`;
-                newMessageConnectionCount.textContent = `Connections: ${dailyConnections.count}/${DAILY_CONNECTION_LIMIT}`;
-                
-                // Update progress bar
-                const progressPercentage = (dailyConnections.count / DAILY_CONNECTION_LIMIT) * 100;
-                connectionProgressBar.style.width = `${progressPercentage}%`;
-                
-                // Change color based on usage
-                if (progressPercentage > 75) {
-                    connectionProgressBar.classList.add('bg-danger');
-                    connectionProgressBar.classList.remove('bg-primary');
-                } else {
-                    connectionProgressBar.classList.add('bg-primary');
-                    connectionProgressBar.classList.remove('bg-danger');
-                }
-            }
-            
-            // Function to increment connection counter
-            function incrementConnectionCounter() {
-                dailyConnections.count++;
-                localStorage.setItem(CONNECTION_STORAGE_KEY, JSON.stringify(dailyConnections));
-                updateConnectionCounter();
-                
-                // Check if limit is reached
-                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
-                    showConnectionLimitAlert();
-                }
-            }
-            
-            // Function to show connection limit alert
-            function showConnectionLimitAlert() {
-                connectionLimitAlert.style.display = 'block';
-                setTimeout(() => {
-                    connectionLimitAlert.style.display = 'none';
-                    
-                    // If in new message panel, close it and show limit state
-                    if (!newMessagePanel.classList.contains('hidden')) {
-                        newMessagePanel.classList.add('slide-out');
-                        setTimeout(() => {
-                            newMessagePanel.classList.remove('slide-out');
-                            newMessagePanel.classList.add('hidden');
-                            showConnectionLimitState();
-                        }, 300);
-                    }
+                    toastNotification.style.opacity = 0;
                 }, 3000);
             }
             
-            // Function to show connection limit state
-            function showConnectionLimitState() {
-                messagesList.classList.add('hidden');
-                connectionsList.classList.add('hidden');
-                emptyState.classList.add('hidden');
-                noConnectionsState.classList.add('hidden');
-                connectionLimitState.classList.remove('hidden');
-            }
-            
-            // Function to set up online status simulation
-            function setupOnlineStatusSimulation() {
-                // Set initial random online states
-                registeredUsers.forEach(user => {
-                    userOnlineStates[user.id] = Math.random() > 0.6;
-                });
-                
-                // Update online states every 30 seconds
-                setInterval(() => {
-                    registeredUsers.forEach(user => {
-                        // 10% chance to change state
-                        if (Math.random() < 0.1) {
-                            userOnlineStates[user.id] = !userOnlineStates[user.id];
-                            
-                            // Update if this is the current chat user
-                            if (currentChatUserId === user.id) {
-                                updateChatUserStatus();
-                            }
-                        }
-                    });
-                    
-                    // Refresh conversations list to update online indicators
-                    if (!chatView.classList.contains('hidden')) {
-                        // Don't refresh if in chat view
-                        return;
-                    }
-                    
-                    if (conversationsTab.classList.contains('text-primary')) {
-                        displayConversations();
-                    } else {
-                        displayConnections();
-                    }
-                }, 30000);
-            }
-            
-            // Function to set up message polling
-            function setupMessagePolling() {
-                // Check for new messages every 5 seconds
-                messageCheckInterval = setInterval(() => {
-                    // In a real app this would connect to an API
-                    // For now we'll just simulate incoming messages
-                    
-                    // 3% chance of random message from a connection
-                    if (Math.random() < 0.03 && currentUser.connections && currentUser.connections.length > 0) {
-                        // Pick a random connection
-                        const randomConnection = currentUser.connections[Math.floor(Math.random() * currentUser.connections.length)];
-                        
-                        // Simulate a new message
-                        simulateIncomingMessage(randomConnection.id);
-                    }
-                }, 5000);
-            }
-            
-            // Function to simulate incoming message
-            function simulateIncomingMessage(userId) {
-                // Find user data
-                const user = findUserById(userId);
-                if (!user) return;
-                
-                // Find or create conversation
-                let conversation = conversations.find(convo => convo.userId == userId);
-                
-                if (!conversation) {
-                    // Create new conversation
-                    conversation = {
-                        userId: userId,
-                        messages: []
-                    };
-                    conversations.push(conversation);
-                }
-                
-                // Sample messages
-                const sampleMessages = [
-                    "Hi there! How are you doing?",
-                    "I saw your profile and thought we should connect.",
-                    "Are you available for a quick chat about the project?",
-                    "Just checking in to see how everything is going.",
-                    "Do you have time for a meeting tomorrow?",
-                    "I'd love to hear your thoughts on the new proposal.",
-                    "Have you seen the latest industry report?",
-                    "Thanks for connecting with me!",
-                    "Looking forward to working with you.",
-                    "Let me know when you're free to discuss the details."
-                ];
-                
-                // Pick a random message
-                const messageText = sampleMessages[Math.floor(Math.random() * sampleMessages.length)];
-                
-                // Create message object
-                const newMessage = {
-                    sender: userId,
-                    content: messageText,
-                    timestamp: Date.now(),
-                    read: currentChatUserId === userId // Read if we're in the chat
-                };
-                
-                // Add message to conversation
-                conversation.messages.push(newMessage);
-                
-                // Save conversations
-                saveConversations();
-                
-                // Update UI if needed
-                if (currentChatUserId === userId) {
-                    // Show typing indicator first
-                    showTypingIndicator();
-                    
-                    // Hide typing and show message after a delay
-                    setTimeout(() => {
-                        hideTypingIndicator();
-                        displayChatMessages(conversation);
-                    }, 1500);
-                } else {
-                    // Update conversations list if viewing conversations
-                    if (conversationsTab.classList.contains('text-primary') && !chatView.classList.contains('hidden')) {
-                        displayConversations();
-                    }
-                    
-                    // Show notification
-                    showToast(`New message from ${user.fullName}`);
-                }
-            }
-            
-            // Function to load conversations
-            function loadConversations() {
-                // Get conversations from localStorage
-                const storedConversations = JSON.parse(localStorage.getItem('userConversations_' + currentUser.id)) || [];
-                conversations = storedConversations;
-            }
-            
-            // Function to save conversations
-            function saveConversations() {
-                localStorage.setItem('userConversations_' + currentUser.id, JSON.stringify(conversations));
-            }
-            
-            // Function to load registered users
-            function loadUsers() {
-                // Use the ProConnectUsers utility to get all registered users
-                registeredUsers = ProConnectUsers.getAllUsers();
-            }
-            
-            // Function to display conversations
-            function displayConversations() {
-                // Check if connection limit is reached
-                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
-                    // Don't show connection limit state here, only show it when actively trying to create a new connection
-                    // Just update the counter
-                    updateConnectionCounter();
-                }
-                
-                // Hide connection list and no connection state
-                connectionsList.classList.add('hidden');
-                noConnectionsState.classList.add('hidden');
-                connectionLimitState.classList.add('hidden');
-                
-                // Filter conversations based on search term
-                const searchTerm = conversationSearch.value.toLowerCase();
-                
-                let filteredConversations = conversations;
-                
-                if (searchTerm) {
-                    filteredConversations = conversations.filter(convo => {
-                        const user = findUserById(convo.userId);
-                        return user && user.fullName.toLowerCase().includes(searchTerm);
-                    });
-                }
-                
-                // If no conversations, show empty state
-                if (filteredConversations.length === 0) {
-                    messagesList.classList.add('hidden');
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
-                
-                // Show messages list and hide empty state
-                messagesList.classList.remove('hidden');
-                emptyState.classList.add('hidden');
-                
-                // Sort conversations by latest message time
-                filteredConversations.sort((a, b) => {
-                    const aLatest = a.messages.length > 0 ? a.messages[a.messages.length - 1].timestamp : 0;
-                    const bLatest = b.messages.length > 0 ? b.messages[b.messages.length - 1].timestamp : 0;
-                    return bLatest - aLatest; // Newest first
-                });
-                
-                // Clear messages list
-                messagesList.innerHTML = '';
-                
-                // Add each conversation
-                filteredConversations.forEach(conversation => {
-                    const user = findUserById(conversation.userId);
-                    if (!user) return; // Skip if user not found
-                    
-                    // Determine latest message info
-                    let latestMessage = '';
-                    let latestTime = '';
-                    let unreadCount = 0;
-                    
-                    if (conversation.messages.length > 0) {
-                        const lastMsg = conversation.messages[conversation.messages.length - 1];
-                        
-                        // Skip system messages for display
-                        if (lastMsg.sender === 'system') {
-                            if (conversation.messages.length > 1) {
-                                const prevMsg = conversation.messages[conversation.messages.length - 2];
-                                latestMessage = prevMsg.content;
-                                // Format timestamp for the previous message
-                                latestTime = formatConversationTime(prevMsg.timestamp);
-                            } else {
-                                latestMessage = "New connection";
-                                latestTime = formatConversationTime(lastMsg.timestamp);
-                            }
-                        } else {
-                            latestMessage = lastMsg.content;
-                            // Format timestamp
-                            latestTime = formatConversationTime(lastMsg.timestamp);
-                        }
-                        
-                        // Count unread messages
-                        unreadCount = conversation.messages.filter(msg => !msg.read && msg.sender !== currentUser.id && msg.sender !== 'system').length;
-                    }
-                    
-                    // Create conversation item
-                    const item = document.createElement('div');
-                    item.className = 'bg-lightSecondary p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
-                    item.dataset.userId = conversation.userId;
-                    
-                    // User online status
-                    const isOnline = userOnlineStates[user.id] || false;
-                    
-                    item.innerHTML = `
-                        <div class="flex items-center">
-                            <div class="relative mr-3">
-                                <img src="${user.profileImage}" class="w-12 h-12 rounded-full object-cover" alt="Profile photo">
-                                ${isOnline ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>' : ''}
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <h3 class="font-medium">${user.fullName}</h3>
-                                    <span class="text-xs text-textLight">${latestTime}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <p class="text-sm text-textMedium truncate max-w-[180px]">${latestMessage || 'Start a conversation'}</p>
-                                    ${unreadCount > 0 ? `<span class="bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center ml-2">${unreadCount}</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    messagesList.appendChild(item);
-                    
-                    // Add click handler
-                    item.addEventListener('click', function() {
-                        openChat(conversation.userId);
-                    });
-                });
-            }
-            
-            // Function to display connections
-            function displayConnections() {
-                // Hide messages list and empty state
-                messagesList.classList.add('hidden');
-                emptyState.classList.add('hidden');
-                connectionLimitState.classList.add('hidden');
-                
-                // Show connections list
-                connectionsList.classList.remove('hidden');
-                
-                // Get user connections
-                const connections = currentUser.connections || [];
-                
-                // If no connections, show no connections state
-                if (connections.length === 0) {
-                    connectionsList.classList.add('hidden');
-                    noConnectionsState.classList.remove('hidden');
-                    return;
-                }
-                
-                // Hide no connections state
-                noConnectionsState.classList.add('hidden');
-                
-                // Filter connections based on search term
-                const searchTerm = conversationSearch.value.toLowerCase();
-                
-                let filteredConnections = connections;
-                
-                if (searchTerm) {
-                    filteredConnections = connections.filter(conn => 
-                        conn.name.toLowerCase().includes(searchTerm)
-                    );
-                }
-                
-                // Clear connections list
-                connectionsList.innerHTML = '';
-                
-                // Add each connection
-                filteredConnections.forEach(connection => {
-                    // Get full user data if available
-                    const fullUserData = findUserById(connection.id) || {
-                        id: connection.id,
-                        fullName: connection.name,
-                        profileImage: connection.profileImage,
-                        currentRole: connection.title || '',
-                        company: connection.company || ''
-                    };
-                    
-                    // Check if we have a conversation with this user
-                    const hasConversation = conversations.some(convo => convo.userId == connection.id);
-                    
-                    // User online status
-                    const isOnline = userOnlineStates[connection.id] || false;
-                    
-                    // Create connection item
-                    const item = document.createElement('div');
-                    item.className = 'flex items-center bg-lightSecondary p-3 rounded-lg';
-                    
-                    item.innerHTML = `
-                        <div class="relative mr-3">
-                            <img src="${fullUserData.profileImage}" class="w-12 h-12 rounded-full object-cover" alt="Profile photo">
-                            ${isOnline ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>' : ''}
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-medium">${fullUserData.fullName}</h3>
-                            <p class="text-sm text-textMedium">${fullUserData.currentRole}${fullUserData.company ? ' at ' + fullUserData.company : ''}</p>
-                        </div>
-                        <button class="message-btn ml-2 bg-primary text-white px-3 py-1 rounded-lg text-sm">
-                            ${hasConversation ? 'Message' : 'Start Chat'}
-                        </button>
-                    `;
-                    
-                    connectionsList.appendChild(item);
-                    
-                    // Add click handler to message button
-                    item.querySelector('.message-btn').addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        openChat(connection.id);
-                    });
-                });
-            }
-            
-            // Function to format conversation time
-            function formatConversationTime(timestamp) {
-                const msgDate = new Date(timestamp);
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-                
-                if (msgDate.toDateString() === today.toDateString()) {
-                    // Today - show time
-                    return msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                } else if (msgDate.toDateString() === yesterday.toDateString()) {
-                    // Yesterday
-                    return 'Yesterday';
-                } else {
-                    // Earlier - show date
-                    return msgDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                }
-            }
-            
-            // Function to find user by ID
-            function findUserById(userId) {
-                return registeredUsers.find(user => user.id == userId);
-            }
-            
-            // Function to open chat with a specific user
-            function openChat(userId) {
-                // Find user
-                const user = findUserById(userId);
-                if (!user) return;
-                
-                // Find or create conversation
-                let conversation = conversations.find(convo => convo.userId == userId);
-                
-                if (!conversation) {
-                    // Create new conversation
-                    conversation = {
-                        userId: userId,
-                        messages: [{
-                            sender: 'system',
-                            content: `You are now connected with ${user.fullName}! Say hello to start the conversation.`,
-                            timestamp: Date.now(),
-                            read: true
-                        }]
-                    };
-                    conversations.push(conversation);
-                    saveConversations();
-                    
-                    // If this user is not in connections, add them
-                    if (!currentUser.connections) {
-                        currentUser.connections = [];
-                    }
-                    
-                    if (!currentUser.connections.some(conn => conn.id === userId)) {
-                        currentUser.connections.push({
-                            id: userId,
-                            name: user.fullName,
-                            profileImage: user.profileImage,
-                            timestamp: Date.now()
-                        });
-                        
-                        // Save updated user data
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    }
-                }
-                
-                // Set current chat user
-                currentChatUserId = userId;
-                
-                // Update chat header with user info
-                updateChatUserInfo(user);
-                
-                // Mark all messages as read
-                conversation.messages.forEach(msg => {
-                    if (msg.sender !== currentUser.id) {
-                        msg.read = true;
-                    }
-                });
-                saveConversations();
-                
-                // Display messages
-                displayChatMessages(conversation);
-                
-                // Show chat view
-                chatView.classList.remove('hidden');
-                
-                // Focus on message input
-                setTimeout(() => {
-                    messageInput.focus();
-                }, 300);
-            }
-            
-            // Function to update chat user info in header
-            function updateChatUserInfo(user) {
-                document.getElementById('chatUserName').textContent = user.fullName;
-                updateChatUserStatus();
-                document.getElementById('chatUserImage').src = user.profileImage;
-            }
-            
-            // Function to update chat user status
-            function updateChatUserStatus() {
-                const isOnline = userOnlineStates[currentChatUserId] || false;
-                const statusDot = document.getElementById('chatUserStatusDot');
-                const statusText = document.getElementById('chatUserStatus');
-                
-                if (isOnline) {
-                    statusDot.className = 'status-dot status-online';
-                    statusText.textContent = 'Online';
-                } else {
-                    statusDot.className = 'status-dot status-offline';
-                    statusText.textContent = 'Offline';
-                }
-            }
-            
-            // Function to display chat messages
-            function displayChatMessages(conversation) {
-                const messagesContainer = document.getElementById('chatMessages');
-                messagesContainer.innerHTML = '';
-                
-                // Group messages by date
-                let currentDate = null;
-                
-                conversation.messages.forEach(message => {
-                    const msgDate = new Date(message.timestamp);
-                    const msgDateStr = msgDate.toDateString();
-                    
-                    // Add date separator if needed
-                    if (msgDateStr !== currentDate) {
-                        currentDate = msgDateStr;
-                        
-                        const today = new Date();
-                        const yesterday = new Date(today);
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        
-                        let dateLabel;
-                        
-                        if (msgDateStr === today.toDateString()) {
-                            dateLabel = 'Today';
-                        } else if (msgDateStr === yesterday.toDateString()) {
-                            dateLabel = 'Yesterday';
-                        } else {
-                            dateLabel = msgDate.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-                        }
-                        
-                        const dateSeparator = document.createElement('div');
-                        dateSeparator.className = 'flex justify-center my-4';
-                        dateSeparator.innerHTML = `
-                            <span class="text-xs text-textLight bg-lightBg px-3 py-1 rounded-full">${dateLabel}</span>
-                        `;
-                        messagesContainer.appendChild(dateSeparator);
-                    }
-                    
-                    // Handle system messages differently
-                    if (message.sender === 'system') {
-                        const systemMessageElement = document.createElement('div');
-                        systemMessageElement.className = 'flex justify-center my-4 message-fade-in';
-                        systemMessageElement.innerHTML = `
-                            <div class="bg-primary/5 px-4 py-2 rounded-lg">
-                                <p class="text-sm text-textMedium text-center">${message.content}</p>
-                            </div>
-                        `;
-                        messagesContainer.appendChild(systemMessageElement);
-                        return;
-                    }
-                    
-                    // Add message
-                    const messageElement = document.createElement('div');
-                    
-                    if (message.sender === currentUser.id) {
-                        // Sent message
-                        messageElement.className = 'flex justify-end message-fade-in';
-                        messageElement.innerHTML = `
-                            <div class="max-w-[80%] relative group">
-                                <div class="bg-primary text-white p-3 chat-bubble-sent">
-                                    <p class="text-sm">${message.content}</p>
-                                </div>
-                                <div class="flex justify-end items-center mt-1">
-                                    <span class="text-xs text-textLight mr-1">${formatMessageTime(message.timestamp)}</span>
-                                    <i class="fas fa-check text-xs ${message.read ? 'text-success' : 'text-textLight'}"></i>
-                                </div>
-                                <div class="reaction-popup">
-                                    <span class="reaction-btn">👍</span>
-                                    <span class="reaction-btn">❤️</span>
-                                    <span class="reaction-btn">😂</span>
-                                    <span class="reaction-btn">😮</span>
-                                    <span class="reaction-btn">😢</span>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // Received message
-                        const user = findUserById(message.sender);
-                        messageElement.className = 'flex items-end message-fade-in';
-                        messageElement.innerHTML = `
-                            <img src="${user?.profileImage}" class="w-8 h-8 rounded-full object-cover mr-2" alt="Profile photo">
-                            <div class="max-w-[80%] relative group">
-                                <div class="bg-lightSecondary p-3 chat-bubble-received">
-                                    <p class="text-sm">${message.content}</p>
-                                </div>
-                                <span class="text-xs text-textLight ml-2">${formatMessageTime(message.timestamp)}</span>
-                                <div class="reaction-popup">
-                                    <span class="reaction-btn">👍</span>
-                                    <span class="reaction-btn">❤️</span>
-                                    <span class="reaction-btn">😂</span>
-                                    <span class="reaction-btn">😮</span>
-                                    <span class="reaction-btn">😢</span>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    // Set up long press for reactions
-                    const messageBubble = messageElement.querySelector(message.sender === currentUser.id ? '.chat-bubble-sent' : '.chat-bubble-received');
-                    const reactionPopup = messageElement.querySelector('.reaction-popup');
-                    
-                    // Long press for mobile
-                    let pressTimer;
-                    
-                    messageBubble.addEventListener('touchstart', function() {
-                        pressTimer = setTimeout(function() {
-                            reactionPopup.classList.add('show');
-                        }, 500);
-                    });
-                    
-                    messageBubble.addEventListener('touchend', function() {
-                        clearTimeout(pressTimer);
-                    });
-                    
-                    // Right click for desktop
-                    messageBubble.addEventListener('contextmenu', function(e) {
-                        e.preventDefault();
-                        reactionPopup.classList.add('show');
-                    });
-                    
-                    // Add reaction click handlers
-                    const reactionButtons = messageElement.querySelectorAll('.reaction-btn');
-                    reactionButtons.forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            // In a real app, this would send the reaction to the backend
-                            showToast(`Reaction ${this.textContent} sent`);
-                            reactionPopup.classList.remove('show');
-                        });
-                    });
-                    
-                    // Hide reaction popup when clicking elsewhere
-                    document.addEventListener('click', function(e) {
-                        if (!e.target.closest('.reaction-popup') && !e.target.closest('.chat-bubble-sent') && !e.target.closest('.chat-bubble-received')) {
-                            reactionPopup.classList.remove('show');
-                        }
-                    });
-                    
-                    // Add message to container
-                    messagesContainer.appendChild(messageElement);
-                });
-                
-                // Scroll to bottom
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-            
-            // Function to format message time
-            function formatMessageTime(timestamp) {
-                const date = new Date(timestamp);
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-            
-            // Function to show typing indicator
-            function showTypingIndicator() {
-                typingIndicator.classList.remove('hidden');
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-            
-            // Function to hide typing indicator
-            function hideTypingIndicator() {
-                typingIndicator.classList.add('hidden');
-            }
-            
-            // Function to send a message
+            // Send a message
             function sendMessage() {
                 const messageText = messageInput.value.trim();
+                if (!messageText) return;
                 
-                if (!messageText || !currentChatUserId) return;
+                // Create message element
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message-bubble message-sent message-appear';
                 
-                // Find conversation
-                const conversation = conversations.find(convo => convo.userId == currentChatUserId);
-                if (!conversation) return;
+                // Add message content
+                const messageContent = document.createElement('p');
+                messageContent.textContent = messageText;
+                messageElement.appendChild(messageContent);
                 
-                // Create message object
-                const newMessage = {
-                    sender: currentUser.id,
-                    content: messageText,
-                    timestamp: Date.now(),
-                    read: false
-                };
+                // Add message status
+                const messageStatus = document.createElement('div');
+                messageStatus.className = 'message-status';
+                messageStatus.textContent = 'Delivered • ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messageElement.appendChild(messageStatus);
                 
-                // Add message to conversation
-                conversation.messages.push(newMessage);
-                
-                // Save conversations
-                saveConversations();
+                // Add to messages container
+                messagesContainer.appendChild(messageElement);
                 
                 // Clear input
                 messageInput.value = '';
                 
-                // Enable/disable send button
-                sendMessageBtn.disabled = true;
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 
-                // Update display
-                displayChatMessages(conversation);
+                // Remove typing indicator if exists
+                const typingIndicator = document.querySelector('.typing-indicator');
+                if (typingIndicator) {
+                    setTimeout(() => {
+                        typingIndicator.remove();
+                    }, 500);
+                }
                 
-                // Show typing indicator after a short delay to simulate the other user typing
+                // Simulate response after a delay (for demo purposes)
                 setTimeout(() => {
-                    // Random chance (70%) of response for demonstration
-                    if (Math.random() < 0.7) {
-                        showTypingIndicator();
+                    // Add typing indicator
+                    const typingElement = document.createElement('div');
+                    typingElement.className = 'typing-indicator message-bubble message-received py-3 px-4 message-appear';
+                    
+                    const dot1 = document.createElement('div');
+                    dot1.className = 'typing-dot';
+                    const dot2 = document.createElement('div');
+                    dot2.className = 'typing-dot';
+                    const dot3 = document.createElement('div');
+                    dot3.className = 'typing-dot';
+                    
+                    typingElement.appendChild(dot1);
+                    typingElement.appendChild(dot2);
+                    typingElement.appendChild(dot3);
+                    
+                    messagesContainer.appendChild(typingElement);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // After some time, show the response
+                    setTimeout(() => {
+                        // Remove typing indicator
+                        typingElement.remove();
                         
-                        // Generate response after a realistic delay
-                        setTimeout(() => {
-                            hideTypingIndicator();
-                            simulateResponse(conversation);
-                        }, 1000 + Math.random() * 3000);
-                    }
-                }, 500);
-            }
-            
-            // Function to simulate response
-            function simulateResponse(conversation) {
-                // Sample responses
-                const responses = [
-                    "That's interesting, tell me more!",
-                    "I agree with your perspective.",
-                    "Thanks for sharing that information!",
-                    "Good point, I hadn't thought of it that way.",
-                    "I'd love to discuss this further sometime.",
-                    "That aligns with my experience as well.",
-                    "What made you interested in this topic?",
-                    "I appreciate your insights!",
-                    "Let's schedule a call to discuss further.",
-                    "Do you have any resources on this subject you could share?"
-                ];
-                
-                // Context-aware responses
-                const lastMessage = conversation.messages[conversation.messages.length - 1].content.toLowerCase();
-                
-                let responseOptions = [...responses];
-                
-                // Add context-specific responses based on last message
-                if (lastMessage.includes('hello') || lastMessage.includes('hi ') || lastMessage.includes('hey')) {
-                    responseOptions.unshift("Hello! How are you doing today?", "Hi there! Nice to hear from you.", "Hey! What's up?");
-                } else if (lastMessage.includes('thank')) {
-                    responseOptions.unshift("You're welcome!", "Happy to help!", "Anytime!");
-                } else if (lastMessage.includes('?')) {
-                    responseOptions.unshift("That's a good question.", "Let me think about that.", "Interesting question!");
-                } else if (lastMessage.length < 10) {
-                    responseOptions.unshift("Tell me more about that.", "Could you elaborate?", "I'd love to hear more details.");
-                }
-                
-                // Select response, with priority for context-specific ones
-                const responseText = responseOptions[Math.floor(Math.random() * Math.min(5, responseOptions.length))];
-                
-                // Create message object
-                const responseMessage = {
-                    sender: conversation.userId,
-                    content: responseText,
-                    timestamp: Date.now(),
-                    read: true // Mark as read since we're already in the chat
-                };
-                
-                // Add message to conversation
-                conversation.messages.push(responseMessage);
-                
-                // Save conversations
-                saveConversations();
-                
-                // Update display
-                displayChatMessages(conversation);
-            }
-            
-            // Function to search for users
-            function searchUsers() {
-                const searchTerm = userSearchInput.value.toLowerCase();
-                
-                // Clear previous results
-                userSearchResults.innerHTML = '';
-                
-                if (!searchTerm) {
-                    userSearchResults.innerHTML = `
-                        <div class="text-center text-textMedium py-10">
-                            Search for users to start a conversation
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Get all users
-                const allUsers = ProConnectUsers.searchUsers(searchTerm);
-                
-                if (allUsers.length === 0) {
-                    userSearchResults.innerHTML = `
-                        <div class="text-center text-textMedium py-10">
-                            No users found matching "${searchTerm}"
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Create results
-                allUsers.forEach(user => {
-                    // Check if connection already exists
-                    const isExistingConnection = currentUser.connections && currentUser.connections.some(conn => conn.id == user.id);
-                    // Check if conversation already exists
-                    const existingConvo = conversations.find(c => c.userId == user.id);
-                    
-                    // For non-connections, check if limit is reached
-                    const connectionLimitReached = dailyConnections.count >= DAILY_CONNECTION_LIMIT && !isExistingConnection;
-                    
-                    const userItem = document.createElement('div');
-                    userItem.className = `user-list-item flex items-center p-3 rounded-lg ${connectionLimitReached ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-primary/5'} transition`;
-                    
-                    const isOnline = userOnlineStates[user.id] || false;
-                    
-                    userItem.innerHTML = `
-                        <div class="relative mr-3">
-                            <img src="${user.profileImage}" class="w-12 h-12 rounded-full object-cover" alt="Profile photo">
-                            ${isOnline ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>' : ''}
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-medium">${user.fullName}</h3>
-                            <p class="text-sm text-textMedium">${user.currentRole || ''}${user.company ? ' at ' + user.company : ''}</p>
-                        </div>
-                        ${connectionLimitReached ? 
-                            '<span class="text-danger text-sm">Limit Reached</span>' : 
-                            (existingConvo ? 
-                                '<span class="text-primary text-sm">Message</span>' : 
-                                (isExistingConnection ? 
-                                    '<span class="text-primary text-sm">Connect</span>' : 
-                                    '<span class="text-textLight text-sm">Add Connection</span>'
-                                )
-                            )
+                        // Create response message
+                        let responseText = 'Thanks for your message! Let me think about that and get back to you.';
+                        
+                        if (messageText.toLowerCase().includes('project')) {
+                            responseText = 'The project is for a new mobile app focused on wellness. We need someone with experience in product management to help define the roadmap and features.';
+                        } else if (messageText.toLowerCase().includes('call') || messageText.toLowerCase().includes('meet')) {
+                            responseText = 'Sure, I can do a call tomorrow afternoon around 2pm. Does that work for you?';
+                        } else if (messageText.toLowerCase().includes('hello') || messageText.toLowerCase().includes('hi')) {
+                            responseText = 'Hello! How are you doing today?';
                         }
-                    `;
-                    
-                    userSearchResults.appendChild(userItem);
-                    
-                    // Add click handler if not at limit
-                    if (!connectionLimitReached) {
-                        userItem.addEventListener('click', function() {
-                            startNewConversation(user.id);
-                        });
+                        
+                        const responseElement = document.createElement('div');
+                        responseElement.className = 'message-bubble message-received message-appear';
+                        
+                        const responseContent = document.createElement('p');
+                        responseContent.textContent = responseText;
+                        responseElement.appendChild(responseContent);
+                        
+                        messagesContainer.appendChild(responseElement);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 1500);
+                }, 1000);
+            }
+            
+            // Change active contact
+            function setActiveContact(contactId) {
+                // Update contact items
+                contactItems.forEach(item => {
+                    if (item.getAttribute('data-contact') === contactId) {
+                        item.classList.add('active');
                     } else {
-                        // Show limit message on click
-                        userItem.addEventListener('click', function() {
-                            showConnectionLimitAlert();
-                        });
+                        item.classList.remove('active');
                     }
                 });
-            }
-            
-            // Function to start a new conversation
-            function startNewConversation(userId) {
-                // Check if this is a new connection
-                let isNewConnection = false;
                 
-                if (currentUser.connections) {
-                    isNewConnection = !currentUser.connections.some(conn => conn.id == userId);
-                } else {
-                    currentUser.connections = [];
-                    isNewConnection = true;
-                }
-                
-                // Check if we've reached the daily connection limit
-                if (isNewConnection && dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
-                    showConnectionLimitAlert();
-                    return;
-                }
-                
-                // If new connection, add it and increment counter
-                if (isNewConnection) {
-                    const user = findUserById(userId);
-                    if (user) {
-                        currentUser.connections.push({
-                            id: userId,
-                            name: user.fullName,
-                            timestamp: Date.now(),
-                            profileImage: user.profileImage
-                        });
-                        
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        
-                        // Increment the connection counter
-                        incrementConnectionCounter();
-                        
-                        // Show toast
-                        showToast(`Connected with ${user.fullName}`);
+                // Update mobile contact items
+                mobileContactItems.forEach(item => {
+                    if (item.getAttribute('data-contact') === contactId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
                     }
+                });
+                
+                // Update chat header
+                const contact = contacts[contactId];
+                document.getElementById('currentChatImage').src = contact.image;
+                document.getElementById('currentChatName').textContent = contact.name;
+                document.getElementById('currentChatStatus').textContent = contact.status;
+                document.getElementById('currentChatStatus').className = `text-xs ${contact.statusClass}`;
+                
+                // Close mobile sidebar
+                mobileContactsSidebar.classList.add('hidden');
+                
+                // Scroll to bottom of messages
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Remove unread indicator if any
+                const unreadIndicator = document.querySelector(`[data-contact="${contactId}"] .unread-indicator`);
+                if (unreadIndicator) {
+                    unreadIndicator.remove();
                 }
                 
-                // Close new message panel
-                newMessagePanel.classList.add('slide-out');
-                
-                setTimeout(() => {
-                    newMessagePanel.classList.remove('slide-out');
-                    newMessagePanel.classList.add('hidden');
-                    
-                    // Open chat with the selected user
-                    openChat(userId);
-                }, 300);
-            }
-            
-            // Function to show toast notification
-            function showToast(message) {
-                toastNotification.textContent = message;
-                toastNotification.classList.add('opacity-100');
-                
-                setTimeout(() => {
-                    toastNotification.classList.remove('opacity-100');
-                }, 3000);
-            }
-            
-            // Function to clear chat history
-            function clearChat() {
-                if (!currentChatUserId) return;
-                
-                // Find conversation
-                const conversationIndex = conversations.findIndex(convo => convo.userId == currentChatUserId);
-                if (conversationIndex === -1) return;
-                
-                // Confirm with user (in a real app, use a custom dialog instead of native confirm)
-                if (confirm("Are you sure you want to clear all messages in this chat?")) {
-                    // Keep the conversation but clear messages
-                    conversations[conversationIndex].messages = [{
-                        sender: 'system',
-                        content: 'Chat history cleared',
-                        timestamp: Date.now(),
-                        read: true
-                    }];
-                    
-                    // Save conversations
-                    saveConversations();
-                    
-                    // Update display
-                    displayChatMessages(conversations[conversationIndex]);
-                    
-                    // Hide dropdown
-                    chatOptionsDropdown.classList.add('hidden');
-                    
-                    // Show toast
-                    showToast('Chat history cleared');
-                }
+                // Focus message input
+                messageInput.focus();
             }
             
             // Event Listeners
             
-            // Tab switching
-            conversationsTab.addEventListener('click', function() {
-                conversationsTab.classList.add('text-primary', 'border-primary');
-                conversationsTab.classList.remove('text-textMedium', 'border-transparent');
-                connectionsTab.classList.add('text-textMedium', 'border-transparent');
-                connectionsTab.classList.remove('text-primary', 'border-primary');
-                
-                connectionsList.classList.add('hidden');
-                noConnectionsState.classList.add('hidden');
-                connectionLimitState.classList.add('hidden');
-                
-                // Show conversations
-                displayConversations();
-            });
-            
-            connectionsTab.addEventListener('click', function() {
-                connectionsTab.classList.add('text-primary', 'border-primary');
-                connectionsTab.classList.remove('text-textMedium', 'border-transparent');
-                conversationsTab.classList.add('text-textMedium', 'border-transparent');
-                conversationsTab.classList.remove('text-primary', 'border-primary');
-                
-                messagesList.classList.add('hidden');
-                emptyState.classList.add('hidden');
-                connectionLimitState.classList.add('hidden');
-                
-                // Show connections
-                displayConnections();
-            });
-            
-            // New message button
-            newMessageBtn.addEventListener('click', function() {
-                // Check if connection limit is reached for new connections only
-                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
-                    // Still allow viewing existing connections
-                    showConnectionLimitState();
-                    return;
-                }
-                
-                newMessagePanel.classList.remove('hidden');
-                newMessagePanel.classList.add('slide-in');
-                userSearchInput.value = '';
-                updateConnectionCounter();
-                searchUsers();
-                userSearchInput.focus();
-            });
-            
-            // Start conversation button (from empty state)
-            startConversationBtn.addEventListener('click', function() {
-                // Check connection limit before showing new message panel
-                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
-                    showConnectionLimitState();
-                    return;
-                }
-                
-                newMessageBtn.click();
-            });
-            
-            // Close new message panel
-            closeNewMessageBtn.addEventListener('click', function() {
-                newMessagePanel.classList.add('slide-out');
-                
-                setTimeout(() => {
-                    newMessagePanel.classList.remove('slide-out');
-                    newMessagePanel.classList.add('hidden');
-                }, 300);
-            });
-            
-            // Back to chats button
-            backToChats.addEventListener('click', function() {
-                chatView.classList.add('hidden');
-                currentChatUserId = null;
-                chatOptionsDropdown.classList.add('hidden');
-                attachmentMenu.classList.add('hidden');
-                
-                // Cancel message checking interval
-                clearInterval(messageCheckInterval);
-                
-                // Reset message input
-                messageInput.value = '';
-                sendMessageBtn.disabled = true;
-                
-                // Refresh conversations list
-                if (conversationsTab.classList.contains('text-primary')) {
-                    displayConversations();
-                } else {
-                    displayConnections();
-                }
-                
-                // Restart message polling
-                setupMessagePolling();
-            });
-            
-            // View existing connections button
-            viewExistingConnectionsBtn.addEventListener('click', function() {
-                connectionLimitState.classList.add('hidden');
-                connectionsTab.click();
-            });
-            
-            // Close alert button
-            closeAlertBtn.addEventListener('click', function() {
-                connectionLimitAlert.style.display = 'none';
-            });
-            
             // Send message button
-            sendMessageBtn.addEventListener('click', function() {
-                if (!sendMessageBtn.disabled) {
-                    sendMessage();
-                }
-            });
+            sendMessageBtn.addEventListener('click', sendMessage);
             
-            // Message input changes
-            messageInput.addEventListener('input', function() {
-                // Enable/disable send button based on content
-                sendMessageBtn.disabled = !this.value.trim();
-                
-                // Simulate typing indicator for the other user
-                if (this.value.trim() && !isTyping) {
-                    isTyping = true;
-                    
-                    // Clear previous timeout
-                    clearTimeout(typingTimeout);
-                    
-                    // Set timeout to stop "typing" after 2 seconds of inactivity
-                    typingTimeout = setTimeout(() => {
-                        isTyping = false;
-                    }, 2000);
-                }
-            });
-            
-            // Send message on Enter key
+            // Enter key in message input
             messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey && !sendMessageBtn.disabled) {
+                if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
             });
             
-            // User search input
-            userSearchInput.addEventListener('input', function() {
-                searchUsers();
-            });
-            
-            // Conversation search input
-            conversationSearch.addEventListener('input', function() {
-                if (conversationsTab.classList.contains('text-primary')) {
-                    displayConversations();
+            // Auto resize textarea
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+                if (this.scrollHeight > 150) {
+                    this.style.overflowY = 'auto';
                 } else {
-                    displayConnections();
+                    this.style.overflowY = 'hidden';
                 }
             });
             
-            // View profile button
-            viewProfileBtn.addEventListener('click', function() {
-                if (currentChatUserId) {
-                    // Store the user ID for viewing
-                    localStorage.setItem('viewProfileId', currentChatUserId);
-                    
-                    // Redirect to user profile page
-                    window.location.href = `profile.html?view=${currentChatUserId}`;
+            // Show mobile contacts sidebar
+            showContactsBtn.addEventListener('click', function() {
+                mobileContactsSidebar.classList.remove('hidden');
+            });
+            
+            // Close mobile contacts sidebar
+            closeContactsBtn.addEventListener('click', function() {
+                mobileContactsSidebar.classList.add('hidden');
+            });
+            
+            // Contact click handler
+            contactItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const contactId = this.getAttribute('data-contact');
+                    setActiveContact(contactId);
+                });
+            });
+            
+            // Mobile contact click handler
+            mobileContactItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const contactId = this.getAttribute('data-contact');
+                    setActiveContact(contactId);
+                });
+            });
+            
+            // New message button
+            newMessageBtn.addEventListener('click', function() {
+                newMessageModal.classList.remove('hidden');
+            });
+            
+            // Mobile new message button
+            mobileNewMessageBtn.addEventListener('click', function() {
+                mobileContactsSidebar.classList.add('hidden');
+                newMessageModal.classList.remove('hidden');
+            });
+            
+            // Close new message modal
+            closeNewMessageBtn.addEventListener('click', function() {
+                newMessageModal.classList.add('hidden');
+            });
+            
+            // Contact options in new message modal
+            contactOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const name = this.querySelector('h4').textContent;
+                    newMessageModal.classList.add('hidden');
+                    showToast(`New chat started with ${name}`);
+                });
+            });
+            
+            // Send new message button
+            sendNewMessageBtn.addEventListener('click', function() {
+                newMessageModal.classList.add('hidden');
+                showToast('Chat started');
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === mobileContactsSidebar) {
+                    mobileContactsSidebar.classList.add('hidden');
+                }
+                if (e.target === newMessageModal) {
+                    newMessageModal.classList.add('hidden');
                 }
             });
             
-            // Chat options menu
-            chatOptionsBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                chatOptionsDropdown.classList.toggle('hidden');
-                attachmentMenu.classList.add('hidden'); // Hide attachment menu if open
-            });
-            
-            // Clear chat button
-            clearChatBtn.addEventListener('click', clearChat);
-            
-            // Block user button
-            blockUserBtn.addEventListener('click', function() {
-                if (!currentChatUserId) return;
-                
-                // Find user
-                const user = findUserById(currentChatUserId);
-                if (!user) return;
-                
-                // Confirm with user
-                if (confirm(`Are you sure you want to block ${user.fullName}?`)) {
-                    // In a real app, this would update a blocked users list
-                    showToast(`${user.fullName} has been blocked`);
-                    
-                    // Hide dropdown
-                    chatOptionsDropdown.classList.add('hidden');
-                    
-                    // Go back to chats
-                    backToChats.click();
-                }
-            });
-            
-            // Mute notifications button
-            muteNotificationsBtn.addEventListener('click', function() {
-                if (!currentChatUserId) return;
-                
-                // Find user
-                const user = findUserById(currentChatUserId);
-                if (!user) return;
-                
-                // In a real app, this would update notification settings
-                showToast(`Notifications muted for ${user.fullName}`);
-                
-                // Hide dropdown
-                chatOptionsDropdown.classList.add('hidden');
-                
-                // Update button text
-                this.innerHTML = '<i class="fas fa-bell mr-2"></i> Unmute Notifications';
-            });
-            
-            // Attachment button
-            attachmentBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                attachmentMenu.classList.toggle('hidden');
-                chatOptionsDropdown.classList.add('hidden'); // Hide chat options if open
-            });
-            
-            // Hide menus when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('#chatOptionsBtn') && !e.target.closest('#chatOptionsDropdown')) {
-                    chatOptionsDropdown.classList.add('hidden');
-                }
-                
-                if (!e.target.closest('#attachmentBtn') && !e.target.closest('#attachmentMenu')) {
-                    attachmentMenu.classList.add('hidden');
-                }
-            });
+            // Initialize
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         });
     </script>
 </body>
