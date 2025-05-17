@@ -191,6 +191,37 @@
             animation: shimmer 2s infinite linear;
         }
         
+        /* Connection limit alert */
+        .connection-limit-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        /* Progress bar */
+        .connection-progress {
+            height: 6px;
+            border-radius: 3px;
+            background-color: #E9ECEF;
+            margin-bottom: 1rem;
+        }
+        
+        .connection-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            background-color: #0078D4;
+            transition: width 0.3s ease;
+        }
+        
         /* Dark mode overrides */
         .dark .bg-white {
             background-color: #1E1E1E;
@@ -249,6 +280,17 @@
             <div class="flex border-b mb-4">
                 <button id="conversationsTab" class="text-primary border-b-2 border-primary pb-2 px-4 font-medium">Conversations</button>
                 <button id="connectionsTab" class="text-textMedium pb-2 px-4 font-medium">Connections</button>
+            </div>
+
+            <!-- Connection Counter -->
+            <div id="connectionCounter" class="mb-4">
+                <div class="flex justify-between mb-1">
+                    <span class="text-xs text-textMedium">Today's Connections</span>
+                    <span id="connectionCount" class="text-xs text-textMedium">0/10</span>
+                </div>
+                <div class="connection-progress">
+                    <div id="connectionProgressBar" class="connection-progress-bar" style="width: 0%"></div>
+                </div>
             </div>
 
             <!-- Search Box -->
@@ -343,6 +385,18 @@
                 <a href="search.html" class="bg-primary text-white px-6 py-2 rounded-lg flex items-center">
                     <i class="fas fa-search mr-2"></i> Find Connections
                 </a>
+            </div>
+
+            <!-- Connection Limit Reached State -->
+            <div id="connectionLimitState" class="hidden flex flex-col items-center justify-center py-8">
+                <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-clock text-accent text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Daily Connection Limit Reached</h3>
+                <p class="text-textMedium mb-4 text-center">You've used all 10 connections for today. Come back tomorrow for more networking!</p>
+                <button id="viewExistingConnectionsBtn" class="bg-primary text-white px-6 py-2 rounded-lg">
+                    View Existing Connections
+                </button>
             </div>
 
             <!-- Messages List (Shown only if authenticated and has messages) -->
@@ -450,6 +504,9 @@
                         <i class="fas fa-arrow-left text-xl"></i>
                     </button>
                     <h3 class="font-medium">New Message</h3>
+                    <div class="ml-auto">
+                        <span id="newMessageConnectionCount" class="text-xs text-textMedium">Connections: 0/10</span>
+                    </div>
                 </div>
                 
                 <!-- Search Users -->
@@ -470,6 +527,14 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Connection Limit Alert -->
+        <div id="connectionLimitAlert" class="connection-limit-alert">
+            <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+            <h3 class="text-lg font-bold mb-2">Connection Limit Reached</h3>
+            <p class="mb-4">You've used all your connections for today. Come back tomorrow for more networking!</p>
+            <button id="closeAlertBtn" class="bg-white text-black px-4 py-2 rounded-lg">Got it</button>
         </div>
 
         <!-- Toast Notification -->
@@ -639,6 +704,12 @@
             const emptyState = document.getElementById('emptyState');
             const loadingState = document.getElementById('loadingState');
             const noConnectionsState = document.getElementById('noConnectionsState');
+            const connectionLimitState = document.getElementById('connectionLimitState');
+            const connectionCount = document.getElementById('connectionCount');
+            const connectionProgressBar = document.getElementById('connectionProgressBar');
+            const newMessageConnectionCount = document.getElementById('newMessageConnectionCount');
+            const connectionLimitAlert = document.getElementById('connectionLimitAlert');
+            const closeAlertBtn = document.getElementById('closeAlertBtn');
             const chatView = document.getElementById('chatView');
             const newMessagePanel = document.getElementById('newMessagePanel');
             const newMessageBtn = document.getElementById('newMessageBtn');
@@ -662,6 +733,12 @@
             const attachmentBtn = document.getElementById('attachmentBtn');
             const attachmentMenu = document.getElementById('attachmentMenu');
             const toastNotification = document.getElementById('toastNotification');
+            const viewExistingConnectionsBtn = document.getElementById('viewExistingConnectionsBtn');
+            const connectionCounter = document.getElementById('connectionCounter');
+            
+            // Constants
+            const DAILY_CONNECTION_LIMIT = 10;
+            const CONNECTION_STORAGE_KEY = 'proconnect_daily_connections';
             
             // Current state
             let currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -673,6 +750,7 @@
             let typingTimeout;
             let messageCheckInterval;
             let userOnlineStates = {};
+            let dailyConnections = getDailyConnections();
             
             // Check if user is logged in
             if (!currentUser) {
@@ -682,11 +760,22 @@
                 emptyState.classList.add('hidden');
                 loadingState.classList.add('hidden');
                 noConnectionsState.classList.add('hidden');
+                connectionLimitState.classList.add('hidden');
+                connectionCounter.classList.add('hidden');
                 return;
             } else {
                 // Hide auth check message, show loading
                 authCheck.classList.add('hidden');
                 loadingState.classList.remove('hidden');
+                
+                // Check if daily connection limit is reached
+                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
+                    connectionCounter.classList.remove('hidden');
+                    updateConnectionCounter();
+                } else {
+                    connectionCounter.classList.remove('hidden');
+                    updateConnectionCounter();
+                }
                 
                 // Load conversations and registered users
                 setTimeout(() => {
@@ -706,6 +795,80 @@
                     // Set up polling for new messages
                     setupMessagePolling();
                 }, 800); // Simulate loading time
+            }
+            
+            // Function to get daily connections from localStorage
+            function getDailyConnections() {
+                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+                const storedConnections = JSON.parse(localStorage.getItem(CONNECTION_STORAGE_KEY)) || { date: today, count: 0 };
+                
+                // Reset counter if it's a new day
+                if (storedConnections.date !== today) {
+                    storedConnections.date = today;
+                    storedConnections.count = 0;
+                    localStorage.setItem(CONNECTION_STORAGE_KEY, JSON.stringify(storedConnections));
+                }
+                
+                return storedConnections;
+            }
+            
+            // Function to update connection counter
+            function updateConnectionCounter() {
+                dailyConnections = getDailyConnections();
+                connectionCount.textContent = `${dailyConnections.count}/${DAILY_CONNECTION_LIMIT}`;
+                newMessageConnectionCount.textContent = `Connections: ${dailyConnections.count}/${DAILY_CONNECTION_LIMIT}`;
+                
+                // Update progress bar
+                const progressPercentage = (dailyConnections.count / DAILY_CONNECTION_LIMIT) * 100;
+                connectionProgressBar.style.width = `${progressPercentage}%`;
+                
+                // Change color based on usage
+                if (progressPercentage > 75) {
+                    connectionProgressBar.classList.add('bg-danger');
+                    connectionProgressBar.classList.remove('bg-primary');
+                } else {
+                    connectionProgressBar.classList.add('bg-primary');
+                    connectionProgressBar.classList.remove('bg-danger');
+                }
+            }
+            
+            // Function to increment connection counter
+            function incrementConnectionCounter() {
+                dailyConnections.count++;
+                localStorage.setItem(CONNECTION_STORAGE_KEY, JSON.stringify(dailyConnections));
+                updateConnectionCounter();
+                
+                // Check if limit is reached
+                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
+                    showConnectionLimitAlert();
+                }
+            }
+            
+            // Function to show connection limit alert
+            function showConnectionLimitAlert() {
+                connectionLimitAlert.style.display = 'block';
+                setTimeout(() => {
+                    connectionLimitAlert.style.display = 'none';
+                    
+                    // If in new message panel, close it and show limit state
+                    if (!newMessagePanel.classList.contains('hidden')) {
+                        newMessagePanel.classList.add('slide-out');
+                        setTimeout(() => {
+                            newMessagePanel.classList.remove('slide-out');
+                            newMessagePanel.classList.add('hidden');
+                            showConnectionLimitState();
+                        }, 300);
+                    }
+                }, 3000);
+            }
+            
+            // Function to show connection limit state
+            function showConnectionLimitState() {
+                messagesList.classList.add('hidden');
+                connectionsList.classList.add('hidden');
+                emptyState.classList.add('hidden');
+                noConnectionsState.classList.add('hidden');
+                connectionLimitState.classList.remove('hidden');
             }
             
             // Function to set up online status simulation
@@ -851,6 +1014,18 @@
             
             // Function to display conversations
             function displayConversations() {
+                // Check if connection limit is reached
+                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
+                    // Don't show connection limit state here, only show it when actively trying to create a new connection
+                    // Just update the counter
+                    updateConnectionCounter();
+                }
+                
+                // Hide connection list and no connection state
+                connectionsList.classList.add('hidden');
+                noConnectionsState.classList.add('hidden');
+                connectionLimitState.classList.add('hidden');
+                
                 // Filter conversations based on search term
                 const searchTerm = conversationSearch.value.toLowerCase();
                 
@@ -959,6 +1134,7 @@
                 // Hide messages list and empty state
                 messagesList.classList.add('hidden');
                 emptyState.classList.add('hidden');
+                connectionLimitState.classList.add('hidden');
                 
                 // Show connections list
                 connectionsList.classList.remove('hidden');
@@ -1442,12 +1618,16 @@
                 
                 // Create results
                 allUsers.forEach(user => {
+                    // Check if connection already exists
+                    const isExistingConnection = currentUser.connections && currentUser.connections.some(conn => conn.id == user.id);
                     // Check if conversation already exists
                     const existingConvo = conversations.find(c => c.userId == user.id);
-                    const isConnection = currentUser.connections && currentUser.connections.some(conn => conn.id == user.id);
+                    
+                    // For non-connections, check if limit is reached
+                    const connectionLimitReached = dailyConnections.count >= DAILY_CONNECTION_LIMIT && !isExistingConnection;
                     
                     const userItem = document.createElement('div');
-                    userItem.className = 'user-list-item flex items-center p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
+                    userItem.className = `user-list-item flex items-center p-3 rounded-lg ${connectionLimitReached ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-primary/5'} transition`;
                     
                     const isOnline = userOnlineStates[user.id] || false;
                     
@@ -1460,21 +1640,31 @@
                             <h3 class="font-medium">${user.fullName}</h3>
                             <p class="text-sm text-textMedium">${user.currentRole || ''}${user.company ? ' at ' + user.company : ''}</p>
                         </div>
-                        ${existingConvo ? 
-                            '<span class="text-primary text-sm">Message</span>' : 
-                            (isConnection ? 
-                                '<span class="text-primary text-sm">Connect</span>' : 
-                                '<span class="text-textLight text-sm">Add Connection</span>'
+                        ${connectionLimitReached ? 
+                            '<span class="text-danger text-sm">Limit Reached</span>' : 
+                            (existingConvo ? 
+                                '<span class="text-primary text-sm">Message</span>' : 
+                                (isExistingConnection ? 
+                                    '<span class="text-primary text-sm">Connect</span>' : 
+                                    '<span class="text-textLight text-sm">Add Connection</span>'
+                                )
                             )
                         }
                     `;
                     
                     userSearchResults.appendChild(userItem);
                     
-                    // Add click handler
-                    userItem.addEventListener('click', function() {
-                        startNewConversation(user.id);
-                    });
+                    // Add click handler if not at limit
+                    if (!connectionLimitReached) {
+                        userItem.addEventListener('click', function() {
+                            startNewConversation(user.id);
+                        });
+                    } else {
+                        // Show limit message on click
+                        userItem.addEventListener('click', function() {
+                            showConnectionLimitAlert();
+                        });
+                    }
                 });
             }
             
@@ -1490,7 +1680,13 @@
                     isNewConnection = true;
                 }
                 
-                // If new connection, add it
+                // Check if we've reached the daily connection limit
+                if (isNewConnection && dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
+                    showConnectionLimitAlert();
+                    return;
+                }
+                
+                // If new connection, add it and increment counter
                 if (isNewConnection) {
                     const user = findUserById(userId);
                     if (user) {
@@ -1502,6 +1698,9 @@
                         });
                         
                         localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        
+                        // Increment the connection counter
+                        incrementConnectionCounter();
                         
                         // Show toast
                         showToast(`Connected with ${user.fullName}`);
@@ -1573,6 +1772,7 @@
                 
                 connectionsList.classList.add('hidden');
                 noConnectionsState.classList.add('hidden');
+                connectionLimitState.classList.add('hidden');
                 
                 // Show conversations
                 displayConversations();
@@ -1586,6 +1786,7 @@
                 
                 messagesList.classList.add('hidden');
                 emptyState.classList.add('hidden');
+                connectionLimitState.classList.add('hidden');
                 
                 // Show connections
                 displayConnections();
@@ -1593,15 +1794,29 @@
             
             // New message button
             newMessageBtn.addEventListener('click', function() {
+                // Check if connection limit is reached for new connections only
+                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
+                    // Still allow viewing existing connections
+                    showConnectionLimitState();
+                    return;
+                }
+                
                 newMessagePanel.classList.remove('hidden');
                 newMessagePanel.classList.add('slide-in');
                 userSearchInput.value = '';
+                updateConnectionCounter();
                 searchUsers();
                 userSearchInput.focus();
             });
             
             // Start conversation button (from empty state)
             startConversationBtn.addEventListener('click', function() {
+                // Check connection limit before showing new message panel
+                if (dailyConnections.count >= DAILY_CONNECTION_LIMIT) {
+                    showConnectionLimitState();
+                    return;
+                }
+                
                 newMessageBtn.click();
             });
             
@@ -1638,6 +1853,17 @@
                 
                 // Restart message polling
                 setupMessagePolling();
+            });
+            
+            // View existing connections button
+            viewExistingConnectionsBtn.addEventListener('click', function() {
+                connectionLimitState.classList.add('hidden');
+                connectionsTab.click();
+            });
+            
+            // Close alert button
+            closeAlertBtn.addEventListener('click', function() {
+                connectionLimitAlert.style.display = 'none';
             });
             
             // Send message button
