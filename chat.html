@@ -6,8 +6,6 @@
     <title>ProConnect - Messages</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Include the user search utility -->
-    <script src="user-search.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -107,15 +105,72 @@
             50% { opacity: 1; transform: translateY(-3px); }
             100% { opacity: 0.3; transform: translateY(0); }
         }
+        
+        /* Message fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        /* Quick reactions popup */
+        .reaction-popup {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 5px 10px;
+            z-index: 10;
+        }
+        
+        .reaction-popup.show {
+            display: flex;
+        }
+        
+        .reaction-btn {
+            font-size: 16px;
+            padding: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .reaction-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Online status */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        
+        .status-online {
+            background-color: #27AE60;
+        }
+        
+        .status-offline {
+            background-color: #E9ECEF;
+        }
+        
+        .status-away {
+            background-color: #FFB900;
+        }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md pb-20">
         <!-- App Header -->
         <header class="flex justify-between items-center mb-6">
-            <a href="index.html" class="text-primary">
-                <i class="fas fa-arrow-left text-xl"></i>
-            </a>
             <h1 class="text-xl font-bold text-primary">Messages</h1>
             <button id="newMessageBtn" class="text-primary">
                 <i class="fas fa-edit text-xl"></i>
@@ -126,8 +181,8 @@
         <main>
             <!-- Tabs -->
             <div class="flex border-b mb-4">
-                <button class="text-primary border-b-2 border-primary pb-2 px-4 font-medium">Conversations</button>
-                <button class="text-textMedium pb-2 px-4 font-medium">Connections</button>
+                <button id="conversationsTab" class="text-primary border-b-2 border-primary pb-2 px-4 font-medium">Conversations</button>
+                <button id="connectionsTab" class="text-textMedium pb-2 px-4 font-medium">Connections</button>
             </div>
 
             <!-- Search Box -->
@@ -148,17 +203,17 @@
                 <h3 class="text-lg font-semibold mb-2">Sign in to view messages</h3>
                 <p class="text-textMedium mb-4 text-center">Please sign in or create an account to access your messages</p>
                 <div class="flex space-x-4">
-                    <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                    <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-lg">
                         Sign In
                     </a>
-                    <a href="onboarding.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
+                    <a href="register.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg">
                         Sign Up
                     </a>
                 </div>
             </div>
 
             <!-- Empty State (When no messages) -->
-            <div id="emptyState" class="flex flex-col items-center justify-center py-8 hidden">
+            <div id="emptyState" class="hidden flex flex-col items-center justify-center py-8">
                 <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 pulse">
                     <i class="fas fa-comments text-primary text-2xl"></i>
                 </div>
@@ -175,9 +230,26 @@
                 <h3 class="text-lg font-semibold">Loading conversations...</h3>
             </div>
 
+            <!-- No Connections State -->
+            <div id="noConnectionsState" class="hidden flex flex-col items-center justify-center py-8">
+                <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4 pulse">
+                    <i class="fas fa-user-plus text-accent text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">No connections yet</h3>
+                <p class="text-textMedium mb-4 text-center">Find and connect with professionals to start messaging</p>
+                <a href="search.html" class="bg-primary text-white px-6 py-2 rounded-lg flex items-center">
+                    <i class="fas fa-search mr-2"></i> Find Connections
+                </a>
+            </div>
+
             <!-- Messages List (Shown only if authenticated and has messages) -->
             <div id="messagesList" class="space-y-2">
                 <!-- Messages will be populated here -->
+            </div>
+            
+            <!-- Connections List (Hidden initially) -->
+            <div id="connectionsList" class="space-y-2 hidden">
+                <!-- Connections will be populated here -->
             </div>
         </main>
 
@@ -192,16 +264,32 @@
                     <img id="chatUserImage" src="" class="w-10 h-10 rounded-full object-cover mr-3" alt="Profile photo">
                     <div>
                         <h3 id="chatUserName" class="font-medium"></h3>
-                        <p id="chatUserStatus" class="text-xs text-textMedium"></p>
+                        <div class="flex items-center">
+                            <span id="chatUserStatusDot" class="status-dot"></span>
+                            <p id="chatUserStatus" class="text-xs text-textMedium"></p>
+                        </div>
                     </div>
                     <div class="ml-auto flex space-x-4">
                         <button id="viewProfileBtn" class="text-primary">
                             <i class="fas fa-user"></i>
                         </button>
-                        <button class="text-primary">
+                        <button id="chatOptionsBtn" class="text-primary">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                     </div>
+                </div>
+                
+                <!-- Chat Options Dropdown (Hidden initially) -->
+                <div id="chatOptionsDropdown" class="absolute right-4 top-16 bg-white shadow-lg rounded-lg p-2 z-10 hidden">
+                    <button id="clearChatBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
+                        <i class="fas fa-trash-alt mr-2 text-danger"></i> Clear Chat
+                    </button>
+                    <button id="blockUserBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
+                        <i class="fas fa-ban mr-2 text-danger"></i> Block User
+                    </button>
+                    <button id="muteNotificationsBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
+                        <i class="fas fa-bell-slash mr-2"></i> Mute Notifications
+                    </button>
                 </div>
                 
                 <!-- Chat Messages -->
@@ -209,17 +297,40 @@
                     <!-- Messages will be populated by JavaScript -->
                 </div>
                 
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="px-4 py-2 hidden">
+                    <div class="flex items-center">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <span class="text-xs text-textMedium ml-2">typing...</span>
+                    </div>
+                </div>
+                
                 <!-- Message Input -->
                 <div class="bg-white p-3 border-t">
                     <div class="flex items-center">
-                        <button class="text-primary p-2">
+                        <button id="attachmentBtn" class="text-primary p-2 relative">
                             <i class="fas fa-plus"></i>
+                            
+                            <!-- Attachment Menu (Hidden initially) -->
+                            <div id="attachmentMenu" class="absolute bottom-full left-0 bg-white shadow-lg rounded-lg p-2 hidden">
+                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
+                                    <i class="fas fa-image mr-2 text-secondary"></i> Photo
+                                </button>
+                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
+                                    <i class="fas fa-file mr-2 text-primary"></i> Document
+                                </button>
+                                <button class="w-full text-left px-4 py-2 text-sm hover:bg-lightSecondary rounded-lg">
+                                    <i class="fas fa-map-marker-alt mr-2 text-danger"></i> Location
+                                </button>
+                            </div>
                         </button>
                         <input type="text" id="messageInput" placeholder="Type a message..." class="flex-1 px-4 py-2 rounded-full border focus:outline-none focus:ring-2 focus:ring-primary">
-                        <button class="text-primary p-2">
-                            <i class="fas fa-microphone"></i>
+                        <button id="emojiBtn" class="text-primary p-2">
+                            <i class="fas fa-smile"></i>
                         </button>
-                        <button id="sendMessageBtn" class="bg-primary text-white p-2 rounded-full ml-2">
+                        <button id="sendMessageBtn" class="bg-primary text-white p-2 rounded-full ml-2 disabled:opacity-50" disabled>
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -248,7 +359,7 @@
                     </div>
                 </div>
                 
-                <!-- User Results -->
+                <!-- User Search Results -->
                 <div id="userSearchResults" class="flex-1 overflow-y-auto p-4">
                     <!-- User search results will be populated here -->
                     <div class="text-center text-textMedium py-10">
@@ -258,11 +369,16 @@
             </div>
         </div>
 
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-textDark text-white px-4 py-2 rounded-lg opacity-0 transition-opacity duration-300 z-50">
+            Message notification
+        </div>
+
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 flex justify-around">
             <a href="index.html" class="text-textLight flex flex-col items-center">
-                <i class="fas fa-home text-xl"></i>
-                <span class="text-xs mt-1">Home</span>
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Analytics</span>
             </a>
             <a href="chat.html" class="text-primary flex flex-col items-center">
                 <i class="fas fa-comments text-xl"></i>
@@ -280,12 +396,120 @@
     </div>
 
     <script>
+        // User Search Utility (Simplified version)
+        const ProConnectUsers = {
+            getAllUsers: function() {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                const currentUserId = currentUser ? currentUser.id : null;
+                let allUsers = [];
+                
+                // Scan localStorage for user data
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    
+                    // Skip non-user items
+                    if (key === 'currentUser' || 
+                        key.includes('Conversations') || 
+                        key.startsWith('proconnect_')) {
+                        continue;
+                    }
+                    
+                    try {
+                        const value = JSON.parse(localStorage.getItem(key));
+                        
+                        // Check if this could be a user object
+                        if (value && 
+                            typeof value === 'object' &&
+                            (value.fullName || value.name || value.username) && 
+                            value.id) {
+                            
+                            // Normalize user object format
+                            const user = this.normalizeUserObject(value);
+                            
+                            // Don't include current user
+                            if (user.id !== currentUserId) {
+                                allUsers.push(user);
+                            }
+                        }
+                    } catch (e) {
+                        // Skip invalid JSON entries
+                        continue;
+                    }
+                }
+                
+                // Also ensure current user's connections are included
+                if (currentUser && currentUser.connections) {
+                    currentUser.connections.forEach(conn => {
+                        if (!allUsers.some(u => u.id == conn.id)) {
+                            // Create a minimal user object if not found elsewhere
+                            allUsers.push({
+                                id: conn.id,
+                                fullName: conn.name || "Unknown User",
+                                profileImage: conn.profileImage || this.getDefaultProfileImage(),
+                                currentRole: conn.role || "",
+                                company: conn.company || "",
+                                industry: "Unknown",
+                                isConnection: true
+                            });
+                        }
+                    });
+                }
+                
+                return allUsers;
+            },
+            
+            normalizeUserObject: function(user) {
+                return {
+                    id: user.id,
+                    fullName: user.fullName || user.name || user.username || "Unknown User",
+                    profileImage: user.profileImage || user.image || this.getDefaultProfileImage(),
+                    currentRole: user.currentRole || user.title || user.role || "",
+                    company: user.company || "",
+                    industry: user.industry || "",
+                    location: user.location || "",
+                    isOnline: !!user.isOnline // Default to offline
+                };
+            },
+            
+            getDefaultProfileImage: function() {
+                const defaultImages = [
+                    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                ];
+                return defaultImages[Math.floor(Math.random() * defaultImages.length)];
+            },
+            
+            searchUsers: function(query) {
+                const allUsers = this.getAllUsers();
+                
+                if (!query || query.trim() === '') {
+                    return allUsers;
+                }
+                
+                const searchTerm = query.toLowerCase().trim();
+                
+                return allUsers.filter(user => {
+                    return user.fullName.toLowerCase().includes(searchTerm) ||
+                           (user.currentRole && user.currentRole.toLowerCase().includes(searchTerm)) ||
+                           (user.company && user.company.toLowerCase().includes(searchTerm));
+                });
+            },
+            
+            getUserById: function(userId) {
+                return this.getAllUsers().find(user => user.id == userId);
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
             const authCheck = document.getElementById('authCheck');
             const messagesList = document.getElementById('messagesList');
+            const connectionsList = document.getElementById('connectionsList');
             const emptyState = document.getElementById('emptyState');
             const loadingState = document.getElementById('loadingState');
+            const noConnectionsState = document.getElementById('noConnectionsState');
             const chatView = document.getElementById('chatView');
             const newMessagePanel = document.getElementById('newMessagePanel');
             const newMessageBtn = document.getElementById('newMessageBtn');
@@ -298,6 +522,17 @@
             const userSearchResults = document.getElementById('userSearchResults');
             const conversationSearch = document.getElementById('conversationSearch');
             const viewProfileBtn = document.getElementById('viewProfileBtn');
+            const conversationsTab = document.getElementById('conversationsTab');
+            const connectionsTab = document.getElementById('connectionsTab');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const chatOptionsBtn = document.getElementById('chatOptionsBtn');
+            const chatOptionsDropdown = document.getElementById('chatOptionsDropdown');
+            const clearChatBtn = document.getElementById('clearChatBtn');
+            const blockUserBtn = document.getElementById('blockUserBtn');
+            const muteNotificationsBtn = document.getElementById('muteNotificationsBtn');
+            const attachmentBtn = document.getElementById('attachmentBtn');
+            const attachmentMenu = document.getElementById('attachmentMenu');
+            const toastNotification = document.getElementById('toastNotification');
             
             // Current state
             let currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -305,6 +540,10 @@
             let registeredUsers = [];
             let conversations = [];
             let isLoading = true;
+            let isTyping = false;
+            let typingTimeout;
+            let messageCheckInterval;
+            let userOnlineStates = {};
             
             // Check if user is logged in
             if (!currentUser) {
@@ -313,6 +552,7 @@
                 messagesList.classList.add('hidden');
                 emptyState.classList.add('hidden');
                 loadingState.classList.add('hidden');
+                noConnectionsState.classList.add('hidden');
                 return;
             } else {
                 // Hide auth check message, show loading
@@ -324,13 +564,142 @@
                     loadConversations();
                     loadUsers();
                     
+                    // Set up online status simulation
+                    setupOnlineStatusSimulation();
+                    
                     // Update UI after loading
                     isLoading = false;
                     loadingState.classList.add('hidden');
                     
                     // Display conversations or empty state
                     displayConversations();
+                    
+                    // Set up polling for new messages
+                    setupMessagePolling();
                 }, 500); // Simulate loading time
+            }
+            
+            // Function to set up online status simulation
+            function setupOnlineStatusSimulation() {
+                // Set initial random online states
+                registeredUsers.forEach(user => {
+                    userOnlineStates[user.id] = Math.random() > 0.6;
+                });
+                
+                // Update online states every 30 seconds
+                setInterval(() => {
+                    registeredUsers.forEach(user => {
+                        // 10% chance to change state
+                        if (Math.random() < 0.1) {
+                            userOnlineStates[user.id] = !userOnlineStates[user.id];
+                            
+                            // Update if this is the current chat user
+                            if (currentChatUserId === user.id) {
+                                updateChatUserStatus();
+                            }
+                        }
+                    });
+                    
+                    // Refresh conversations list to update online indicators
+                    if (!chatView.classList.contains('hidden')) {
+                        // Don't refresh if in chat view
+                        return;
+                    }
+                    
+                    if (conversationsTab.classList.contains('text-primary')) {
+                        displayConversations();
+                    } else {
+                        displayConnections();
+                    }
+                }, 30000);
+            }
+            
+            // Function to set up message polling
+            function setupMessagePolling() {
+                // Check for new messages every 5 seconds
+                messageCheckInterval = setInterval(() => {
+                    // In a real app this would connect to an API
+                    // For now we'll just simulate incoming messages
+                    
+                    // 3% chance of random message from a connection
+                    if (Math.random() < 0.03 && currentUser.connections && currentUser.connections.length > 0) {
+                        // Pick a random connection
+                        const randomConnection = currentUser.connections[Math.floor(Math.random() * currentUser.connections.length)];
+                        
+                        // Simulate a new message
+                        simulateIncomingMessage(randomConnection.id);
+                    }
+                }, 5000);
+            }
+            
+            // Function to simulate incoming message
+            function simulateIncomingMessage(userId) {
+                // Find user data
+                const user = findUserById(userId);
+                if (!user) return;
+                
+                // Find or create conversation
+                let conversation = conversations.find(convo => convo.userId == userId);
+                
+                if (!conversation) {
+                    // Create new conversation
+                    conversation = {
+                        userId: userId,
+                        messages: []
+                    };
+                    conversations.push(conversation);
+                }
+                
+                // Sample messages
+                const sampleMessages = [
+                    "Hi there! How are you doing?",
+                    "I saw your profile and thought we should connect.",
+                    "Are you available for a quick chat about the project?",
+                    "Just checking in to see how everything is going.",
+                    "Do you have time for a meeting tomorrow?",
+                    "I'd love to hear your thoughts on the new proposal.",
+                    "Have you seen the latest industry report?",
+                    "Thanks for connecting with me!",
+                    "Looking forward to working with you.",
+                    "Let me know when you're free to discuss the details."
+                ];
+                
+                // Pick a random message
+                const messageText = sampleMessages[Math.floor(Math.random() * sampleMessages.length)];
+                
+                // Create message object
+                const newMessage = {
+                    sender: userId,
+                    content: messageText,
+                    timestamp: Date.now(),
+                    read: currentChatUserId === userId // Read if we're in the chat
+                };
+                
+                // Add message to conversation
+                conversation.messages.push(newMessage);
+                
+                // Save conversations
+                saveConversations();
+                
+                // Update UI if needed
+                if (currentChatUserId === userId) {
+                    // Show typing indicator first
+                    showTypingIndicator();
+                    
+                    // Hide typing and show message after a delay
+                    setTimeout(() => {
+                        hideTypingIndicator();
+                        displayChatMessages(conversation);
+                    }, 1500);
+                } else {
+                    // Update conversations list if viewing conversations
+                    if (conversationsTab.classList.contains('text-primary') && !chatView.classList.contains('hidden')) {
+                        displayConversations();
+                    }
+                    
+                    // Show notification
+                    showToast(`New message from ${user.fullName}`);
+                }
             }
             
             // Function to load conversations
@@ -425,8 +794,8 @@
                     item.className = 'chat-item bg-lightSecondary p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
                     item.dataset.userId = conversation.userId;
                     
-                    // User online status - random for demo
-                    const isOnline = Math.random() > 0.5;
+                    // User online status
+                    const isOnline = userOnlineStates[user.id] || false;
                     
                     item.innerHTML = `
                         <div class="flex items-center">
@@ -452,6 +821,87 @@
                     // Add click handler
                     item.addEventListener('click', function() {
                         openChat(conversation.userId);
+                    });
+                });
+            }
+            
+            // Function to display connections
+            function displayConnections() {
+                // Hide messages list and empty state
+                messagesList.classList.add('hidden');
+                emptyState.classList.add('hidden');
+                
+                // Show connections list
+                connectionsList.classList.remove('hidden');
+                
+                // Get user connections
+                const connections = currentUser.connections || [];
+                
+                // If no connections, show no connections state
+                if (connections.length === 0) {
+                    connectionsList.classList.add('hidden');
+                    noConnectionsState.classList.remove('hidden');
+                    return;
+                }
+                
+                // Hide no connections state
+                noConnectionsState.classList.add('hidden');
+                
+                // Filter connections based on search term
+                const searchTerm = conversationSearch.value.toLowerCase();
+                
+                let filteredConnections = connections;
+                
+                if (searchTerm) {
+                    filteredConnections = connections.filter(conn => 
+                        conn.name.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                // Clear connections list
+                connectionsList.innerHTML = '';
+                
+                // Add each connection
+                filteredConnections.forEach(connection => {
+                    // Get full user data if available
+                    const fullUserData = findUserById(connection.id) || {
+                        id: connection.id,
+                        fullName: connection.name,
+                        profileImage: connection.profileImage,
+                        currentRole: connection.title || '',
+                        company: connection.company || ''
+                    };
+                    
+                    // Check if we have a conversation with this user
+                    const hasConversation = conversations.some(convo => convo.userId == connection.id);
+                    
+                    // User online status
+                    const isOnline = userOnlineStates[connection.id] || false;
+                    
+                    // Create connection item
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center bg-lightSecondary p-3 rounded-lg';
+                    
+                    item.innerHTML = `
+                        <div class="relative mr-3">
+                            <img src="${fullUserData.profileImage}" class="w-12 h-12 rounded-full object-cover" alt="Profile photo">
+                            ${isOnline ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>' : ''}
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium">${fullUserData.fullName}</h3>
+                            <p class="text-sm text-textMedium">${fullUserData.currentRole}${fullUserData.company ? ' at ' + fullUserData.company : ''}</p>
+                        </div>
+                        <button class="message-btn ml-2 bg-primary text-white px-3 py-1 rounded-lg text-sm">
+                            ${hasConversation ? 'Message' : 'Start Chat'}
+                        </button>
+                    `;
+                    
+                    connectionsList.appendChild(item);
+                    
+                    // Add click handler to message button
+                    item.querySelector('.message-btn').addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        openChat(connection.id);
                     });
                 });
             }
@@ -502,15 +952,30 @@
                     };
                     conversations.push(conversation);
                     saveConversations();
+                    
+                    // If this user is not in connections, add them
+                    if (!currentUser.connections) {
+                        currentUser.connections = [];
+                    }
+                    
+                    if (!currentUser.connections.some(conn => conn.id === userId)) {
+                        currentUser.connections.push({
+                            id: userId,
+                            name: user.fullName,
+                            profileImage: user.profileImage,
+                            timestamp: Date.now()
+                        });
+                        
+                        // Save updated user data
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    }
                 }
                 
                 // Set current chat user
                 currentChatUserId = userId;
                 
-                // Update chat header
-                document.getElementById('chatUserName').textContent = user.fullName;
-                document.getElementById('chatUserStatus').textContent = user.currentRole ? `${user.currentRole}${user.company ? ' at ' + user.company : ''}` : (Math.random() > 0.5 ? 'Online' : 'Last seen recently');
-                document.getElementById('chatUserImage').src = user.profileImage;
+                // Update chat header with user info
+                updateChatUserInfo(user);
                 
                 // Mark all messages as read
                 conversation.messages.forEach(msg => {
@@ -530,6 +995,28 @@
                 setTimeout(() => {
                     messageInput.focus();
                 }, 300);
+            }
+            
+            // Function to update chat user info in header
+            function updateChatUserInfo(user) {
+                document.getElementById('chatUserName').textContent = user.fullName;
+                updateChatUserStatus();
+                document.getElementById('chatUserImage').src = user.profileImage;
+            }
+            
+            // Function to update chat user status
+            function updateChatUserStatus() {
+                const isOnline = userOnlineStates[currentChatUserId] || false;
+                const statusDot = document.getElementById('chatUserStatusDot');
+                const statusText = document.getElementById('chatUserStatus');
+                
+                if (isOnline) {
+                    statusDot.className = 'status-dot status-online';
+                    statusText.textContent = 'Online';
+                } else {
+                    statusDot.className = 'status-dot status-offline';
+                    statusText.textContent = 'Offline';
+                }
             }
             
             // Function to display chat messages
@@ -573,7 +1060,7 @@
                     // Handle system messages differently
                     if (message.sender === 'system') {
                         const systemMessageElement = document.createElement('div');
-                        systemMessageElement.className = 'flex justify-center my-4';
+                        systemMessageElement.className = 'flex justify-center my-4 message-fade-in';
                         systemMessageElement.innerHTML = `
                             <div class="bg-primary/5 px-4 py-2 rounded-lg">
                                 <p class="text-sm text-textMedium text-center">${message.content}</p>
@@ -588,9 +1075,9 @@
                     
                     if (message.sender === currentUser.id) {
                         // Sent message
-                        messageElement.className = 'flex justify-end';
+                        messageElement.className = 'flex justify-end message-fade-in';
                         messageElement.innerHTML = `
-                            <div class="max-w-[80%]">
+                            <div class="max-w-[80%] relative group">
                                 <div class="bg-primary text-white p-3 chat-bubble-sent">
                                     <p class="text-sm">${message.content}</p>
                                 </div>
@@ -598,23 +1085,66 @@
                                     <span class="text-xs text-textLight mr-1">${formatMessageTime(message.timestamp)}</span>
                                     <i class="fas fa-check text-xs ${message.read ? 'text-success' : 'text-textLight'}"></i>
                                 </div>
+                                <div class="reaction-popup">
+                                    <span class="reaction-btn">👍</span>
+                                    <span class="reaction-btn">❤️</span>
+                                    <span class="reaction-btn">😂</span>
+                                    <span class="reaction-btn">😮</span>
+                                    <span class="reaction-btn">😢</span>
+                                </div>
                             </div>
                         `;
                     } else {
                         // Received message
                         const user = findUserById(message.sender);
-                        messageElement.className = 'flex items-end';
+                        messageElement.className = 'flex items-end message-fade-in';
                         messageElement.innerHTML = `
                             <img src="${user?.profileImage}" class="w-8 h-8 rounded-full object-cover mr-2" alt="Profile photo">
-                            <div class="max-w-[80%]">
+                            <div class="max-w-[80%] relative group">
                                 <div class="bg-lightSecondary p-3 chat-bubble-received">
                                     <p class="text-sm">${message.content}</p>
                                 </div>
                                 <span class="text-xs text-textLight ml-2">${formatMessageTime(message.timestamp)}</span>
+                                <div class="reaction-popup">
+                                    <span class="reaction-btn">👍</span>
+                                    <span class="reaction-btn">❤️</span>
+                                    <span class="reaction-btn">😂</span>
+                                    <span class="reaction-btn">😮</span>
+                                    <span class="reaction-btn">😢</span>
+                                </div>
                             </div>
                         `;
                     }
                     
+                    // Set up long press for reactions
+                    const messageBubble = messageElement.querySelector(message.sender === currentUser.id ? '.chat-bubble-sent' : '.chat-bubble-received');
+                    const reactionPopup = messageElement.querySelector('.reaction-popup');
+                    
+                    // Long press for mobile
+                    let pressTimer;
+                    
+                    messageBubble.addEventListener('touchstart', function() {
+                        pressTimer = setTimeout(function() {
+                            reactionPopup.classList.add('show');
+                        }, 500);
+                    });
+                    
+                    messageBubble.addEventListener('touchend', function() {
+                        clearTimeout(pressTimer);
+                    });
+                    
+                    // Right click for desktop
+                    messageBubble.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        reactionPopup.classList.add('show');
+                    });
+                    
+                    // Hide reaction popup when clicking elsewhere
+                    document.addEventListener('click', function() {
+                        reactionPopup.classList.remove('show');
+                    });
+                    
+                    // Add message to container
                     messagesContainer.appendChild(messageElement);
                 });
                 
@@ -626,6 +1156,18 @@
             function formatMessageTime(timestamp) {
                 const date = new Date(timestamp);
                 return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            // Function to show typing indicator
+            function showTypingIndicator() {
+                typingIndicator.classList.remove('hidden');
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Function to hide typing indicator
+            function hideTypingIndicator() {
+                typingIndicator.classList.add('hidden');
             }
             
             // Function to send a message
@@ -655,64 +1197,28 @@
                 // Clear input
                 messageInput.value = '';
                 
+                // Enable/disable send button
+                sendMessageBtn.disabled = true;
+                
                 // Update display
                 displayChatMessages(conversation);
                 
-                // Show typing indicator after a short delay
+                // Show typing indicator after a short delay to simulate the other user typing
                 setTimeout(() => {
-                    showTypingIndicator();
-                    
-                    // Simulate received message after a delay (for demo purposes)
-                    setTimeout(() => {
-                        hideTypingIndicator();
-                        simulateResponse(conversation);
-                    }, 1000 + Math.random() * 3000);
+                    // Random chance (70%) of response for demonstration
+                    if (Math.random() < 0.7) {
+                        showTypingIndicator();
+                        
+                        // Generate response after a realistic delay
+                        setTimeout(() => {
+                            hideTypingIndicator();
+                            simulateResponse(conversation);
+                        }, 1000 + Math.random() * 3000);
+                    }
                 }, 500);
             }
             
-            // Function to show typing indicator
-            function showTypingIndicator() {
-                const messagesContainer = document.getElementById('chatMessages');
-                
-                // Remove existing typing indicator if any
-                const existingIndicator = document.getElementById('typingIndicator');
-                if (existingIndicator) {
-                    existingIndicator.remove();
-                }
-                
-                // Create typing indicator
-                const typingElement = document.createElement('div');
-                typingElement.className = 'flex items-end typing-indicator';
-                typingElement.id = 'typingIndicator';
-                
-                const user = findUserById(currentChatUserId);
-                
-                typingElement.innerHTML = `
-                    <img src="${user?.profileImage}" class="w-8 h-8 rounded-full object-cover mr-2" alt="Profile photo">
-                    <div class="max-w-[80%]">
-                        <div class="bg-lightSecondary p-3 chat-bubble-received">
-                            <div class="flex items-center">
-                                <span class="typing-dot"></span>
-                                <span class="typing-dot"></span>
-                                <span class="typing-dot"></span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                messagesContainer.appendChild(typingElement);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-            
-            // Function to hide typing indicator
-            function hideTypingIndicator() {
-                const typingIndicator = document.getElementById('typingIndicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-            }
-            
-            // Function to simulate response (for demo purposes)
+            // Function to simulate response
             function simulateResponse(conversation) {
                 // Sample responses
                 const responses = [
@@ -728,8 +1234,24 @@
                     "Do you have any resources on this subject you could share?"
                 ];
                 
-                // Select random response
-                const responseText = responses[Math.floor(Math.random() * responses.length)];
+                // Context-aware responses
+                const lastMessage = conversation.messages[conversation.messages.length - 1].content.toLowerCase();
+                
+                let responseOptions = [...responses];
+                
+                // Add context-specific responses based on last message
+                if (lastMessage.includes('hello') || lastMessage.includes('hi ') || lastMessage.includes('hey')) {
+                    responseOptions.unshift("Hello! How are you doing today?", "Hi there! Nice to hear from you.", "Hey! What's up?");
+                } else if (lastMessage.includes('thank')) {
+                    responseOptions.unshift("You're welcome!", "Happy to help!", "Anytime!");
+                } else if (lastMessage.includes('?')) {
+                    responseOptions.unshift("That's a good question.", "Let me think about that.", "Interesting question!");
+                } else if (lastMessage.length < 10) {
+                    responseOptions.unshift("Tell me more about that.", "Could you elaborate?", "I'd love to hear more details.");
+                }
+                
+                // Select response, with priority for context-specific ones
+                const responseText = responseOptions[Math.floor(Math.random() * Math.min(5, responseOptions.length))];
                 
                 // Create message object
                 const responseMessage = {
@@ -765,10 +1287,10 @@
                     return;
                 }
                 
-                // Search users with ProConnectUsers utility
-                const filteredUsers = ProConnectUsers.searchUsers(searchTerm, 'all');
+                // Get all users
+                const allUsers = ProConnectUsers.searchUsers(searchTerm);
                 
-                if (filteredUsers.length === 0) {
+                if (allUsers.length === 0) {
                     userSearchResults.innerHTML = `
                         <div class="text-center text-textMedium py-10">
                             No users found matching "${searchTerm}"
@@ -778,7 +1300,7 @@
                 }
                 
                 // Create results
-                filteredUsers.forEach(user => {
+                allUsers.forEach(user => {
                     // Check if conversation already exists
                     const existingConvo = conversations.find(c => c.userId == user.id);
                     const isConnection = currentUser.connections && currentUser.connections.some(conn => conn.id == user.id);
@@ -786,8 +1308,13 @@
                     const userItem = document.createElement('div');
                     userItem.className = 'user-list-item flex items-center p-3 rounded-lg cursor-pointer hover:bg-primary/5 transition';
                     
+                    const isOnline = userOnlineStates[user.id] || false;
+                    
                     userItem.innerHTML = `
-                        <img src="${user.profileImage}" class="w-12 h-12 rounded-full object-cover mr-3" alt="Profile photo">
+                        <div class="relative mr-3">
+                            <img src="${user.profileImage}" class="w-12 h-12 rounded-full object-cover" alt="Profile photo">
+                            ${isOnline ? '<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>' : ''}
+                        </div>
                         <div class="flex-1">
                             <h3 class="font-medium">${user.fullName}</h3>
                             <p class="text-sm text-textMedium">${user.currentRole || ''}${user.company ? ' at ' + user.company : ''}</p>
@@ -834,6 +1361,9 @@
                         });
                         
                         localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        
+                        // Show toast
+                        showToast(`Connected with ${user.fullName}`);
                     }
                 }
                 
@@ -849,7 +1379,76 @@
                 }, 300);
             }
             
+            // Function to show toast notification
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.classList.add('opacity-100');
+                
+                setTimeout(() => {
+                    toastNotification.classList.remove('opacity-100');
+                }, 3000);
+            }
+            
+            // Function to clear chat history
+            function clearChat() {
+                if (!currentChatUserId) return;
+                
+                // Find conversation
+                const conversationIndex = conversations.findIndex(convo => convo.userId == currentChatUserId);
+                if (conversationIndex === -1) return;
+                
+                // Confirm with user
+                if (confirm("Are you sure you want to clear all messages in this chat?")) {
+                    // Keep the conversation but clear messages
+                    conversations[conversationIndex].messages = [{
+                        sender: 'system',
+                        content: 'Chat history cleared',
+                        timestamp: Date.now(),
+                        read: true
+                    }];
+                    
+                    // Save conversations
+                    saveConversations();
+                    
+                    // Update display
+                    displayChatMessages(conversations[conversationIndex]);
+                    
+                    // Hide dropdown
+                    chatOptionsDropdown.classList.add('hidden');
+                    
+                    // Show toast
+                    showToast('Chat history cleared');
+                }
+            }
+            
             // Event Listeners
+            
+            // Tab switching
+            conversationsTab.addEventListener('click', function() {
+                conversationsTab.classList.add('text-primary', 'border-primary');
+                conversationsTab.classList.remove('text-textMedium', 'border-transparent');
+                connectionsTab.classList.add('text-textMedium', 'border-transparent');
+                connectionsTab.classList.remove('text-primary', 'border-primary');
+                
+                connectionsList.classList.add('hidden');
+                noConnectionsState.classList.add('hidden');
+                
+                // Show conversations
+                displayConversations();
+            });
+            
+            connectionsTab.addEventListener('click', function() {
+                connectionsTab.classList.add('text-primary', 'border-primary');
+                connectionsTab.classList.remove('text-textMedium', 'border-transparent');
+                conversationsTab.classList.add('text-textMedium', 'border-transparent');
+                conversationsTab.classList.remove('text-primary', 'border-primary');
+                
+                messagesList.classList.add('hidden');
+                emptyState.classList.add('hidden');
+                
+                // Show connections
+                displayConnections();
+            });
             
             // New message button
             newMessageBtn.addEventListener('click', function() {
@@ -879,19 +1478,57 @@
             backToChats.addEventListener('click', function() {
                 chatView.classList.add('hidden');
                 currentChatUserId = null;
+                chatOptionsDropdown.classList.add('hidden');
+                attachmentMenu.classList.add('hidden');
+                
+                // Cancel message checking interval
+                clearInterval(messageCheckInterval);
+                
+                // Reset message input
+                messageInput.value = '';
+                sendMessageBtn.disabled = true;
                 
                 // Refresh conversations list
-                displayConversations();
+                if (conversationsTab.classList.contains('text-primary')) {
+                    displayConversations();
+                } else {
+                    displayConnections();
+                }
+                
+                // Restart message polling
+                setupMessagePolling();
             });
             
             // Send message button
             sendMessageBtn.addEventListener('click', function() {
-                sendMessage();
+                if (!sendMessageBtn.disabled) {
+                    sendMessage();
+                }
+            });
+            
+            // Message input changes
+            messageInput.addEventListener('input', function() {
+                // Enable/disable send button based on content
+                sendMessageBtn.disabled = !this.value.trim();
+                
+                // Simulate typing indicator for the other user
+                if (this.value.trim() && !isTyping) {
+                    isTyping = true;
+                    
+                    // Clear previous timeout
+                    clearTimeout(typingTimeout);
+                    
+                    // Set timeout to stop "typing" after 2 seconds of inactivity
+                    typingTimeout = setTimeout(() => {
+                        isTyping = false;
+                    }, 2000);
+                }
             });
             
             // Send message on Enter key
             messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.shiftKey && !sendMessageBtn.disabled) {
+                    e.preventDefault();
                     sendMessage();
                 }
             });
@@ -903,7 +1540,11 @@
             
             // Conversation search input
             conversationSearch.addEventListener('input', function() {
-                displayConversations();
+                if (conversationsTab.classList.contains('text-primary')) {
+                    displayConversations();
+                } else {
+                    displayConnections();
+                }
             });
             
             // View profile button
@@ -916,92 +1557,78 @@
                     window.location.href = `profile.html?view=${currentChatUserId}`;
                 }
             });
+            
+            // Chat options menu
+            chatOptionsBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                chatOptionsDropdown.classList.toggle('hidden');
+                attachmentMenu.classList.add('hidden'); // Hide attachment menu if open
+            });
+            
+            // Clear chat button
+            clearChatBtn.addEventListener('click', clearChat);
+            
+            // Block user button
+            blockUserBtn.addEventListener('click', function() {
+                if (!currentChatUserId) return;
+                
+                // Find user
+                const user = findUserById(currentChatUserId);
+                if (!user) return;
+                
+                // Confirm with user
+                if (confirm(`Are you sure you want to block ${user.fullName}?`)) {
+                    // In a real app, this would update a blocked users list
+                    showToast(`${user.fullName} has been blocked`);
+                    
+                    // Hide dropdown
+                    chatOptionsDropdown.classList.add('hidden');
+                    
+                    // Go back to chats
+                    backToChats.click();
+                }
+            });
+            
+            // Mute notifications button
+            muteNotificationsBtn.addEventListener('click', function() {
+                if (!currentChatUserId) return;
+                
+                // Find user
+                const user = findUserById(currentChatUserId);
+                if (!user) return;
+                
+                // In a real app, this would update notification settings
+                showToast(`Notifications muted for ${user.fullName}`);
+                
+                // Hide dropdown
+                chatOptionsDropdown.classList.add('hidden');
+                
+                // Update button text
+                this.innerHTML = '<i class="fas fa-bell mr-2"></i> Unmute Notifications';
+            });
+            
+            // Attachment button
+            attachmentBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                attachmentMenu.classList.toggle('hidden');
+                chatOptionsDropdown.classList.add('hidden'); // Hide chat options if open
+            });
+            
+            // Hide menus when clicking outside
+            document.addEventListener('click', function() {
+                chatOptionsDropdown.classList.add('hidden');
+                attachmentMenu.classList.add('hidden');
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            chatOptionsDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            attachmentMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
         });
     </script>
 </body>
 </html>
-// Enhanced chat system - add to chat.html
-const ProConnectChat = {
-  // Initialize chat with real-time features
-  initialize: function() {
-    // Set up polling for "real-time" updates
-    this.startMessagePolling();
-    
-    // Add online status simulation
-    this.simulateOnlineStatus();
-    
-    // Add typing indicators
-    this.setupTypingIndicators();
-  },
-  
-  // Poll for new messages every 5 seconds
-  startMessagePolling: function() {
-    setInterval(() => {
-      if (window.currentChatUserId) {
-        this.checkForNewMessages(window.currentChatUserId);
-      }
-    }, 5000);
-  },
-  
-  // Check if there are new messages
-  checkForNewMessages: function(userId) {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) return;
-    
-    // In a real app, this would call an API endpoint
-    // For now, we'll simulate occasional responses
-    if (Math.random() < 0.1) { // 10% chance of new message
-      // Find conversation
-      const conversations = JSON.parse(localStorage.getItem('userConversations_' + currentUser.id)) || [];
-      const conversation = conversations.find(c => c.userId == userId);
-      
-      if (conversation && window.simulateResponse) {
-        window.simulateResponse(conversation);
-        // Refresh UI
-        if (window.displayChatMessages) {
-          window.displayChatMessages(conversation);
-        }
-      }
-    }
-  },
-  
-  // Simulate online status changes
-  simulateOnlineStatus: function() {
-    const users = ProConnectUsers.getAllUsers();
-    
-    // Randomly update online status every 30 seconds
-    setInterval(() => {
-      users.forEach(user => {
-        user.isOnline = Math.random() > 0.5;
-        user.lastSeen = user.isOnline ? null : new Date().toISOString();
-      });
-      
-      // Update UI if on chat screen
-      if (window.displayConversations) {
-        window.displayConversations();
-      }
-    }, 30000);
-  },
-  
-  // Set up realistic typing indicators
-  setupTypingIndicators: function() {
-    if (!window.messageInput) return;
-    
-    // Track when user is typing
-    let typingTimeout;
-    window.messageInput.addEventListener('input', () => {
-      // In a real app, this would notify the other user
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        // Typing stopped
-      }, 1000);
-    });
-  }
-};
-
-// Initialize enhanced chat
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.location.pathname.includes('chat.html')) {
-    ProConnectChat.initialize();
-  }
-});
