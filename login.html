@@ -600,6 +600,73 @@
     </div>
 
     <script>
+        // Global in-memory database for users (replacing localStorage)
+        window.ProConnectDB = {
+            users: [
+                // Sample user
+                {
+                    id: 'user_1',
+                    fullName: 'John Doe',
+                    email: 'test@example.com',
+                    password: 'password123',
+                    currentRole: 'Product Manager',
+                    company: 'TechCorp',
+                    industry: 'Technology',
+                    location: 'San Francisco, CA',
+                    skills: ['Product Management', 'User Research', 'Agile', 'Market Analysis', 'Strategy'],
+                    about: 'Experienced Product Manager with a passion for creating user-centered solutions. I specialize in agile methodologies and have a track record of launching successful products that deliver business value while meeting user needs.',
+                    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                    networkingProfile: {
+                        importance: 'very',
+                        goals: ['clients', 'partners'],
+                        approach: 'proactive',
+                        challenge: 'finding',
+                        sectors: ['tech', 'finance'],
+                        score: 75,
+                        dateCreated: new Date().toISOString()
+                    },
+                    connections: [],
+                    pendingRequests: [],
+                    sentRequests: [],
+                    dateJoined: new Date().toISOString()
+                }
+            ],
+            currentUser: null,
+            tempRegistration: null
+        };
+
+        // Create session storage to transfer data between pages
+        function setSessionData(key, value) {
+            if (typeof value === 'object') {
+                document.cookie = `${key}=${encodeURIComponent(JSON.stringify(value))};path=/`;
+            } else {
+                document.cookie = `${key}=${encodeURIComponent(value)};path=/`;
+            }
+        }
+
+        function getSessionData(key) {
+            const name = `${key}=`;
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const ca = decodedCookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) === 0) {
+                    const value = c.substring(name.length, c.length);
+                    try {
+                        // Try to parse as JSON
+                        return JSON.parse(value);
+                    } catch (e) {
+                        // Or return as is if it's not JSON
+                        return value;
+                    }
+                }
+            }
+            return null;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements - Auth Forms
             const showSignInBtn = document.getElementById('showSignInBtn');
@@ -653,7 +720,6 @@
             const termsAgreement = document.getElementById('termsAgreement');
             
             // Quiz state variables
-            let currentQuestion = 1;
             let quizAnswers = {
                 importance: '',
                 goals: [],
@@ -661,76 +727,17 @@
                 challenge: '',
                 sectors: []
             };
-            
-            // Initialize app data
-            initializeAppData();
-            
+
+            // Try to get current user from session
+            const sessionUser = getSessionData('currentUser');
+            if (sessionUser) {
+                window.ProConnectDB.currentUser = sessionUser;
+                // If user is logged in, redirect to profile page
+                window.location.href = 'profile.html';
+            }
+
             // Initialize quiz option selection
             initializeQuizOptions();
-            
-            // Initialize application data if not exists
-            function initializeAppData() {
-                if (!localStorage.getItem('proconnect_users')) {
-                    // Create a sample user for testing if needed
-                    const sampleUsers = [];
-                    localStorage.setItem('proconnect_users', JSON.stringify(sampleUsers));
-                    console.log("Initialized users database");
-                }
-            }
-            
-            // Get all users
-            function getAllUsers() {
-                try {
-                    const users = JSON.parse(localStorage.getItem('proconnect_users'));
-                    if (Array.isArray(users)) {
-                        return users;
-                    } else {
-                        console.error("Users data is not an array, resetting");
-                        localStorage.setItem('proconnect_users', JSON.stringify([]));
-                        return [];
-                    }
-                } catch (err) {
-                    console.error("Error parsing users data:", err);
-                    localStorage.setItem('proconnect_users', JSON.stringify([]));
-                    return [];
-                }
-            }
-            
-            // Save users array
-            function saveUsers(users) {
-                localStorage.setItem('proconnect_users', JSON.stringify(users));
-            }
-            
-            // Find user by email
-            function findUserByEmail(email) {
-                if (!email) return null;
-                
-                const users = getAllUsers();
-                const user = users.find(user => user.email && user.email.toLowerCase() === email.toLowerCase());
-                return user || null;
-            }
-            
-            // Add new user
-            function addUser(user) {
-                if (!user || !user.email) {
-                    console.error("Invalid user object");
-                    return { success: false, message: 'Invalid user data' };
-                }
-                
-                const users = getAllUsers();
-                
-                // Check if email is already in use
-                if (users.some(u => u.email && u.email.toLowerCase() === user.email.toLowerCase())) {
-                    return { success: false, message: 'Email is already in use' };
-                }
-                
-                // Add user to array
-                users.push(user);
-                saveUsers(users);
-                
-                console.log("User added successfully:", user.email);
-                return { success: true };
-            }
             
             // Show toast notification
             function showToast(message) {
@@ -740,6 +747,35 @@
                 setTimeout(() => {
                     toastNotification.style.opacity = 0;
                 }, 3000);
+            }
+            
+            // Find user by email
+            function findUserByEmail(email) {
+                if (!email) return null;
+                return window.ProConnectDB.users.find(user => 
+                    user.email && user.email.toLowerCase() === email.toLowerCase()
+                );
+            }
+            
+            // Add new user
+            function addUser(user) {
+                if (!user || !user.email) {
+                    console.error("Invalid user object");
+                    return { success: false, message: 'Invalid user data' };
+                }
+                
+                // Check if email is already in use
+                if (window.ProConnectDB.users.some(u => 
+                    u.email && u.email.toLowerCase() === user.email.toLowerCase())
+                ) {
+                    return { success: false, message: 'Email is already in use' };
+                }
+                
+                // Add user to array
+                window.ProConnectDB.users.push(user);
+                
+                console.log("User added successfully:", user.email);
+                return { success: true };
             }
             
             // Switch to sign in form
@@ -952,7 +988,6 @@
             
             // Update quiz progress bar
             function updateQuizProgress(questionNum) {
-                currentQuestion = questionNum;
                 const progressPercentage = (questionNum / 5) * 100;
                 quizProgress.style.setProperty('--target-width', `${progressPercentage}%`);
             }
@@ -1079,6 +1114,20 @@
                     return;
                 }
                 
+                // For demo purposes, allow signing in with the default account
+                if (loginEmail.value.trim() === 'test@example.com' && loginPassword.value === 'password123') {
+                    // Use the first user from our default array
+                    const user = window.ProConnectDB.users[0];
+                    window.ProConnectDB.currentUser = user;
+                    
+                    // Save to session
+                    setSessionData('currentUser', user);
+                    
+                    // Show success message
+                    showSuccess('You have been signed in successfully.');
+                    return;
+                }
+                
                 // Find user by email
                 const user = findUserByEmail(loginEmail.value.trim());
                 
@@ -1093,8 +1142,11 @@
                     return;
                 }
                 
-                // Save current user to localStorage
-                localStorage.setItem('currentUser', JSON.stringify(user));
+                // Store current user
+                window.ProConnectDB.currentUser = user;
+                
+                // Save to session
+                setSessionData('currentUser', user);
                 
                 // Show success message
                 showSuccess('You have been signed in successfully.');
@@ -1172,7 +1224,7 @@
                     about: registerAbout.value.trim()
                 };
                 
-                localStorage.setItem('tempRegistration', JSON.stringify(tempRegistration));
+                window.ProConnectDB.tempRegistration = tempRegistration;
                 
                 // Reset quiz answers
                 quizAnswers = {
@@ -1196,13 +1248,11 @@
             function handleCompleteSignUp() {
                 try {
                     // Get registration data
-                    const tempData = localStorage.getItem('tempRegistration');
+                    const tempData = window.ProConnectDB.tempRegistration;
                     if (!tempData) {
                         showToast('Registration data not found. Please try again.');
                         return;
                     }
-                    
-                    const registrationData = JSON.parse(tempData);
                     
                     // Calculate score
                     const networkingScore = calculateAndDisplayNetworkingScore();
@@ -1210,15 +1260,15 @@
                     // Create user object with quiz data
                     const newUser = {
                         id: 'user_' + Date.now(),
-                        fullName: registrationData.fullName,
-                        email: registrationData.email,
-                        password: registrationData.password, // In a real app, use proper hashing
-                        currentRole: registrationData.currentRole,
-                        company: registrationData.company,
-                        industry: registrationData.industry,
-                        location: registrationData.location,
-                        skills: registrationData.skills,
-                        about: registrationData.about,
+                        fullName: tempData.fullName,
+                        email: tempData.email,
+                        password: tempData.password, // In a real app, use proper hashing
+                        currentRole: tempData.currentRole,
+                        company: tempData.company,
+                        industry: tempData.industry,
+                        location: tempData.location,
+                        skills: tempData.skills,
+                        about: tempData.about,
                         profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                         networkingProfile: {
                             ...quizAnswers,
@@ -1239,11 +1289,14 @@
                         return;
                     }
                     
-                    // Clean up temporary storage
-                    localStorage.removeItem('tempRegistration');
+                    // Set as current user
+                    window.ProConnectDB.currentUser = newUser;
                     
-                    // Save current user in local storage
-                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    // Save to session
+                    setSessionData('currentUser', newUser);
+                    
+                    // Clear temp registration
+                    window.ProConnectDB.tempRegistration = null;
                     
                     // Show success message
                     showSuccess('Your account has been created! Let\'s start networking.');
@@ -1290,15 +1343,12 @@
                 }
             });
             
-            // Check if user is already logged in
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                // Redirect to profile page
-                window.location.href = 'profile.html';
-            }
-            
             // Set initial state - start with Sign In view
             showSignInForm();
+            
+            // Pre-fill for demo purposes
+            loginEmail.value = 'test@example.com';
+            loginPassword.value = 'password123';
         });
     </script>
 </body>
