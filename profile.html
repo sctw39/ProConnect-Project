@@ -257,6 +257,12 @@
             border-color: #202020;
         }
         
+        .dark input, .dark textarea, .dark select {
+            color: #E9ECEF;
+            background-color: #2A2A2A;
+            border-color: #3A3A3A;
+        }
+        
         /* Bottom navigation - dark mode */
         .dark .bottom-nav {
             background-color: #202020 !important;
@@ -631,7 +637,7 @@
                     </div>
                     
                     <div class="flex justify-end space-x-3">
-                        <button id="cancelProfileImageBtn" class="px-4 py-2 border rounded-lg text-textMedium">
+                        <button id="cancelProfileImageBtn" class="px-4 py-2 border rounded-lg text-textMedium dark:border-darkTertiary">
                             Cancel
                         </button>
                         <button id="saveProfileImageBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
@@ -798,10 +804,24 @@
             const saveProfileImageBtn = document.getElementById('saveProfileImageBtn');
             
             // Current state variables
-            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            let currentUser = JSON.parse(localStorage.getItem('currentUser')) || createDefaultUser();
             let isViewMode = false;
             let viewUserId = null;
             let tempImageDataUrl = null;
+            
+            // Create a default user if none exists
+            function createDefaultUser() {
+                const defaultUser = {
+                    id: 'user_' + Date.now(),
+                    fullName: "Your Name",
+                    currentRole: "Professional Title",
+                    about: "Tell people about yourself",
+                    skills: ["Add", "Your", "Skills"],
+                    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
+                };
+                localStorage.setItem('currentUser', JSON.stringify(defaultUser));
+                return defaultUser;
+            }
             
             // Check URL for view parameter
             const urlParams = new URLSearchParams(window.location.search);
@@ -841,7 +861,7 @@
                         loadProfile();
                         profileContent.classList.remove('hidden');
                     }
-                }, 1000);
+                }, 800);
             }
             
             // Load current user's profile
@@ -999,7 +1019,7 @@
                     
                     if (!userData) {
                         // Check if it's in the current user's connections
-                        const connection = currentUser.connections.find(c => c.id === userId);
+                        const connection = currentUser.connections?.find(c => c.id === userId);
                         if (connection) {
                             userData = {
                                 id: connection.id,
@@ -1348,6 +1368,9 @@
                 panelContent.classList.remove('slide-in');
                 panelContent.classList.add('slide-out');
                 
+                // Reset temp image data
+                tempImageDataUrl = null;
+                
                 setTimeout(() => {
                     panelContent.classList.remove('slide-out');
                     editProfilePanel.classList.add('hidden');
@@ -1379,6 +1402,9 @@
                 // Save profile image if changed
                 if (tempImageDataUrl) {
                     currentUser.profileImage = tempImageDataUrl;
+                    // Update all previews
+                    document.getElementById('profileImage').src = tempImageDataUrl;
+                    uploadImagePreview.src = tempImageDataUrl;
                     tempImageDataUrl = null;
                 }
                 
@@ -1400,11 +1426,6 @@
                     document.getElementById('profileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${currentUser.location}`;
                 } else {
                     document.getElementById('profileLocation').innerHTML = '<i class="fas fa-map-marker-alt mr-1"></i>Add your location';
-                }
-                
-                // Update profile image
-                if (currentUser.profileImage) {
-                    document.getElementById('profileImage').src = currentUser.profileImage;
                 }
                 
                 // Update profile completion
@@ -1714,6 +1735,22 @@
             // View analytics button
             viewAnalyticsBtn.addEventListener('click', function() {
                 window.location.href = "index.html";
+            });
+            
+            // View all connections button
+            viewAllConnectionsBtn.addEventListener('click', function() {
+                showToast("Coming soon: Connections page");
+            });
+            
+            // Settings button
+            settingsBtn.addEventListener('click', function() {
+                showToast("Coming soon: Settings page");
+            });
+            
+            // Share profile button
+            shareProfileBtn.addEventListener('click', function() {
+                // Simulate sharing functionality
+                showToast("Profile link copied to clipboard");
             });
             
             // Format month and year
