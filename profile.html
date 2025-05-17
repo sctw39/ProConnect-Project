@@ -327,10 +327,10 @@
             <h3 class="text-lg font-semibold mb-2">Sign in to view your profile</h3>
             <p class="text-textMedium mb-4 text-center">Please sign in or create an account to build your professional profile</p>
             <div class="flex space-x-4">
-                <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-lg">
+                <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primaryDark transition duration-300">
                     Sign In
                 </a>
-                <a href="login.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200">
+                <a href="login.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-300">
                     Sign Up
                 </a>
             </div>
@@ -389,10 +389,10 @@
                 
                 <!-- Quick Action Buttons -->
                 <div class="flex space-x-3">
-                    <button id="editProfileBtn" class="bg-primary text-white px-4 py-2 rounded-lg flex items-center">
+                    <button id="editProfileBtn" class="bg-primary text-white px-4 py-2 rounded-lg flex items-center hover:bg-primaryDark transition duration-300">
                         <i class="fas fa-pen mr-2"></i> Edit Profile
                     </button>
-                    <button id="viewAnalyticsBtn" class="bg-lightTertiary text-textDark px-4 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200">
+                    <button id="viewAnalyticsBtn" class="bg-lightTertiary text-textDark px-4 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-300">
                         <i class="fas fa-chart-line mr-2"></i> Analytics
                     </button>
                 </div>
@@ -595,7 +595,7 @@
                     </div>
                     <div>
                         <span class="text-sm text-textMedium">Focus Sectors</span>
-                        <div class="flex flex-wrap mt-1">
+                        <div class="flex flex-wrap mt-1" id="focusSectorsList">
                             <span class="inline-block px-2 py-1 bg-primary/10 text-primary rounded text-xs mr-1 mb-1">Technology</span>
                             <span class="inline-block px-2 py-1 bg-primary/10 text-primary rounded text-xs mr-1 mb-1">Finance</span>
                         </div>
@@ -608,7 +608,7 @@
             </div>
 
             <!-- Sign Out Button -->
-            <button id="signOutButton" class="w-full py-3 bg-white dark:bg-darkSecondary text-danger rounded-lg shadow-sm flex justify-center items-center mb-6">
+            <button id="signOutButton" class="w-full py-3 bg-white dark:bg-darkSecondary text-danger rounded-lg shadow-sm flex justify-center items-center mb-6 hover:bg-gray-100 dark:hover:bg-darkTertiary transition duration-300">
                 <i class="fas fa-sign-out-alt mr-2"></i> Sign Out
             </button>
         </div>
@@ -628,7 +628,7 @@
                     <div class="text-center">
                         <img id="imagePreview" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Profile photo preview" class="image-preview mb-3">
                         <div class="file-input-container">
-                            <button class="bg-primary text-white px-4 py-2 rounded-lg">
+                            <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primaryDark transition duration-300">
                                 <i class="fas fa-camera mr-2"></i> Change Photo
                             </button>
                             <input type="file" id="profileImageInput" class="file-input" accept="image/*">
@@ -675,7 +675,7 @@
                     </div>
                     
                     <div class="pt-4 flex justify-end">
-                        <button id="saveProfileBtn" class="bg-primary text-white px-6 py-2 rounded-lg">
+                        <button id="saveProfileBtn" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primaryDark transition duration-300">
                             Save Changes
                         </button>
                     </div>
@@ -694,17 +694,17 @@
                     <img id="uploadImagePreview" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Preview" class="image-preview mb-4">
                     
                     <div class="file-input-container mb-6">
-                        <button class="bg-lightTertiary dark:bg-darkTertiary text-textDark dark:text-white px-4 py-2 rounded-lg">
+                        <button class="bg-lightTertiary dark:bg-darkTertiary text-textDark dark:text-white px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-300">
                             <i class="fas fa-upload mr-2"></i> Choose Photo
                         </button>
                         <input type="file" id="uploadProfileImageInput" class="file-input" accept="image/*">
                     </div>
                     
                     <div class="flex justify-end space-x-3">
-                        <button id="cancelProfileImageBtn" class="px-4 py-2 border rounded-lg text-textMedium dark:border-darkTertiary">
+                        <button id="cancelProfileImageBtn" class="px-4 py-2 border rounded-lg text-textMedium dark:border-darkTertiary hover:bg-gray-100 dark:hover:bg-darkTertiary transition duration-300">
                             Cancel
                         </button>
-                        <button id="saveProfileImageBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
+                        <button id="saveProfileImageBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primaryDark transition duration-300">
                             Save Photo
                         </button>
                     </div>
@@ -723,10 +723,10 @@
                     <p class="text-textMedium mb-6">Are you sure you want to sign out of your account?</p>
                     
                     <div class="flex justify-center space-x-4">
-                        <button id="cancelSignOutBtn" class="px-6 py-2 border rounded-lg text-textMedium dark:border-darkTertiary">
+                        <button id="cancelSignOutBtn" class="px-6 py-2 border rounded-lg text-textMedium dark:border-darkTertiary hover:bg-gray-100 dark:hover:bg-darkTertiary transition duration-300">
                             Cancel
                         </button>
-                        <button id="confirmSignOutBtn" class="bg-danger text-white px-6 py-2 rounded-lg">
+                        <button id="confirmSignOutBtn" class="bg-danger text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300">
                             Sign Out
                         </button>
                     </div>
@@ -782,6 +782,7 @@
             const signOutModal = document.getElementById('signOutModal');
             const cancelSignOutBtn = document.getElementById('cancelSignOutBtn');
             const confirmSignOutBtn = document.getElementById('confirmSignOutBtn');
+            const focusSectorsList = document.getElementById('focusSectorsList');
             
             // Edit Profile Panel Elements
             const editProfilePanel = document.getElementById('editProfilePanel');
@@ -983,9 +984,8 @@
                     }).join('');
                     
                     // Update DOM
-                    const sectorParent = document.querySelector(".bg-white.dark\\:bg-darkSecondary:nth-of-type(5) .flex.flex-wrap");
-                    if (sectorParent) {
-                        sectorParent.innerHTML = sectorsHtml;
+                    if (focusSectorsList) {
+                        focusSectorsList.innerHTML = sectorsHtml;
                     }
                 }
             }
@@ -1230,4 +1230,300 @@
                     // Update all previews
                     document.getElementById('profileImage').src = tempImageDataUrl;
                     uploadImagePreview.src = tempImageDataUrl;
-                    tempImageDataUrl = null
+                    tempImageDataUrl = null;
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Update UI
+                document.getElementById('profileName').textContent = currentUser.fullName;
+                
+                // Update profile title
+                let title = currentUser.currentRole;
+                if (currentUser.company) {
+                    title += " at " + currentUser.company;
+                }
+                document.getElementById('profileTitle').textContent = title;
+                
+                // Update location
+                if (currentUser.location) {
+                    document.getElementById('profileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${currentUser.location}`;
+                } else {
+                    document.getElementById('profileLocation').innerHTML = '<i class="fas fa-map-marker-alt mr-1"></i>Add your location';
+                }
+                
+                // Update profile completion
+                updateProfileCompletion();
+                
+                // Close edit profile panel
+                const panelContent = editProfilePanel.querySelector('.absolute');
+                panelContent.classList.remove('slide-in');
+                panelContent.classList.add('slide-out');
+                
+                setTimeout(() => {
+                    panelContent.classList.remove('slide-out');
+                    editProfilePanel.classList.add('hidden');
+                }, 300);
+                
+                // Show success message
+                showToast('Profile updated successfully');
+            });
+            
+            // Profile Image Input Change
+            profileImageInput.addEventListener('change', function() {
+                handleProfileImageSelect(this, imagePreview);
+            });
+            
+            // Edit Profile Image Button
+            editProfileImageBtn.addEventListener('click', function() {
+                // Show image upload modal
+                imageUploadModal.classList.remove('hidden');
+                
+                // Set preview image to current profile image
+                if (currentUser.profileImage) {
+                    uploadImagePreview.src = currentUser.profileImage;
+                }
+            });
+            
+            // Upload Profile Image Input Change
+            uploadProfileImageInput.addEventListener('change', function() {
+                handleProfileImageSelect(this, uploadImagePreview);
+            });
+            
+            // Cancel Profile Image Button
+            cancelProfileImageBtn.addEventListener('click', function() {
+                // Hide image upload modal
+                imageUploadModal.classList.add('hidden');
+                
+                // Reset temp image
+                tempImageDataUrl = null;
+            });
+            
+            // Save Profile Image Button
+            saveProfileImageBtn.addEventListener('click', function() {
+                if (!tempImageDataUrl) {
+                    showToast('Please select an image first');
+                    return;
+                }
+                
+                // Update user data
+                currentUser.profileImage = tempImageDataUrl;
+                
+                // Save to localStorage
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Update UI
+                document.getElementById('profileImage').src = currentUser.profileImage;
+                imagePreview.src = currentUser.profileImage;
+                
+                // Reset temp image
+                tempImageDataUrl = null;
+                
+                // Hide image upload modal
+                imageUploadModal.classList.add('hidden');
+                
+                // Update profile completion
+                updateProfileCompletion();
+                
+                // Show success message
+                showToast('Profile photo updated');
+            });
+            
+            // Edit section buttons
+            const editSectionBtns = document.querySelectorAll('.edit-section-btn');
+            
+            editSectionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    const formId = section + 'EditForm';
+                    
+                    // Show edit form
+                    document.getElementById(formId).classList.remove('hidden');
+                });
+            });
+            
+            // Cancel edit buttons
+            const cancelEditBtns = document.querySelectorAll('.cancel-edit-btn');
+            
+            cancelEditBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Find the parent form
+                    const form = this.closest('[id$="EditForm"]');
+                    form.classList.add('hidden');
+                });
+            });
+            
+            // Save edit buttons
+            const saveEditBtns = document.querySelectorAll('.save-edit-btn');
+            
+            saveEditBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    
+                    // Get form data and update profile
+                    if (section === 'about') {
+                        const aboutText = document.getElementById('aboutTextarea').value.trim();
+                        currentUser.about = aboutText;
+                        document.getElementById('aboutContent').textContent = aboutText;
+                    } else if (section === 'skills') {
+                        const skillsText = document.getElementById('skillsInput').value.trim();
+                        const skillsArray = skillsText.split(',').map(s => s.trim()).filter(s => s !== "");
+                        
+                        currentUser.skills = skillsArray;
+                        
+                        // Update skills display
+                        let skillsHtml = skillsArray.map(skill => {
+                            return `<span class="skill-badge">${skill}</span>`;
+                        }).join('');
+                        
+                        document.getElementById('skillsList').innerHTML = skillsHtml || '<span class="text-textLight text-sm">Add your skills</span>';
+                    } else if (section === 'experience') {
+                        // Get form values
+                        const title = document.getElementById('expTitleInput').value.trim();
+                        const company = document.getElementById('expCompanyInput').value.trim();
+                        const startDate = document.getElementById('expStartInput').value;
+                        const endDate = document.getElementById('expEndInput').value;
+                        const isCurrent = document.getElementById('expCurrentInput').checked;
+                        const description = document.getElementById('expDescriptionInput').value.trim();
+                        
+                        if (!title || !company || !startDate) {
+                            showToast("Please fill in the required fields");
+                            return;
+                        }
+                        
+                        // Format dates
+                        const formattedStartDate = startDate ? formatMonthYear(startDate) : '';
+                        const formattedEndDate = isCurrent ? null : (endDate ? formatMonthYear(endDate) : '');
+                        
+                        // Create new experience object
+                        const newExperience = {
+                            title,
+                            company,
+                            startDate: formattedStartDate,
+                            endDate: formattedEndDate,
+                            description
+                        };
+                        
+                        // Add to user profile
+                        if (!currentUser.experience) {
+                            currentUser.experience = [];
+                        }
+                        
+                        currentUser.experience.unshift(newExperience); // Add to beginning of array
+                        
+                        // Update experience display
+                        let experienceHtml = currentUser.experience.map((exp, index) => {
+                            const isLast = index === currentUser.experience.length - 1;
+                            return `
+                                <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                    <h4 class="font-medium">${exp.title}</h4>
+                                    <p class="text-textMedium text-sm">${exp.company}</p>
+                                    <p class="text-textLight text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
+                                    ${exp.description ? `<p class="text-textMedium text-sm mt-1">${exp.description}</p>` : ''}
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        document.getElementById('experienceList').innerHTML = experienceHtml;
+                        
+                        // Reset form
+                        document.getElementById('expTitleInput').value = '';
+                        document.getElementById('expCompanyInput').value = '';
+                        document.getElementById('expStartInput').value = '';
+                        document.getElementById('expEndInput').value = '';
+                        document.getElementById('expCurrentInput').checked = false;
+                        document.getElementById('expDescriptionInput').value = '';
+                        
+                    } else if (section === 'education') {
+                        // Get form values
+                        const degree = document.getElementById('eduDegreeInput').value.trim();
+                        const fieldOfStudy = document.getElementById('eduFieldInput').value.trim();
+                        const school = document.getElementById('eduSchoolInput').value.trim();
+                        const startYear = document.getElementById('eduStartInput').value.trim();
+                        const endYear = document.getElementById('eduEndInput').value.trim();
+                        
+                        if (!degree || !school || !startYear) {
+                            showToast("Please fill in the required fields");
+                            return;
+                        }
+                        
+                        // Create new education object
+                        const newEducation = {
+                            degree,
+                            fieldOfStudy,
+                            school,
+                            startYear,
+                            endYear
+                        };
+                        
+                        // Add to user profile
+                        if (!currentUser.education) {
+                            currentUser.education = [];
+                        }
+                        
+                        currentUser.education.unshift(newEducation); // Add to beginning of array
+                        
+                        // Update education display
+                        let educationHtml = currentUser.education.map((edu, index) => {
+                            const isLast = index === currentUser.education.length - 1;
+                            const fullDegree = edu.degree + (edu.fieldOfStudy ? ' in ' + edu.fieldOfStudy : '');
+                            return `
+                                <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
+                                    <h4 class="font-medium">${fullDegree}</h4>
+                                    <p class="text-textMedium text-sm">${edu.school}</p>
+                                    <p class="text-textLight text-xs">${edu.startYear} - ${edu.endYear || 'Present'}</p>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        document.getElementById('educationList').innerHTML = educationHtml;
+                        
+                        // Reset form
+                        document.getElementById('eduDegreeInput').value = '';
+                        document.getElementById('eduFieldInput').value = '';
+                        document.getElementById('eduSchoolInput').value = '';
+                        document.getElementById('eduStartInput').value = '';
+                        document.getElementById('eduEndInput').value = '';
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    // Hide form
+                    const form = this.closest('[id$="EditForm"]');
+                    form.classList.add('hidden');
+                    
+                    // Update profile completion
+                    updateProfileCompletion();
+                    
+                    // Show success message
+                    showToast("Profile updated successfully");
+                });
+            });
+            
+            // View analytics button
+            viewAnalyticsBtn.addEventListener('click', function() {
+                window.location.href = "index.html";
+            });
+            
+            // View all connections button
+            viewAllConnectionsBtn.addEventListener('click', function() {
+                showToast("Coming soon: Connections page");
+            });
+            
+            // Share profile button
+            shareProfileBtn.addEventListener('click', function() {
+                // Simulate sharing functionality
+                showToast("Profile link copied to clipboard");
+            });
+            
+            // Format month and year
+            function formatMonthYear(input) {
+                const date = new Date(input);
+                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            }
+        });
+    </script>
+</body>
+</html>
