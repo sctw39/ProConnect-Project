@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,21 +29,12 @@
                         darkTertiary: '#2A2A2A'
                     }
                 }
-            }
+            },
+            darkMode: 'class'
         }
         
-        // Check for dark mode
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
+        // Force dark mode
+        document.documentElement.classList.add('dark');
     </script>
     <style>
         /* Form animations */
@@ -124,7 +115,7 @@
         .meter {
             position: relative;
             height: 8px;
-            background: #e9ecef;
+            background: #333;
             border-radius: 4px;
             overflow: hidden;
         }
@@ -155,79 +146,64 @@
         }
         
         .tab-btn.inactive {
-            background-color: white;
+            background-color: #202020;
             color: #0078D4;
             border: 2px solid #0078D4;
         }
         
         .tab-btn.inactive:hover {
-            background-color: #f8f9fa;
-        }
-        
-        /* Dark mode support */
-        .dark .bg-lightBg {
-            background-color: #181818 !important;
-        }
-        
-        .dark .bg-white, .dark .bg-lightSecondary {
-            background-color: #202020 !important;
-        }
-        
-        .dark .bg-lightTertiary {
-            background-color: #2A2A2A !important;
-        }
-        
-        .dark .text-textDark {
-            color: #F8F9FA !important;
-        }
-        
-        .dark .text-textMedium {
-            color: #CED4DA !important;
-        }
-        
-        .dark .border-gray-200, .dark .border-gray-300 {
-            border-color: #2A2A2A !important;
-        }
-        
-        .dark .form-input {
             background-color: #2A2A2A;
-            border-color: #3A3A3A;
-            color: #E9ECEF;
         }
         
-        .dark .form-input::placeholder {
-            color: #6C757D;
-        }
-        
-        .dark .meter {
-            background: #333;
-        }
-        
-        .dark .quiz-option {
+        /* Quiz option styling */
+        .quiz-option {
             background-color: #2A2A2A;
             border-color: #3A3A3A;
         }
         
-        .dark .quiz-option:hover {
+        .quiz-option:hover {
             background-color: #333333;
         }
         
-        .dark .quiz-option.selected {
+        .quiz-option.selected {
             background-color: rgba(0, 120, 212, 0.2);
             border-color: #0078D4;
         }
         
-        .dark .tab-btn.inactive {
-            background-color: #202020;
-            color: #0078D4;
+        /* General dark mode styling */
+        body {
+            background-color: #181818 !important;
+            color: #F8F9FA !important;
         }
         
-        .dark .tab-btn.inactive:hover {
-            background-color: #2A2A2A;
+        .bg-white, .bg-lightSecondary, .bg-lightBg {
+            background-color: #202020 !important;
+        }
+        
+        .bg-lightTertiary {
+            background-color: #2A2A2A !important;
+        }
+        
+        .text-textMedium {
+            color: #CED4DA !important;
+        }
+        
+        .border-gray-200, .border-gray-300 {
+            border-color: #2A2A2A !important;
+        }
+        
+        input, textarea, select {
+            background-color: #2A2A2A !important;
+            border-color: #3A3A3A !important;
+            color: #E9ECEF !important;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #6C757D !important;
         }
     </style>
 </head>
-<body class="bg-lightBg text-textDark min-h-screen dark:bg-darkBg">
+<body class="dark:bg-darkBg text-textDark min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md min-h-screen flex flex-col justify-center">
         <!-- App Logo -->
         <div class="text-center mb-8">
@@ -235,7 +211,7 @@
                 <i class="fas fa-network-wired text-4xl text-white"></i>
             </div>
             <h1 class="text-2xl font-bold text-primary">ProConnect</h1>
-            <p class="text-textMedium mt-1">Your Professional Network</p>
+            <p class="text-white mt-1">Your Professional Network</p>
         </div>
         
         <!-- Authentication Tabs -->
@@ -248,21 +224,21 @@
         <div id="signInForm" class="auth-form">
             <form class="space-y-4">
                 <div>
-                    <label for="loginEmail" class="block text-sm font-medium mb-1">Email</label>
-                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your email" required>
+                    <label for="loginEmail" class="block text-sm font-medium mb-1 text-white">Email</label>
+                    <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:text-white" placeholder="Enter your email" required>
                 </div>
                 
                 <div>
                     <div class="flex justify-between mb-1">
-                        <label for="loginPassword" class="block text-sm font-medium">Password</label>
+                        <label for="loginPassword" class="block text-sm font-medium text-white">Password</label>
                         <a href="#" class="text-primary text-sm">Forgot?</a>
                     </div>
-                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your password" required>
+                    <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:text-white" placeholder="Enter your password" required>
                 </div>
                 
                 <div class="flex items-center">
                     <input type="checkbox" id="rememberMe" class="mr-2">
-                    <label for="rememberMe" class="text-sm">Remember me</label>
+                    <label for="rememberMe" class="text-sm text-white">Remember me</label>
                 </div>
                 
                 <button type="button" id="signInBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md hover:bg-primaryDark transition duration-300">
@@ -273,22 +249,22 @@
             <div class="mt-6">
                 <div class="relative">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300 dark:border-darkTertiary"></div>
+                        <div class="w-full border-t border-gray-700"></div>
                     </div>
                     <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-lightBg text-textMedium dark:bg-darkBg">Or continue with</span>
+                        <span class="px-2 bg-darkBg text-gray-400">Or continue with</span>
                     </div>
                 </div>
                 
                 <div class="mt-6 grid grid-cols-3 gap-3">
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition">
+                    <button class="py-2 px-4 border border-gray-700 rounded-lg flex justify-center items-center hover:bg-darkTertiary transition">
                         <i class="fab fa-google text-red-500"></i>
                     </button>
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition">
+                    <button class="py-2 px-4 border border-gray-700 rounded-lg flex justify-center items-center hover:bg-darkTertiary transition">
                         <i class="fab fa-linkedin text-blue-600"></i>
                     </button>
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition">
-                        <i class="fab fa-github text-gray-700 dark:text-gray-300"></i>
+                    <button class="py-2 px-4 border border-gray-700 rounded-lg flex justify-center items-center hover:bg-darkTertiary transition">
+                        <i class="fab fa-github text-gray-300"></i>
                     </button>
                 </div>
             </div>
@@ -297,43 +273,43 @@
         <!-- Sign Up Form (Hidden initially) -->
         <div id="signUpForm" class="auth-form hidden">
             <form class="space-y-4">
-                <h2 class="text-lg font-bold">Create Your Account</h2>
-                <p class="text-textMedium text-sm mb-4">Fill out your profile information to get started</p>
+                <h2 class="text-lg font-bold text-white">Create Your Account</h2>
+                <p class="text-gray-300 text-sm mb-4">Fill out your profile information to get started</p>
                 
                 <div>
-                    <label for="registerFullName" class="block text-sm font-medium mb-1">Full Name*</label>
-                    <input type="text" id="registerFullName" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your full name" required>
+                    <label for="registerFullName" class="block text-sm font-medium mb-1 text-white">Full Name*</label>
+                    <input type="text" id="registerFullName" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="Enter your full name" required>
                 </div>
                 
                 <div>
-                    <label for="registerEmail" class="block text-sm font-medium mb-1">Email*</label>
-                    <input type="email" id="registerEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your email" required>
+                    <label for="registerEmail" class="block text-sm font-medium mb-1 text-white">Email*</label>
+                    <input type="email" id="registerEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="Enter your email" required>
                 </div>
                 
                 <div>
-                    <label for="registerPassword" class="block text-sm font-medium mb-1">Password*</label>
-                    <input type="password" id="registerPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Create a password" required>
-                    <p class="text-xs text-textMedium mt-1">Password must be at least 8 characters long</p>
+                    <label for="registerPassword" class="block text-sm font-medium mb-1 text-white">Password*</label>
+                    <input type="password" id="registerPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="Create a password" required>
+                    <p class="text-xs text-gray-400 mt-1">Password must be at least 8 characters long</p>
                 </div>
                 
                 <div>
-                    <label for="registerConfirmPassword" class="block text-sm font-medium mb-1">Confirm Password*</label>
-                    <input type="password" id="registerConfirmPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Confirm your password" required>
+                    <label for="registerConfirmPassword" class="block text-sm font-medium mb-1 text-white">Confirm Password*</label>
+                    <input type="password" id="registerConfirmPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="Confirm your password" required>
                 </div>
                 
                 <div>
-                    <label for="registerTitle" class="block text-sm font-medium mb-1">Professional Title*</label>
-                    <input type="text" id="registerTitle" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Product Manager" required>
+                    <label for="registerTitle" class="block text-sm font-medium mb-1 text-white">Professional Title*</label>
+                    <input type="text" id="registerTitle" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="e.g. Product Manager" required>
                 </div>
                 
                 <div>
-                    <label for="registerCompany" class="block text-sm font-medium mb-1">Company</label>
-                    <input type="text" id="registerCompany" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. TechCorp">
+                    <label for="registerCompany" class="block text-sm font-medium mb-1 text-white">Company</label>
+                    <input type="text" id="registerCompany" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="e.g. TechCorp">
                 </div>
                 
                 <div>
-                    <label for="registerIndustry" class="block text-sm font-medium mb-1">Industry</label>
-                    <select id="registerIndustry" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary">
+                    <label for="registerIndustry" class="block text-sm font-medium mb-1 text-white">Industry</label>
+                    <select id="registerIndustry" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base">
                         <option value="">Select your industry</option>
                         <option value="Technology">Technology</option>
                         <option value="Finance">Finance</option>
@@ -348,42 +324,42 @@
                 </div>
                 
                 <div>
-                    <label for="registerLocation" class="block text-sm font-medium mb-1">Location</label>
-                    <input type="text" id="registerLocation" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. New York, NY">
+                    <label for="registerLocation" class="block text-sm font-medium mb-1 text-white">Location</label>
+                    <input type="text" id="registerLocation" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="e.g. New York, NY">
                 </div>
                 
                 <div>
-                    <label for="registerSkills" class="block text-sm font-medium mb-1">Skills</label>
-                    <input type="text" id="registerSkills" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Marketing, SEO, Analytics (comma separated)">
-                    <p class="text-xs text-textMedium mt-1">Enter skills separated by commas</p>
+                    <label for="registerSkills" class="block text-sm font-medium mb-1 text-white">Skills</label>
+                    <input type="text" id="registerSkills" class="w-full p-3 border rounded-lg form-input focus:outline-none text-base" placeholder="e.g. Marketing, SEO, Analytics (comma separated)">
+                    <p class="text-xs text-gray-400 mt-1">Enter skills separated by commas</p>
                 </div>
                 
                 <div>
-                    <label for="registerAbout" class="block text-sm font-medium mb-1">About</label>
-                    <textarea id="registerAbout" class="w-full p-3 border rounded-lg form-input focus:outline-none resize-none text-base dark:bg-darkTertiary dark:border-darkTertiary" rows="3" placeholder="Tell us about yourself"></textarea>
+                    <label for="registerAbout" class="block text-sm font-medium mb-1 text-white">About</label>
+                    <textarea id="registerAbout" class="w-full p-3 border rounded-lg form-input focus:outline-none resize-none text-base" rows="3" placeholder="Tell us about yourself"></textarea>
                 </div>
                 
                 <div class="flex items-center">
                     <input type="checkbox" id="termsAgreement" class="mr-2" required>
-                    <label for="termsAgreement" class="text-sm">I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a></label>
+                    <label for="termsAgreement" class="text-sm text-white">I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a></label>
                 </div>
                 
                 <button type="button" id="continueToQuizBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md hover:bg-primaryDark transition duration-300">
                     Continue to Networking Quiz
                 </button>
                 
-                <p class="text-xs text-textLight text-center">Fields marked with * are required</p>
+                <p class="text-xs text-gray-400 text-center">Fields marked with * are required</p>
             </form>
         </div>
         
         <!-- Networking Quiz (Hidden initially) -->
         <div id="networkingQuiz" class="auth-form hidden">
             <div class="mb-4">
-                <h2 class="text-lg font-bold mb-2">Business Networking Quiz</h2>
-                <p class="text-textMedium text-sm mb-4">Answer these 5 questions to help us understand how ProConnect can best support your business networking goals</p>
+                <h2 class="text-lg font-bold mb-2 text-white">Business Networking Quiz</h2>
+                <p class="text-gray-300 text-sm mb-4">Answer these 5 questions to help us understand how ProConnect can best support your business networking goals</p>
                 
                 <!-- Progress Bar -->
-                <div class="w-full bg-gray-200 rounded-full h-2 mb-6 dark:bg-darkTertiary">
+                <div class="w-full bg-darkTertiary rounded-full h-2 mb-6">
                     <div id="quizProgress" class="bg-primary h-2 rounded-full progress-bar" style="--target-width: 20%"></div>
                 </div>
                 
@@ -391,22 +367,22 @@
                     <!-- Quiz Question 1 -->
                     <div id="question1" class="quiz-slide">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">How important is expanding your business network to your career goals?</h3>
+                            <h3 class="font-medium mb-1 text-white">How important is expanding your business network to your career goals?</h3>
                             <div class="space-y-2 mt-3">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="critical">
-                                    <span>Critical - it's my top priority</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="critical">
+                                    <span class="text-white">Critical - it's my top priority</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="very">
-                                    <span>Very important - it's one of my main goals</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="very">
+                                    <span class="text-white">Very important - it's one of my main goals</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="somewhat">
-                                    <span>Somewhat important - it would be helpful</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="somewhat">
+                                    <span class="text-white">Somewhat important - it would be helpful</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="not">
-                                    <span>Not very important right now</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="not">
+                                    <span class="text-white">Not very important right now</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="unsure">
-                                    <span>Unsure - I haven't thought about it much</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="unsure">
+                                    <span class="text-white">Unsure - I haven't thought about it much</span>
                                 </div>
                             </div>
                         </div>
@@ -420,31 +396,31 @@
                     <!-- Quiz Question 2 (Hidden initially) -->
                     <div id="question2" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">What are your primary business networking goals?</h3>
-                            <p class="text-textMedium text-sm mb-3">Select all that apply</p>
+                            <h3 class="font-medium mb-1 text-white">What are your primary business networking goals?</h3>
+                            <p class="text-gray-300 text-sm mb-3">Select all that apply</p>
                             <div class="space-y-2">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="clients">
-                                    <span>Finding new clients or customers</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="clients">
+                                    <span class="text-white">Finding new clients or customers</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="partners">
-                                    <span>Identifying strategic business partners</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="partners">
+                                    <span class="text-white">Identifying strategic business partners</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="investors">
-                                    <span>Connecting with potential investors</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="investors">
+                                    <span class="text-white">Connecting with potential investors</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="mentors">
-                                    <span>Finding mentors or advisors</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="mentors">
+                                    <span class="text-white">Finding mentors or advisors</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="talent">
-                                    <span>Recruiting talent for my business</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="talent">
+                                    <span class="text-white">Recruiting talent for my business</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="learning">
-                                    <span>Learning from industry peers</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="learning">
+                                    <span class="text-white">Learning from industry peers</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-700 text-white rounded-lg hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
                             <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
@@ -456,27 +432,27 @@
                     <!-- Quiz Question 3 (Hidden initially) -->
                     <div id="question3" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">How do you typically approach business networking?</h3>
+                            <h3 class="font-medium mb-1 text-white">How do you typically approach business networking?</h3>
                             <div class="space-y-2 mt-3">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="proactive">
-                                    <span>Proactively - I regularly seek out new connections</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="proactive">
+                                    <span class="text-white">Proactively - I regularly seek out new connections</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="opportunistic">
-                                    <span>Opportunistically - I connect when opportunities arise</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="opportunistic">
+                                    <span class="text-white">Opportunistically - I connect when opportunities arise</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="selective">
-                                    <span>Selectively - I'm careful about who I connect with</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="selective">
+                                    <span class="text-white">Selectively - I'm careful about who I connect with</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="reactive">
-                                    <span>Reactively - I mostly respond to requests from others</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="reactive">
+                                    <span class="text-white">Reactively - I mostly respond to requests from others</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="avoid">
-                                    <span>I tend to avoid networking when possible</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="avoid">
+                                    <span class="text-white">I tend to avoid networking when possible</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-700 text-white rounded-lg hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
                             <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
@@ -488,27 +464,27 @@
                     <!-- Quiz Question 4 (Hidden initially) -->
                     <div id="question4" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">What's your biggest business networking challenge?</h3>
+                            <h3 class="font-medium mb-1 text-white">What's your biggest business networking challenge?</h3>
                             <div class="space-y-2 mt-3">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="finding">
-                                    <span>Finding the right people for my specific needs</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="finding">
+                                    <span class="text-white">Finding the right people for my specific needs</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="approaching">
-                                    <span>Approaching new contacts confidently</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="approaching">
+                                    <span class="text-white">Approaching new contacts confidently</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="time">
-                                    <span>Finding time for networking activities</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="time">
+                                    <span class="text-white">Finding time for networking activities</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="conversion">
-                                    <span>Converting connections into business opportunities</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="conversion">
+                                    <span class="text-white">Converting connections into business opportunities</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="maintenance">
-                                    <span>Maintaining relationships over time</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="maintenance">
+                                    <span class="text-white">Maintaining relationships over time</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-700 text-white rounded-lg hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
                             <button type="button" class="next-question px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
@@ -520,37 +496,37 @@
                     <!-- Quiz Question 5 (Hidden initially) -->
                     <div id="question5" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">Which business sectors would you most like to connect with?</h3>
-                            <p class="text-textMedium text-sm mb-3">Select all that apply</p>
+                            <h3 class="font-medium mb-1 text-white">Which business sectors would you most like to connect with?</h3>
+                            <p class="text-gray-300 text-sm mb-3">Select all that apply</p>
                             <div class="space-y-2">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="tech">
-                                    <span>Technology & SaaS</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="tech">
+                                    <span class="text-white">Technology & SaaS</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="finance">
-                                    <span>Finance & Investment</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="finance">
+                                    <span class="text-white">Finance & Investment</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="healthcare">
-                                    <span>Healthcare & Biotech</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="healthcare">
+                                    <span class="text-white">Healthcare & Biotech</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="ecommerce">
-                                    <span>E-commerce & Retail</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="ecommerce">
+                                    <span class="text-white">E-commerce & Retail</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="marketing">
-                                    <span>Marketing & Advertising</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="marketing">
+                                    <span class="text-white">Marketing & Advertising</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="manufacturing">
-                                    <span>Manufacturing & Supply Chain</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="manufacturing">
+                                    <span class="text-white">Manufacturing & Supply Chain</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="professional">
-                                    <span>Professional Services (Legal, Consulting)</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="professional">
+                                    <span class="text-white">Professional Services (Legal, Consulting)</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="real-estate">
-                                    <span>Real Estate & Construction</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-darkTertiary" data-value="real-estate">
+                                    <span class="text-white">Real Estate & Construction</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-between">
-                            <button type="button" class="prev-question px-4 py-2 border border-gray-300 text-textMedium rounded-lg dark:border-darkTertiary hover:bg-gray-50 dark:hover:bg-darkTertiary transition duration-300">
+                            <button type="button" class="prev-question px-4 py-2 border border-gray-700 text-white rounded-lg hover:bg-darkTertiary transition duration-300">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>
                             <button type="button" id="calculateNetworkingScore" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition duration-300">
@@ -568,15 +544,15 @@
                 <div class="w-16 h-16 bg-primary/10 rounded-full mx-auto flex items-center justify-center mb-4">
                     <i class="fas fa-chart-line text-primary text-2xl"></i>
                 </div>
-                <h2 class="text-xl font-bold mb-2">Your Business Networking Score</h2>
-                <p class="text-textMedium mb-4">Based on your responses, here's how ProConnect can help grow your business network</p>
+                <h2 class="text-xl font-bold mb-2 text-white">Your Business Networking Score</h2>
+                <p class="text-gray-300 mb-4">Based on your responses, here's how ProConnect can help grow your business network</p>
                 
                 <!-- Networking Score Meter -->
                 <div class="max-w-xs mx-auto mb-6">
                     <div class="meter mb-1">
                         <div id="networkingScoreMeter" class="meter-bar bg-primary" style="width: 0%"></div>
                     </div>
-                    <div class="flex justify-between text-xs text-textMedium">
+                    <div class="flex justify-between text-xs text-gray-400">
                         <span>Emerging</span>
                         <span>Building</span>
                         <span>Expanding</span>
@@ -587,18 +563,18 @@
                 <div class="mb-4">
                     <h3 class="font-medium text-primary">Business Growth Potential</h3>
                     <div class="flex items-center justify-center space-x-1 mt-2">
-                        <i id="potentialStar1" class="fas fa-star text-gray-300 text-xl"></i>
-                        <i id="potentialStar2" class="fas fa-star text-gray-300 text-xl"></i>
-                        <i id="potentialStar3" class="fas fa-star text-gray-300 text-xl"></i>
-                        <i id="potentialStar4" class="fas fa-star text-gray-300 text-xl"></i>
-                        <i id="potentialStar5" class="fas fa-star text-gray-300 text-xl"></i>
+                        <i id="potentialStar1" class="fas fa-star text-gray-600 text-xl"></i>
+                        <i id="potentialStar2" class="fas fa-star text-gray-600 text-xl"></i>
+                        <i id="potentialStar3" class="fas fa-star text-gray-600 text-xl"></i>
+                        <i id="potentialStar4" class="fas fa-star text-gray-600 text-xl"></i>
+                        <i id="potentialStar5" class="fas fa-star text-gray-600 text-xl"></i>
                     </div>
                 </div>
                 
                 <!-- Personalized Recommendation -->
                 <div class="bg-primary/10 rounded-lg p-4 mb-6 text-left">
                     <h3 class="font-medium mb-2 text-primary">Your Business Networking Recommendation</h3>
-                    <p id="networkingRecommendation" class="text-sm">Based on your profile, we recommend focusing on expanding your business connections in the technology sector. ProConnect can help you find potential partners, clients, and mentors to accelerate your business growth.</p>
+                    <p id="networkingRecommendation" class="text-sm text-white">Based on your profile, we recommend focusing on expanding your business connections in the technology sector. ProConnect can help you find potential partners, clients, and mentors to accelerate your business growth.</p>
                 </div>
                 
                 <button id="completeSignUpBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow-md hover:bg-primaryDark transition duration-300">
@@ -612,9 +588,9 @@
             <div class="w-16 h-16 bg-success/10 rounded-full mx-auto flex items-center justify-center mb-4 check-animation">
                 <i class="fas fa-check text-success text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold mb-2">Success!</h2>
-            <p id="successText" class="text-textMedium mb-4">You have been signed in successfully.</p>
-            <div id="successRedirectMessage" class="text-sm text-textLight">Redirecting you in <span id="countdown">3</span> seconds...</div>
+            <h2 class="text-xl font-bold mb-2 text-white">Success!</h2>
+            <p id="successText" class="text-gray-300 mb-4">You have been signed in successfully.</p>
+            <div id="successRedirectMessage" class="text-sm text-gray-400">Redirecting you in <span id="countdown">3</span> seconds...</div>
         </div>
 
         <!-- Toast Notification -->
@@ -980,7 +956,7 @@
                     // Light up the stars
                     const stars = [potentialStar1, potentialStar2, potentialStar3, potentialStar4, potentialStar5];
                     for (let i = 0; i < potentialStars; i++) {
-                        stars[i].classList.remove('text-gray-300');
+                        stars[i].classList.remove('text-gray-600');
                         stars[i].classList.add('text-accent');
                     }
                 }, 200);
