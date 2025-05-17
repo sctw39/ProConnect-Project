@@ -183,9 +183,9 @@
                 <a href="profile.html" class="text-primary mr-2 block p-2 hover:bg-darkTertiary rounded-full transition">
                     <i class="fas fa-user text-xl"></i>
                 </a>
-                <a href="notifications.html" class="text-primary block p-2 hover:bg-darkTertiary rounded-full transition relative">
+                <a href="connections.html" class="text-primary block p-2 hover:bg-darkTertiary rounded-full transition relative">
                     <i class="fas fa-bell text-xl"></i>
-                    <span id="notificationBadge" class="notification-badge hidden">0</span>
+                    <span id="notificationBadge" class="notification-badge">2</span>
                 </a>
             </div>
         </header>
@@ -200,7 +200,7 @@
             </div>
             
             <div class="flex space-x-2 overflow-x-auto py-2 scrollbar-hide">
-                <button class="filter-btn whitespace-nowrap px-3 py-1 bg-darkTertiary rounded-full text-sm text-white hover:bg-primary transition" data-filter="all">
+                <button class="filter-btn whitespace-nowrap px-3 py-1 bg-primary rounded-full text-sm text-white hover:bg-primaryDark transition" data-filter="all">
                     All
                 </button>
                 <button class="filter-btn whitespace-nowrap px-3 py-1 bg-darkTertiary rounded-full text-sm text-white hover:bg-primary transition" data-filter="Technology">
@@ -223,10 +223,62 @@
         
         <!-- People Browsing - Card Stack -->
         <div id="cardStack" class="mb-6 relative h-[450px]">
-            <!-- Card stack will be populated by JavaScript -->
-            <div class="flex flex-col items-center justify-center h-full">
-                <i class="fas fa-search text-5xl text-gray-600 mb-4"></i>
-                <p class="text-gray-400 text-center">Loading professionals...</p>
+            <!-- First user card (top) -->
+            <div id="user-card-1" class="user-card absolute inset-0 shadow-lg" style="z-index: 3;">
+                <div class="h-full flex flex-col">
+                    <div class="h-1/3 bg-primary"></div>
+                    <div class="p-4 flex-1 relative">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Sarah Johnson" 
+                            class="w-20 h-20 rounded-full absolute -top-10 left-4 border-4 border-darkSecondary object-cover">
+                        
+                        <div class="mt-12">
+                            <h2 class="text-xl font-bold text-white">Sarah Johnson</h2>
+                            <p class="text-gray-300">Marketing Director at Digital Solutions</p>
+                            <p class="text-gray-400 text-sm mb-3">Marketing · New York, NY</p>
+                            
+                            <div class="mb-4">
+                                <h3 class="font-medium text-white mb-1">About</h3>
+                                <p class="text-gray-300 text-sm line-clamp-2">Marketing director with 10+ years of experience in digital transformation and brand development.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h3 class="font-medium text-white mb-1">Skills</h3>
+                                <div class="flex flex-wrap">
+                                    <span class="skill-badge">Digital Marketing</span>
+                                    <span class="skill-badge">SEO</span>
+                                    <span class="skill-badge">Content Strategy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-darkTertiary">
+                        <button class="view-profile-btn w-full py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition" data-id="user_1">
+                            View Full Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Second user card (middle) -->
+            <div id="user-card-2" class="user-card absolute inset-0 shadow-lg" style="z-index: 2; transform: translateY(10px) scale(0.95);">
+                <div class="h-full flex flex-col">
+                    <div class="h-1/3 bg-primary"></div>
+                    <div class="p-4 flex-1 relative">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Michael Chen" 
+                            class="w-20 h-20 rounded-full absolute -top-10 left-4 border-4 border-darkSecondary object-cover">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Third user card (bottom) -->
+            <div id="user-card-3" class="user-card absolute inset-0 shadow-lg" style="z-index: 1; transform: translateY(20px) scale(0.9);">
+                <div class="h-full flex flex-col">
+                    <div class="h-1/3 bg-primary"></div>
+                    <div class="p-4 flex-1 relative">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Emma Wilson" 
+                            class="w-20 h-20 rounded-full absolute -top-10 left-4 border-4 border-darkSecondary object-cover">
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -244,22 +296,53 @@
         <div class="mb-6">
             <h2 class="text-lg font-bold mb-4 text-white">Recommended For You</h2>
             <div id="userListContainer" class="space-y-4">
-                <!-- User list items will be populated by JavaScript -->
-                <div class="animate-pulse">
-                    <div class="bg-darkSecondary p-4 rounded-lg flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-darkTertiary rounded-full"></div>
-                        <div class="flex-1">
-                            <div class="h-4 bg-darkTertiary rounded w-3/4 mb-2"></div>
-                            <div class="h-3 bg-darkTertiary rounded w-1/2"></div>
+                <!-- User list item 1 -->
+                <div class="user-list-item bg-darkSecondary rounded-lg overflow-hidden shadow">
+                    <div class="p-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Emma Wilson" 
+                                class="w-12 h-12 rounded-full object-cover border-2 border-darkTertiary">
+                            <div class="flex-1">
+                                <h3 class="font-medium text-white">Emma Wilson</h3>
+                                <p class="text-sm text-gray-300">Data Scientist at Analytics Pro</p>
+                            </div>
+                            <button class="connect-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="user_3">
+                                Connect
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="animate-pulse">
-                    <div class="bg-darkSecondary p-4 rounded-lg flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-darkTertiary rounded-full"></div>
-                        <div class="flex-1">
-                            <div class="h-4 bg-darkTertiary rounded w-3/4 mb-2"></div>
-                            <div class="h-3 bg-darkTertiary rounded w-1/2"></div>
+                
+                <!-- User list item 2 -->
+                <div class="user-list-item bg-darkSecondary rounded-lg overflow-hidden shadow">
+                    <div class="p-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="David Patel" 
+                                class="w-12 h-12 rounded-full object-cover border-2 border-darkTertiary">
+                            <div class="flex-1">
+                                <h3 class="font-medium text-white">David Patel</h3>
+                                <p class="text-sm text-gray-300">Finance Manager at Global Investments</p>
+                            </div>
+                            <button class="connect-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="user_4">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User list item 3 -->
+                <div class="user-list-item bg-darkSecondary rounded-lg overflow-hidden shadow">
+                    <div class="p-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="Olivia Rodriguez" 
+                                class="w-12 h-12 rounded-full object-cover border-2 border-darkTertiary">
+                            <div class="flex-1">
+                                <h3 class="font-medium text-white">Olivia Rodriguez</h3>
+                                <p class="text-sm text-gray-300">UX Designer at Creative Solutions</p>
+                            </div>
+                            <button class="connect-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="user_5">
+                                Connect
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -269,35 +352,31 @@
         <!-- User Details Modal (Hidden initially) -->
         <div id="userDetailsModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
             <div class="absolute inset-0 bg-black opacity-70"></div>
-            <div class="bg-darkSecondary rounded-lg p-6 max-w-md w-full relative z-10 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="bg-darkSecondary rounded-lg p-6 max-w-md w-full relative z-10 max-h-[90vh] overflow-y-auto">
                 <div class="text-right mb-2">
                     <button id="closeUserDetailsBtn" class="text-gray-300 hover:text-white">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
                 <div class="text-center mb-4">
-                    <img id="modalUserImage" src="" alt="User" class="w-24 h-24 rounded-full object-cover mx-auto border-4 border-darkTertiary mb-3">
-                    <h2 id="modalUserName" class="text-xl font-bold text-white">User Name</h2>
-                    <p id="modalUserTitle" class="text-gray-300">Professional Title</p>
-                    <p id="modalUserLocation" class="text-gray-400 text-sm"><i class="fas fa-map-marker-alt mr-1"></i>Location</p>
+                    <img id="modalUserImage" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&h=200&q=80" alt="User" class="w-24 h-24 rounded-full object-cover mx-auto border-4 border-darkTertiary mb-3">
+                    <h2 id="modalUserName" class="text-xl font-bold text-white">Sarah Johnson</h2>
+                    <p id="modalUserTitle" class="text-gray-300">Marketing Director at Digital Solutions</p>
+                    <p id="modalUserLocation" class="text-gray-400 text-sm mt-1"><i class="fas fa-map-marker-alt mr-1"></i>New York, NY</p>
                 </div>
                 
                 <div class="mb-4">
                     <h3 class="font-medium text-white mb-2">About</h3>
-                    <p id="modalUserAbout" class="text-gray-300 text-sm">User bio goes here...</p>
+                    <p id="modalUserAbout" class="text-gray-300 text-sm">Marketing director with 10+ years of experience in digital transformation and brand development.</p>
                 </div>
                 
                 <div class="mb-4">
                     <h3 class="font-medium text-white mb-2">Skills</h3>
                     <div id="modalUserSkills" class="flex flex-wrap">
-                        <!-- User skills will be populated here -->
-                    </div>
-                </div>
-                
-                <div class="mb-6">
-                    <h3 class="font-medium text-white mb-2">Experience</h3>
-                    <div id="modalUserExperience">
-                        <!-- User experience will be populated here -->
+                        <span class="skill-badge">Digital Marketing</span>
+                        <span class="skill-badge">SEO</span>
+                        <span class="skill-badge">Content Strategy</span>
+                        <span class="skill-badge">Social Media</span>
                     </div>
                 </div>
                 
@@ -316,7 +395,7 @@
         
         <!-- Bottom Navigation -->
         <nav class="fixed bottom-0 left-0 right-0 p-3 flex justify-around bg-darkSecondary border-t border-darkTertiary bottom-nav">
-            <a href="index.html" class="flex flex-col items-center">
+            <a href="analytics.html" class="flex flex-col items-center">
                 <i class="fas fa-chart-line text-xl text-gray-500 nav-icon"></i>
                 <span class="text-xs mt-1 text-gray-500">Analytics</span>
             </a>
@@ -324,9 +403,9 @@
                 <i class="fas fa-search text-xl text-primary nav-icon active"></i>
                 <span class="text-xs mt-1 text-primary">Find</span>
             </a>
-            <a href="notifications.html" class="flex flex-col items-center relative">
+            <a href="connections.html" class="flex flex-col items-center relative">
                 <i class="fas fa-bell text-xl text-gray-500 nav-icon"></i>
-                <span id="navNotificationBadge" class="notification-badge hidden">0</span>
+                <span id="navNotificationBadge" class="notification-badge">2</span>
                 <span class="text-xs mt-1 text-gray-500">Requests</span>
             </a>
             <a href="profile.html" class="flex flex-col items-center">
@@ -342,10 +421,8 @@
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
             const filterButtons = document.querySelectorAll('.filter-btn');
-            const cardStack = document.getElementById('cardStack');
             const skipButton = document.getElementById('skipButton');
             const connectButton = document.getElementById('connectButton');
-            const userListContainer = document.getElementById('userListContainer');
             const userDetailsModal = document.getElementById('userDetailsModal');
             const closeUserDetailsBtn = document.getElementById('closeUserDetailsBtn');
             const modalUserImage = document.getElementById('modalUserImage');
@@ -354,538 +431,12 @@
             const modalUserLocation = document.getElementById('modalUserLocation');
             const modalUserAbout = document.getElementById('modalUserAbout');
             const modalUserSkills = document.getElementById('modalUserSkills');
-            const modalUserExperience = document.getElementById('modalUserExperience');
             const modalConnectButton = document.getElementById('modalConnectButton');
             const toastNotification = document.getElementById('toastNotification');
-            const notificationBadge = document.getElementById('notificationBadge');
-            const navNotificationBadge = document.getElementById('navNotificationBadge');
             
-            // State variables
-            let allUsers = [];
-            let filteredUsers = [];
-            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            let currentIndex = 0;
-            let currentFilter = 'all';
-            let activeCardId = null;
-            let selectedUserId = null;
-            
-            // Initialize application
-            initializeApp();
-            
-            function initializeApp() {
-                // Load all users
-                loadUsers();
-                
-                // Check for notifications
-                checkForPendingRequests();
-                
-                // Set up event listeners
-                setupEventListeners();
-            }
-            
-            // Load all users from localStorage
-            function loadUsers() {
-                allUsers = JSON.parse(localStorage.getItem('proconnect_users') || '[]');
-                
-                // Filter out current user and existing connections
-                filteredUsers = filterUsers(allUsers);
-                
-                // Shuffle the array to show random users
-                shuffleArray(filteredUsers);
-                
-                // Populate UI
-                renderUserCards();
-                renderUserList();
-            }
-            
-            // Filter users based on criteria
-            function filterUsers(users) {
-                // Basic filtering: exclude current user and connections
-                let filtered = users.filter(user => {
-                    // Skip if this is the current user
-                    if (currentUser && user.id === currentUser.id) return false;
-                    
-                    // Skip if this user is already connected to current user
-                    if (currentUser && currentUser.connections && currentUser.connections.includes(user.id)) return false;
-                    
-                    // Skip if current user has already sent a request to this user
-                    if (currentUser && currentUser.sentRequests && currentUser.sentRequests.includes(user.id)) return false;
-                    
-                    return true;
-                });
-                
-                // Apply industry filter if not "all"
-                if (currentFilter !== 'all') {
-                    filtered = filtered.filter(user => user.industry === currentFilter);
-                }
-                
-                // Apply search filter if search input has value
-                const searchQuery = searchInput.value.trim().toLowerCase();
-                if (searchQuery) {
-                    filtered = filtered.filter(user => {
-                        return (
-                            (user.fullName && user.fullName.toLowerCase().includes(searchQuery)) ||
-                            (user.currentRole && user.currentRole.toLowerCase().includes(searchQuery)) ||
-                            (user.company && user.company.toLowerCase().includes(searchQuery)) ||
-                            (user.industry && user.industry.toLowerCase().includes(searchQuery))
-                        );
-                    });
-                }
-                
-                return filtered;
-            }
-            
-            // Set up event listeners
-            function setupEventListeners() {
-                // Search button
-                searchButton.addEventListener('click', function() {
-                    filteredUsers = filterUsers(allUsers);
-                    currentIndex = 0;
-                    renderUserCards();
-                    renderUserList();
-                });
-                
-                // Search input - search on enter key
-                searchInput.addEventListener('keyup', function(e) {
-                    if (e.key === 'Enter') {
-                        filteredUsers = filterUsers(allUsers);
-                        currentIndex = 0;
-                        renderUserCards();
-                        renderUserList();
-                    }
-                });
-                
-                // Filter buttons
-                filterButtons.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        // Update active filter button
-                        filterButtons.forEach(b => b.classList.remove('bg-primary'));
-                        this.classList.add('bg-primary');
-                        
-                        // Update current filter
-                        currentFilter = this.getAttribute('data-filter');
-                        
-                        // Filter users and update UI
-                        filteredUsers = filterUsers(allUsers);
-                        currentIndex = 0;
-                        renderUserCards();
-                        renderUserList();
-                    });
-                });
-                
-                // Skip button
-                skipButton.addEventListener('click', function() {
-                    if (activeCardId) {
-                        const card = document.getElementById(activeCardId);
-                        if (card) {
-                            // Animate swipe left and remove card
-                            card.classList.add('swipe-left');
-                            
-                            // Move to next card after animation
-                            setTimeout(() => {
-                                card.remove();
-                                currentIndex++;
-                                renderNextCard();
-                            }, 500);
-                        }
-                    }
-                });
-                
-                // Connect button
-                connectButton.addEventListener('click', function() {
-                    if (activeCardId && currentIndex < filteredUsers.length) {
-                        const card = document.getElementById(activeCardId);
-                        const targetUser = filteredUsers[currentIndex];
-                        
-                        if (card && targetUser) {
-                            // Send connection request
-                            sendConnectionRequest(targetUser.id);
-                            
-                            // Animate swipe right and remove card
-                            card.classList.add('swipe-right');
-                            
-                            // Show toast notification
-                            showToast('Connection request sent to ' + targetUser.fullName);
-                            
-                            // Move to next card after animation
-                            setTimeout(() => {
-                                card.remove();
-                                currentIndex++;
-                                renderNextCard();
-                            }, 500);
-                        }
-                    }
-                });
-                
-                // Close user details modal
-                closeUserDetailsBtn.addEventListener('click', function() {
-                    userDetailsModal.classList.add('hidden');
-                });
-                
-                // Modal connect button
-                modalConnectButton.addEventListener('click', function() {
-                    if (selectedUserId) {
-                        // Send connection request
-                        sendConnectionRequest(selectedUserId);
-                        
-                        // Update UI
-                        modalConnectButton.disabled = true;
-                        modalConnectButton.innerHTML = '<i class="fas fa-check mr-2"></i> Request Sent';
-                        modalConnectButton.classList.remove('bg-primary', 'hover:bg-primaryDark');
-                        modalConnectButton.classList.add('bg-gray-500');
-                        
-                        // Show toast
-                        showToast('Connection request sent');
-                        
-                        // Close modal after a delay
-                        setTimeout(() => {
-                            userDetailsModal.classList.add('hidden');
-                            
-                            // Remove user from list
-                            removeUserFromList(selectedUserId);
-                            
-                            // Update filtered users
-                            filteredUsers = filteredUsers.filter(user => user.id !== selectedUserId);
-                            
-                            // Reset current index if needed
-                            if (currentIndex >= filteredUsers.length) {
-                                currentIndex = 0;
-                            }
-                            
-                            // Re-render cards
-                            renderUserCards();
-                        }, 1500);
-                    }
-                });
-            }
-            
-            // Remove user from list view
-            function removeUserFromList(userId) {
-                const listItem = document.querySelector(`.user-list-item[data-id="${userId}"]`);
-                if (listItem) {
-                    listItem.classList.add('hidden');
-                }
-            }
-            
-            // Render user cards in the card stack
-            function renderUserCards() {
-                // Clear existing cards
-                cardStack.innerHTML = '';
-                
-                // If no users to display
-                if (filteredUsers.length === 0) {
-                    cardStack.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full">
-                            <i class="fas fa-search text-5xl text-gray-600 mb-4"></i>
-                            <p class="text-gray-400 text-center">No matching professionals found</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Generate cards (visible current card + 2 more underneath)
-                const endIndex = Math.min(currentIndex + 3, filteredUsers.length);
-                
-                for (let i = currentIndex; i < endIndex; i++) {
-                    const user = filteredUsers[i];
-                    const isTopCard = i === currentIndex;
-                    const cardId = `user-card-${user.id}`;
-                    
-                    // If this is the top card, save its ID
-                    if (isTopCard) {
-                        activeCardId = cardId;
-                    }
-                    
-                    // Create card element
-                    const card = document.createElement('div');
-                    card.id = cardId;
-                    card.classList.add('user-card', 'absolute', 'inset-0', 'shadow-lg');
-                    card.style.zIndex = endIndex - i;
-                    card.style.transform = isTopCard ? 'rotate(0deg)' : `translateY(${(i-currentIndex)*10}px) scale(${1 - (i-currentIndex)*0.05})`;
-                    
-                    // Format skills
-                    const skills = user.skills || [];
-                    const skillsHtml = Array.isArray(skills) 
-                        ? skills.slice(0, 3).map(skill => `<span class="skill-badge">${skill}</span>`).join('')
-                        : '';
-                    
-                    // Format experience
-                    let experienceHtml = '';
-                    if (user.experience && user.experience.length > 0) {
-                        const latestExp = user.experience[0];
-                        experienceHtml = `
-                            <div class="mb-2">
-                                <h4 class="font-medium text-white">${latestExp.title}</h4>
-                                <p class="text-gray-300 text-sm">${latestExp.company}</p>
-                                <p class="text-gray-400 text-xs">${latestExp.startDate} - ${latestExp.endDate || 'Present'}</p>
-                            </div>
-                        `;
-                    }
-                    
-                    // Card content
-                    card.innerHTML = `
-                        <div class="h-full flex flex-col">
-                            <div class="h-1/3 bg-primary"></div>
-                            <div class="p-4 flex-1 relative">
-                                <img src="${user.profileImage || 'https://via.placeholder.com/100'}" alt="${user.fullName}" 
-                                    class="w-20 h-20 rounded-full absolute -top-10 left-4 border-4 border-darkSecondary object-cover">
-                                
-                                <div class="mt-12">
-                                    <h2 class="text-xl font-bold text-white">${user.fullName}</h2>
-                                    <p class="text-gray-300">${user.currentRole || ''} ${user.company ? 'at ' + user.company : ''}</p>
-                                    <p class="text-gray-400 text-sm mb-3">${user.industry || ''} · ${user.location || ''}</p>
-                                    
-                                    <div class="mb-4">
-                                        <h3 class="font-medium text-white mb-1">About</h3>
-                                        <p class="text-gray-300 text-sm line-clamp-2">${user.about || 'No bio available'}</p>
-                                    </div>
-                                    
-                                    <div class="mb-4">
-                                        <h3 class="font-medium text-white mb-1">Skills</h3>
-                                        <div class="flex flex-wrap">
-                                            ${skillsHtml}
-                                            ${skills.length > 3 ? `<span class="text-primary text-xs">+${skills.length - 3} more</span>` : ''}
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <h3 class="font-medium text-white mb-1">Experience</h3>
-                                        ${experienceHtml || '<p class="text-gray-400 text-sm">No experience listed</p>'}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="p-4 bg-darkTertiary">
-                                <button class="view-profile-btn w-full py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition" data-id="${user.id}">
-                                    View Full Profile
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Add card to stack
-                    cardStack.appendChild(card);
-                    
-                    // Add click event for "View Profile" button
-                    const viewProfileBtn = card.querySelector('.view-profile-btn');
-                    viewProfileBtn.addEventListener('click', function() {
-                        showUserDetails(this.getAttribute('data-id'));
-                    });
-                }
-            }
-            
-            // Render next card after swipe
-            function renderNextCard() {
-                // Check if we've reached the end
-                if (currentIndex >= filteredUsers.length) {
-                    // No more cards
-                    cardStack.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full">
-                            <i class="fas fa-check-circle text-5xl text-gray-600 mb-4"></i>
-                            <p class="text-gray-400 text-center">You've seen all professionals</p>
-                            <button id="resetCardsBtn" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition">
-                                Start Over
-                            </button>
-                        </div>
-                    `;
-                    
-                    // Add event listener for reset button
-                    const resetBtn = document.getElementById('resetCardsBtn');
-                    if (resetBtn) {
-                        resetBtn.addEventListener('click', function() {
-                            // Shuffle users and reset index
-                            shuffleArray(filteredUsers);
-                            currentIndex = 0;
-                            renderUserCards();
-                        });
-                    }
-                    
-                    return;
-                }
-                
-                // Render cards from new index
-                renderUserCards();
-            }
-            
-            // Render user list at the bottom
-            function renderUserList() {
-                // Clear previous list
-                userListContainer.innerHTML = '';
-                
-                // If no users to display
-                if (filteredUsers.length === 0) {
-                    userListContainer.innerHTML = `
-                        <div class="text-center py-4">
-                            <p class="text-gray-400">No matching professionals found</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Create list items for each user (up to 5)
-                const usersToShow = filteredUsers.slice(0, 5);
-                
-                usersToShow.forEach(user => {
-                    const listItem = document.createElement('div');
-                    listItem.classList.add('user-list-item', 'bg-darkSecondary', 'rounded-lg', 'overflow-hidden', 'shadow');
-                    listItem.setAttribute('data-id', user.id);
-                    
-                    listItem.innerHTML = `
-                        <div class="p-4">
-                            <div class="flex items-center space-x-3">
-                                <img src="${user.profileImage || 'https://via.placeholder.com/50'}" alt="${user.fullName}" 
-                                    class="w-12 h-12 rounded-full object-cover border-2 border-darkTertiary">
-                                <div class="flex-1">
-                                    <h3 class="font-medium text-white">${user.fullName}</h3>
-                                    <p class="text-sm text-gray-300">${user.currentRole || ''} ${user.company ? 'at ' + user.company : ''}</p>
-                                </div>
-                                <button class="connect-btn px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primaryDark transition" data-id="${user.id}">
-                                    Connect
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    userListContainer.appendChild(listItem);
-                    
-                    // Add click event for the list item (show details)
-                    listItem.addEventListener('click', function(e) {
-                        // Don't trigger if the connect button was clicked
-                        if (!e.target.classList.contains('connect-btn')) {
-                            showUserDetails(this.getAttribute('data-id'));
-                        }
-                    });
-                    
-                    // Add click event for "Connect" button
-                    const connectBtn = listItem.querySelector('.connect-btn');
-                    connectBtn.addEventListener('click', function(e) {
-                        e.stopPropagation(); // Prevent opening the details
-                        
-                        const userId = this.getAttribute('data-id');
-                        sendConnectionRequest(userId);
-                        
-                        // Update button
-                        this.disabled = true;
-                        this.textContent = 'Sent';
-                        this.classList.remove('bg-primary', 'hover:bg-primaryDark');
-                        this.classList.add('bg-gray-500');
-                        
-                        // Remove from list after a delay
-                        setTimeout(() => {
-                            removeUserFromList(userId);
-                            
-                            // Remove from filtered users
-                            filteredUsers = filteredUsers.filter(user => user.id !== userId);
-                            
-                            // Reset current index if needed
-                            if (currentIndex >= filteredUsers.length) {
-                                currentIndex = 0;
-                            }
-                            
-                            // Re-render cards
-                            renderUserCards();
-                        }, 1500);
-                        
-                        // Show toast
-                        showToast('Connection request sent');
-                    });
-                });
-            }
-            
-            // Show user details in modal
-            function showUserDetails(userId) {
-                const user = filteredUsers.find(u => u.id === userId);
-                if (!user) return;
-                
-                selectedUserId = userId;
-                
-                // Populate modal with user details
-                modalUserImage.src = user.profileImage || 'https://via.placeholder.com/100';
-                modalUserName.textContent = user.fullName;
-                modalUserTitle.textContent = user.currentRole || '';
-                if (user.company) {
-                    modalUserTitle.textContent += ' at ' + user.company;
-                }
-                
-                if (user.location) {
-                    modalUserLocation.innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${user.location}`;
-                    modalUserLocation.classList.remove('hidden');
-                } else {
-                    modalUserLocation.classList.add('hidden');
-                }
-                
-                modalUserAbout.textContent = user.about || 'No bio available';
-                
-                // Format skills
-                const skills = user.skills || [];
-                modalUserSkills.innerHTML = Array.isArray(skills) 
-                    ? skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')
-                    : '<p class="text-gray-400 text-sm">No skills listed</p>';
-                
-                // Format experience
-                if (user.experience && user.experience.length > 0) {
-                    modalUserExperience.innerHTML = user.experience.map(exp => `
-                        <div class="mb-2">
-                            <h4 class="font-medium text-white">${exp.title}</h4>
-                            <p class="text-gray-300 text-sm">${exp.company}</p>
-                            <p class="text-gray-400 text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
-                            ${exp.description ? `<p class="text-gray-300 text-sm mt-1">${exp.description}</p>` : ''}
-                        </div>
-                    `).join('');
-                } else {
-                    modalUserExperience.innerHTML = '<p class="text-gray-400 text-sm">No experience listed</p>';
-                }
-                
-                // Reset connect button
-                modalConnectButton.disabled = false;
-                modalConnectButton.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Connect';
-                modalConnectButton.classList.remove('bg-gray-500');
-                modalConnectButton.classList.add('bg-primary', 'hover:bg-primaryDark');
-                
-                // Show modal
-                userDetailsModal.classList.remove('hidden');
-            }
-            
-            // Send connection request
-            function sendConnectionRequest(targetUserId) {
-                // Get all users from localStorage
-                const users = JSON.parse(localStorage.getItem('proconnect_users') || '[]');
-                
-                // Find current user and target user
-                const currentUserIndex = users.findIndex(u => u.id === currentUser.id);
-                const targetUserIndex = users.findIndex(u => u.id === targetUserId);
-                
-                if (currentUserIndex === -1 || targetUserIndex === -1) {
-                    console.error('User not found');
-                    return false;
-                }
-                
-                // Update current user's sent requests
-                if (!users[currentUserIndex].sentRequests) {
-                    users[currentUserIndex].sentRequests = [];
-                }
-                
-                if (!users[currentUserIndex].sentRequests.includes(targetUserId)) {
-                    users[currentUserIndex].sentRequests.push(targetUserId);
-                }
-                
-                // Update target user's pending requests
-                if (!users[targetUserIndex].pendingRequests) {
-                    users[targetUserIndex].pendingRequests = [];
-                }
-                
-                if (!users[targetUserIndex].pendingRequests.includes(currentUser.id)) {
-                    users[targetUserIndex].pendingRequests.push(currentUser.id);
-                }
-                
-                // Save changes
-                localStorage.setItem('proconnect_users', JSON.stringify(users));
-                
-                // Update current user in localStorage
-                currentUser = users[currentUserIndex];
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                
-                return true;
-            }
+            // State variables for demo
+            let currentCardIndex = 1;
+            let activeCardId = "user-card-1";
             
             // Show toast notification
             function showToast(message) {
@@ -897,37 +448,170 @@
                 }, 3000);
             }
             
-            // Check for pending connection requests
-            function checkForPendingRequests() {
-                if (!currentUser) return;
-                
-                const pendingRequests = currentUser.pendingRequests || [];
-                const requestCount = pendingRequests.length;
-                
-                if (requestCount > 0) {
-                    // Update notification badges
-                    notificationBadge.textContent = requestCount;
-                    notificationBadge.classList.remove('hidden');
+            // Event Listeners
+            
+            // Skip button - Swipe left
+            skipButton.addEventListener('click', function() {
+                const card = document.getElementById(activeCardId);
+                if (card) {
+                    // Animate swipe left and remove card
+                    card.classList.add('swipe-left');
                     
-                    navNotificationBadge.textContent = requestCount;
-                    navNotificationBadge.classList.remove('hidden');
+                    // Move to next card after animation
+                    setTimeout(() => {
+                        handleNextCard();
+                    }, 500);
+                }
+            });
+            
+            // Connect button - Swipe right
+            connectButton.addEventListener('click', function() {
+                const card = document.getElementById(activeCardId);
+                if (card) {
+                    // Animate swipe right and remove card
+                    card.classList.add('swipe-right');
+                    
+                    // Show toast notification
+                    showToast('Connection request sent');
+                    
+                    // Move to next card after animation
+                    setTimeout(() => {
+                        handleNextCard();
+                    }, 500);
+                }
+            });
+            
+            // View Profile buttons
+            const viewProfileBtns = document.querySelectorAll('.view-profile-btn');
+            viewProfileBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Show user details modal
+                    userDetailsModal.classList.remove('hidden');
+                });
+            });
+            
+            // Close user details modal
+            closeUserDetailsBtn.addEventListener('click', function() {
+                userDetailsModal.classList.add('hidden');
+            });
+            
+            // Modal Connect button
+            modalConnectButton.addEventListener('click', function() {
+                // Show toast notification
+                showToast('Connection request sent');
+                
+                // Update button text and disable
+                this.textContent = 'Request Sent';
+                this.disabled = true;
+                this.classList.remove('bg-primary', 'hover:bg-primaryDark');
+                this.classList.add('bg-gray-500');
+                
+                // Close modal after a delay
+                setTimeout(() => {
+                    userDetailsModal.classList.add('hidden');
+                    
+                    // Reset button for demo purposes
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Connect';
+                        this.disabled = false;
+                        this.classList.remove('bg-gray-500');
+                        this.classList.add('bg-primary', 'hover:bg-primaryDark');
+                    }, 1000);
+                }, 1000);
+            });
+            
+            // Connect buttons in list
+            const connectBtns = document.querySelectorAll('.connect-btn');
+            connectBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Show toast notification
+                    showToast('Connection request sent');
+                    
+                    // Update button text
+                    this.textContent = 'Sent';
+                    this.disabled = true;
+                    this.classList.remove('bg-primary', 'hover:bg-primaryDark');
+                    this.classList.add('bg-gray-500');
+                });
+            });
+            
+            // Filter buttons
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Update active filter button
+                    filterButtons.forEach(b => {
+                        b.classList.remove('bg-primary');
+                        b.classList.add('bg-darkTertiary');
+                    });
+                    this.classList.remove('bg-darkTertiary');
+                    this.classList.add('bg-primary');
+                    
+                    // Show toast with filter applied
+                    const filter = this.getAttribute('data-filter');
+                    if (filter === 'all') {
+                        showToast('Showing all professionals');
+                    } else {
+                        showToast(`Showing ${filter} professionals`);
+                    }
+                });
+            });
+            
+            // Search button
+            searchButton.addEventListener('click', function() {
+                const searchQuery = searchInput.value.trim();
+                if (searchQuery) {
+                    showToast(`Searching for "${searchQuery}"`);
                 } else {
-                    notificationBadge.classList.add('hidden');
-                    navNotificationBadge.classList.add('hidden');
+                    showToast('Please enter a search term');
+                }
+            });
+            
+            // Search on Enter key
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    searchButton.click();
+                }
+            });
+            
+            // Handle moving to next card
+            function handleNextCard() {
+                currentCardIndex++;
+                
+                // For demo, we'll just reset after 3 cards
+                if (currentCardIndex > 3) {
+                    showToast('No more profiles to show');
+                    
+                    // Reset for demo purposes
+                    setTimeout(() => {
+                        // Reset card states
+                        document.querySelectorAll('.user-card').forEach(card => {
+                            card.classList.remove('swipe-left', 'swipe-right', 'hidden');
+                        });
+                        
+                        // Reset to first card
+                        currentCardIndex = 1;
+                        activeCardId = "user-card-1";
+                        
+                        // Reset card positions
+                        const card1 = document.getElementById('user-card-1');
+                        const card2 = document.getElementById('user-card-2');
+                        const card3 = document.getElementById('user-card-3');
+                        
+                        if (card1 && card2 && card3) {
+                            card1.style.zIndex = "3";
+                            card1.style.transform = "rotate(0deg)";
+                            
+                            card2.style.zIndex = "2";
+                            card2.style.transform = "translateY(10px) scale(0.95)";
+                            
+                            card3.style.zIndex = "1";
+                            card3.style.transform = "translateY(20px) scale(0.9)";
+                        }
+                    }, 500);
+                } else {
+                    activeCardId = `user-card-${currentCardIndex}`;
                 }
             }
-            
-            // Utility function to shuffle array
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            }
-            
-            // Check for new connection requests periodically
-            setInterval(checkForPendingRequests, 10000);
         });
     </script>
 </body>
