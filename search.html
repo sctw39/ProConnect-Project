@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProConnect - Professional Match</title>
+    <title>ProConnect - Find</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -28,6 +28,19 @@
                 }
             }
         }
+        
+        // Check for dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
     </script>
     <style>
         /* Card swiping animation */
@@ -227,6 +240,28 @@
         .filter-btn:active {
             transform: scale(0.95);
         }
+        
+        /* Sort dropdown styling */
+        .sort-dropdown {
+            position: relative;
+        }
+        
+        .sort-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 50;
+            display: none;
+        }
+        
+        .sort-menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease-out forwards;
+        }
 
         /* Skill badge styling */
         .skill-badge {
@@ -246,50 +281,113 @@
             color: #27AE60;
         }
         
+        /* Loading shimmer effect */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        
+        /* Filter panel animation */
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s forwards;
+        }
+        
+        .slide-out {
+            animation: slideOut 0.3s forwards;
+        }
+        
         /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            .bg-lightBg {
-                background-color: #181818 !important;
-            }
-            
-            .bg-lightSecondary, .bg-lightTertiary {
-                background-color: #2A2A2A !important;
-            }
-            
-            .text-textDark {
-                color: #F8F9FA !important;
-            }
-            
-            .text-textMedium {
-                color: #CED4DA !important;
-            }
-            
-            .card {
-                background-color: #2A2A2A !important;
-            }
-            
-            .swipe-progress {
-                background-color: #3A3A3A;
-            }
-            
-            .skill-badge {
-                background-color: rgba(0, 120, 212, 0.2);
-            }
-            
-            .skill-badge-match {
-                background-color: rgba(39, 174, 96, 0.2);
-            }
+        .dark .bg-lightBg {
+            background-color: #181818 !important;
+        }
+        
+        .dark .bg-lightSecondary, .dark .bg-lightTertiary {
+            background-color: #2A2A2A !important;
+        }
+        
+        .dark .text-textDark {
+            color: #F8F9FA !important;
+        }
+        
+        .dark .text-textMedium {
+            color: #CED4DA !important;
+        }
+        
+        .dark .card {
+            background-color: #2A2A2A !important;
+        }
+        
+        .dark .swipe-progress {
+            background-color: #3A3A3A;
+        }
+        
+        .dark .skill-badge {
+            background-color: rgba(0, 120, 212, 0.2);
+        }
+        
+        .dark .skill-badge-match {
+            background-color: rgba(39, 174, 96, 0.2);
+        }
+        
+        .dark .sort-menu {
+            background-color: #2A2A2A;
+        }
+        
+        .dark .loading-shimmer {
+            background: linear-gradient(to right, #2A2A2A 8%, #3A3A3A 18%, #2A2A2A 33%);
         }
     </style>
 </head>
 <body class="bg-lightBg text-textDark min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-md pb-20">
+    <div class="container mx-auto px-4 py-6 max-w-md pb-20">
         <!-- App Header -->
         <header class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold text-primary">Professional Match</h1>
-            <button id="filterBtn" class="text-primary">
-                <i class="fas fa-sliders-h text-xl"></i>
-            </button>
+            <h1 class="text-xl font-bold text-primary">Find Professionals</h1>
+            <div class="flex items-center">
+                <div id="sortButton" class="text-primary mr-3 sort-dropdown">
+                    <button class="flex items-center">
+                        <i class="fas fa-sort text-xl"></i>
+                    </button>
+                    <div id="sortMenu" class="sort-menu">
+                        <div class="p-2">
+                            <h3 class="text-sm font-medium text-textMedium mb-2">Sort by</h3>
+                            <div class="space-y-1">
+                                <button class="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-lightSecondary sort-option active" data-sort="match">
+                                    <i class="fas fa-percentage mr-2 text-primary"></i> Match Score
+                                </button>
+                                <button class="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-lightSecondary sort-option" data-sort="name">
+                                    <i class="fas fa-font mr-2 text-primary"></i> Name
+                                </button>
+                                <button class="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-lightSecondary sort-option" data-sort="industry">
+                                    <i class="fas fa-building mr-2 text-primary"></i> Industry
+                                </button>
+                                <button class="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-lightSecondary sort-option" data-sort="location">
+                                    <i class="fas fa-map-marker-alt mr-2 text-primary"></i> Location
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="filterBtn" class="text-primary">
+                    <i class="fas fa-sliders-h text-xl"></i>
+                </button>
+            </div>
         </header>
 
         <!-- Authentication Check -->
@@ -311,7 +409,7 @@
 
         <!-- Filter Panel (Hidden initially) -->
         <div id="filterPanel" class="fixed inset-0 bg-black/70 z-50 hidden">
-            <div class="absolute right-0 top-0 bottom-0 bg-lightBg p-4 w-full max-w-sm shadow-lg transform transition-transform duration-300 ease-out">
+            <div class="absolute right-0 top-0 bottom-0 bg-lightBg p-4 w-full max-w-sm shadow-lg transform transition-transform duration-300 ease-out overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold">Filter Matches</h2>
                     <button id="closeFilterBtn" class="text-textMedium">
@@ -323,7 +421,7 @@
                     <!-- Industry Filter -->
                     <div>
                         <h3 class="text-lg font-medium mb-2">Industry</h3>
-                        <select id="industryFilter" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
+                        <select id="industryFilter" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary text-base">
                             <option value="">All Industries</option>
                             <option value="Technology">Technology</option>
                             <option value="Finance">Finance</option>
@@ -337,13 +435,13 @@
                     <!-- Location Filter -->
                     <div>
                         <h3 class="text-lg font-medium mb-2">Location</h3>
-                        <input type="text" id="locationFilter" placeholder="City, State, or Country" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
+                        <input type="text" id="locationFilter" placeholder="City, State, or Country" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary text-base">
                     </div>
                     
                     <!-- Skills Filter -->
                     <div>
                         <h3 class="text-lg font-medium mb-2">Skills</h3>
-                        <input type="text" id="skillsFilter" placeholder="e.g. JavaScript, Marketing, Finance" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary">
+                        <input type="text" id="skillsFilter" placeholder="e.g. JavaScript, Marketing, Finance" class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary text-base">
                         <div id="selectedSkills" class="flex flex-wrap gap-2 mt-2">
                             <!-- Skills tags will appear here -->
                         </div>
@@ -415,7 +513,7 @@
             <div class="mb-4">
                 <div class="flex justify-between mb-1">
                     <span class="text-xs text-textMedium">Today's Swipes</span>
-                    <span id="swipeCounter" class="text-xs text-textMedium">0/20</span>
+                    <span id="swipeCounter" class="text-xs text-textMedium">0/10</span>
                 </div>
                 <div class="swipe-progress">
                     <div id="swipeProgressBar" class="swipe-progress-bar" style="width: 0%"></div>
@@ -426,6 +524,17 @@
         <!-- Cards Container -->
         <div id="cardDeck" class="card-container mb-8 hidden">
             <!-- Cards will be added dynamically here -->
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden">
+            <div class="card-container mb-8">
+                <div class="card loading-shimmer"></div>
+            </div>
+            <div class="flex justify-center space-x-8 mb-6">
+                <div class="w-14 h-14 rounded-full loading-shimmer"></div>
+                <div class="w-14 h-14 rounded-full loading-shimmer"></div>
+            </div>
         </div>
         
         <!-- No Results State -->
@@ -457,20 +566,13 @@
             </div>
         </div>
         
-        <!-- Loading State -->
-        <div id="loadingState" class="hidden text-center py-8">
-            <div class="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4 mx-auto"></div>
-            <h3 class="text-lg font-semibold">Finding great matches...</h3>
-            <p class="text-textMedium">Our AI is analyzing your profile</p>
-        </div>
-        
         <!-- Swipe Limit Reached State -->
         <div id="swipeLimitState" class="hidden flex flex-col items-center justify-center py-8">
             <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
                 <i class="fas fa-clock text-accent text-2xl"></i>
             </div>
             <h3 class="text-lg font-semibold mb-2">Daily Swipe Limit Reached</h3>
-            <p class="text-textMedium mb-4 text-center">You've used all 20 swipes for today. Come back tomorrow for more matches!</p>
+            <p class="text-textMedium mb-4 text-center">You've used all 10 swipes for today. Come back tomorrow for more matches!</p>
             <a href="index.html" class="bg-primary text-white px-6 py-2 rounded-lg">
                 Return Home
             </a>
@@ -845,7 +947,7 @@
                 
                 if (filters.skills && filters.skills.length > 0) {
                     allUsers = allUsers.filter(user => {
-                        const userSkills = user.skills.map(s => s.toLowerCase());
+                        const userSkills = (user.skills || []).map(s => s.toLowerCase());
                         return filters.skills.some(skill => 
                             userSkills.includes(skill.toLowerCase())
                         );
@@ -876,6 +978,44 @@
                 allUsers.sort((a, b) => b.match - a.match);
                 
                 return allUsers;
+            },
+            
+            sortUsers: function(users, sortMethod) {
+                if (!users || users.length === 0) return [];
+                
+                const clonedUsers = [...users];
+                
+                switch (sortMethod) {
+                    case 'match':
+                        // Sort by match score (highest first)
+                        clonedUsers.sort((a, b) => (b.match || 0) - (a.match || 0));
+                        break;
+                    case 'name':
+                        // Sort alphabetically by name
+                        clonedUsers.sort((a, b) => a.fullName.localeCompare(b.fullName));
+                        break;
+                    case 'industry':
+                        // Sort alphabetically by industry
+                        clonedUsers.sort((a, b) => {
+                            const industryA = a.industry || 'Unknown';
+                            const industryB = b.industry || 'Unknown';
+                            return industryA.localeCompare(industryB);
+                        });
+                        break;
+                    case 'location':
+                        // Sort alphabetically by location
+                        clonedUsers.sort((a, b) => {
+                            const locationA = a.location || 'Unknown';
+                            const locationB = b.location || 'Unknown';
+                            return locationA.localeCompare(locationB);
+                        });
+                        break;
+                    default:
+                        // Default to match score
+                        clonedUsers.sort((a, b) => (b.match || 0) - (a.match || 0));
+                }
+                
+                return clonedUsers;
             },
             
             getSwipedUserIds: function(userId) {
@@ -1018,9 +1158,12 @@
             const resetFiltersBtn = document.getElementById('resetFiltersBtn');
             const applyFiltersBtn = document.getElementById('applyFiltersBtn');
             const toastNotification = document.getElementById('toastNotification');
+            const sortButton = document.getElementById('sortButton');
+            const sortMenu = document.getElementById('sortMenu');
+            const sortOptions = document.querySelectorAll('.sort-option');
             
             // Constants
-            const DAILY_SWIPE_LIMIT = 20;
+            const DAILY_SWIPE_LIMIT = 10;
             const SWIPE_STORAGE_KEY = 'proconnect_daily_swipes';
             
             // Current state
@@ -1031,6 +1174,7 @@
             let isAnimating = false;
             let startX, startY, moveX, moveY;
             let dailySwipes = getDailySwipes();
+            let currentSortMethod = 'match';
             let currentFilters = {
                 industry: '',
                 location: '',
@@ -1053,13 +1197,13 @@
                 authCheck.classList.add('hidden');
                 searchForm.classList.remove('hidden');
                 
-                // Show loading state initially
-                loadingState.classList.remove('hidden');
-                
                 // Check if daily swipe limit is reached
                 if (dailySwipes.count >= DAILY_SWIPE_LIMIT) {
                     showSwipeLimitState();
                 } else {
+                    // Show loading state initially
+                    loadingState.classList.remove('hidden');
+                    
                     // Load users with a slight delay to show loading effect
                     setTimeout(() => {
                         loadingState.classList.add('hidden');
@@ -1084,17 +1228,63 @@
                 // Filter button click
                 filterBtn.addEventListener('click', function() {
                     filterPanel.classList.remove('hidden');
+                    filterPanel.querySelector('.absolute').classList.add('slide-in');
                 });
                 
                 // Close filter button click
                 closeFilterBtn.addEventListener('click', function() {
-                    filterPanel.classList.add('hidden');
+                    const filterPanelContent = filterPanel.querySelector('.absolute');
+                    filterPanelContent.classList.remove('slide-in');
+                    filterPanelContent.classList.add('slide-out');
+                    
+                    setTimeout(() => {
+                        filterPanelContent.classList.remove('slide-out');
+                        filterPanel.classList.add('hidden');
+                    }, 300);
+                });
+                
+                // Sort button click
+                sortButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sortMenu.classList.toggle('show');
+                });
+                
+                // Hide sort menu when clicking outside
+                document.addEventListener('click', function() {
+                    sortMenu.classList.remove('show');
+                });
+                
+                // Sort options
+                sortOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Update active option
+                        sortOptions.forEach(opt => opt.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Update sort method
+                        currentSortMethod = this.getAttribute('data-sort');
+                        
+                        // Refresh user cards with new sort
+                        resortAndDisplayUsers();
+                        
+                        // Close sort menu
+                        sortMenu.classList.remove('show');
+                    });
                 });
                 
                 // Apply filters button click
                 applyFiltersBtn.addEventListener('click', function() {
                     applyFilters();
-                    filterPanel.classList.add('hidden');
+                    
+                    const filterPanelContent = filterPanel.querySelector('.absolute');
+                    filterPanelContent.classList.remove('slide-in');
+                    filterPanelContent.classList.add('slide-out');
+                    
+                    setTimeout(() => {
+                        filterPanelContent.classList.remove('slide-out');
+                        filterPanel.classList.add('hidden');
+                    }, 300);
+                    
                     showToast('Filters applied');
                 });
                 
@@ -1219,6 +1409,20 @@
                     swipeLimitAlert.style.display = 'none';
                     showSwipeLimitState();
                 });
+            }
+            
+            // Function to resort and redisplay users
+            function resortAndDisplayUsers() {
+                if (filteredUsers.length === 0) return;
+                
+                // Apply sorting
+                filteredUsers = ProConnectUsers.sortUsers(filteredUsers, currentSortMethod);
+                
+                // Reset card index
+                currentCardIndex = 0;
+                
+                // Recreate card deck
+                createCards();
             }
             
             // Function to add skill tag to filter
@@ -1476,12 +1680,16 @@
                 // Otherwise use AI recommendations
                 filteredUsers = ProConnectUsers.getRecommendedMatches(currentUser, currentFilters);
                 
+                // Apply sorting
+                filteredUsers = ProConnectUsers.sortUsers(filteredUsers, currentSortMethod);
+                
                 // Show card deck & swipe buttons if there are users
                 if (filteredUsers.length > 0) {
                     cardDeck.classList.remove('hidden');
                     swipeButtons.classList.remove('hidden');
                     noResultsState.classList.add('hidden');
                     noUsersState.classList.add('hidden');
+                    swipeLimitState.classList.add('hidden');
                     
                     // Create cards
                     createCards();
@@ -1523,8 +1731,8 @@
                     user.match = ProConnectUsers.calculateMatchPercentage(currentUser, user, currentFilters.priority);
                 });
                 
-                // Sort by match percentage (highest first)
-                filteredUsers.sort((a, b) => b.match - a.match);
+                // Apply sorting
+                filteredUsers = ProConnectUsers.sortUsers(filteredUsers, currentSortMethod);
                 
                 // Apply minimum match filter if set
                 if (currentFilters.minMatch > 0) {
@@ -1540,6 +1748,7 @@
                     swipeButtons.classList.remove('hidden');
                     noResultsState.classList.add('hidden');
                     noUsersState.classList.add('hidden');
+                    swipeLimitState.classList.add('hidden');
                     
                     // Create cards
                     createCards();
