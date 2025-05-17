@@ -670,15 +670,30 @@
             
             // Initialize application data if not exists
             function initializeAppData() {
-                // Check if we have user data stored
                 if (!localStorage.getItem('proconnect_users')) {
-                    localStorage.setItem('proconnect_users', JSON.stringify([]));
+                    // Create a sample user for testing if needed
+                    const sampleUsers = [];
+                    localStorage.setItem('proconnect_users', JSON.stringify(sampleUsers));
+                    console.log("Initialized users database");
                 }
             }
             
             // Get all users
             function getAllUsers() {
-                return JSON.parse(localStorage.getItem('proconnect_users') || '[]');
+                try {
+                    const users = JSON.parse(localStorage.getItem('proconnect_users'));
+                    if (Array.isArray(users)) {
+                        return users;
+                    } else {
+                        console.error("Users data is not an array, resetting");
+                        localStorage.setItem('proconnect_users', JSON.stringify([]));
+                        return [];
+                    }
+                } catch (err) {
+                    console.error("Error parsing users data:", err);
+                    localStorage.setItem('proconnect_users', JSON.stringify([]));
+                    return [];
+                }
             }
             
             // Save users array
@@ -688,16 +703,24 @@
             
             // Find user by email
             function findUserByEmail(email) {
+                if (!email) return null;
+                
                 const users = getAllUsers();
-                return users.find(user => user.email.toLowerCase() === email.toLowerCase());
+                const user = users.find(user => user.email && user.email.toLowerCase() === email.toLowerCase());
+                return user || null;
             }
             
             // Add new user
             function addUser(user) {
+                if (!user || !user.email) {
+                    console.error("Invalid user object");
+                    return { success: false, message: 'Invalid user data' };
+                }
+                
                 const users = getAllUsers();
                 
                 // Check if email is already in use
-                if (users.some(u => u.email.toLowerCase() === user.email.toLowerCase())) {
+                if (users.some(u => u.email && u.email.toLowerCase() === user.email.toLowerCase())) {
                     return { success: false, message: 'Email is already in use' };
                 }
                 
@@ -705,21 +728,8 @@
                 users.push(user);
                 saveUsers(users);
                 
+                console.log("User added successfully:", user.email);
                 return { success: true };
-            }
-            
-            // Update user
-            function updateUser(updatedUser) {
-                const users = getAllUsers();
-                const index = users.findIndex(u => u.id === updatedUser.id);
-                
-                if (index !== -1) {
-                    users[index] = updatedUser;
-                    saveUsers(users);
-                    return true;
-                }
-                
-                return false;
             }
             
             // Show toast notification
@@ -1045,6 +1055,7 @@
                 }
                 
                 networkingRecommendation.textContent = recommendation;
+                return score;
             }
             
             // Handle sign in
@@ -1149,7 +1160,7 @@
                 }
                 
                 // Store registration data temporarily
-                localStorage.setItem('tempRegistration', JSON.stringify({
+                const tempRegistration = {
                     fullName: registerFullName.value.trim(),
                     email: registerEmail.value.trim(),
                     password: registerPassword.value, // In a real app, never store raw passwords
@@ -1159,7 +1170,23 @@
                     location: registerLocation.value.trim(),
                     skills: registerSkills.value.trim() ? registerSkills.value.split(',').map(s => s.trim()) : [],
                     about: registerAbout.value.trim()
-                }));
+                };
+                
+                localStorage.setItem('tempRegistration', JSON.stringify(tempRegistration));
+                
+                // Reset quiz answers
+                quizAnswers = {
+                    importance: '',
+                    goals: [],
+                    approach: '',
+                    challenge: '',
+                    sectors: []
+                };
+                
+                // Clear selected options in quiz
+                document.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'bg-primary/10', 'border-primary');
+                });
                 
                 // Show networking quiz
                 showNetworkingQuiz();
@@ -1167,84 +1194,64 @@
             
             // Handle complete sign up
             function handleCompleteSignUp() {
-                // Get registration data
-                const registrationData = JSON.parse(localStorage.getItem('tempRegistration') || '{}');
-                
-                // Create user object with quiz data
-                const newUser = {
-                    id: 'user_' + Date.now(),
-                    fullName: registrationData.fullName,
-                    email: registrationData.email,
-                    password: registrationData.password, // In a real app, use proper hashing
-                    currentRole: registrationData.currentRole,
-                    company: registrationData.company,
-                    industry: registrationData.industry,
-                    location: registrationData.location,
-                    skills: registrationData.skills,
-                    about: registrationData.about,
-                    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
-                    networkingProfile: {
-                        ...quizAnswers,
-                        score: calculateNetworkingScore(),
-                        dateCreated: new Date().toISOString()
-                    },
-                    connections: [],
-                    pendingRequests: [],
-                    sentRequests: [],
-                    dateJoined: new Date().toISOString()
-                };
-                
-                // Add user to database
-                const result = addUser(newUser);
-                
-                if (!result.success) {
-                    showToast(result.message);
-                    return;
+                try {
+                    // Get registration data
+                    const tempData = localStorage.getItem('tempRegistration');
+                    if (!tempData) {
+                        showToast('Registration data not found. Please try again.');
+                        return;
+                    }
+                    
+                    const registrationData = JSON.parse(tempData);
+                    
+                    // Calculate score
+                    const networkingScore = calculateAndDisplayNetworkingScore();
+                    
+                    // Create user object with quiz data
+                    const newUser = {
+                        id: 'user_' + Date.now(),
+                        fullName: registrationData.fullName,
+                        email: registrationData.email,
+                        password: registrationData.password, // In a real app, use proper hashing
+                        currentRole: registrationData.currentRole,
+                        company: registrationData.company,
+                        industry: registrationData.industry,
+                        location: registrationData.location,
+                        skills: registrationData.skills,
+                        about: registrationData.about,
+                        profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
+                        networkingProfile: {
+                            ...quizAnswers,
+                            score: networkingScore,
+                            dateCreated: new Date().toISOString()
+                        },
+                        connections: [],
+                        pendingRequests: [],
+                        sentRequests: [],
+                        dateJoined: new Date().toISOString()
+                    };
+                    
+                    // Add user to database
+                    const result = addUser(newUser);
+                    
+                    if (!result.success) {
+                        showToast(result.message);
+                        return;
+                    }
+                    
+                    // Clean up temporary storage
+                    localStorage.removeItem('tempRegistration');
+                    
+                    // Save current user in local storage
+                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    
+                    // Show success message
+                    showSuccess('Your account has been created! Let\'s start networking.');
+                    
+                } catch (error) {
+                    console.error("Error completing sign up:", error);
+                    showToast('An error occurred. Please try again.');
                 }
-                
-                // Clean up temporary storage
-                localStorage.removeItem('tempRegistration');
-                
-                // Save current user to localStorage
-                localStorage.setItem('currentUser', JSON.stringify(newUser));
-                
-                // Show success message
-                showSuccess('Your account has been created! Let\'s start networking.');
-            }
-            
-            // Calculate networking score (simplified version)
-            function calculateNetworkingScore() {
-                let score = 0;
-                
-                // Importance of networking
-                if (quizAnswers.importance === 'critical') score += 25;
-                else if (quizAnswers.importance === 'very') score += 20;
-                else if (quizAnswers.importance === 'somewhat') score += 15;
-                else if (quizAnswers.importance === 'not') score += 5;
-                
-                // Networking goals: more business-focused goals = higher score
-                quizAnswers.goals.forEach(goal => {
-                    if (['clients', 'partners', 'investors'].includes(goal)) score += 10;
-                    else score += 5;
-                });
-                
-                // Approach to networking
-                if (quizAnswers.approach === 'proactive') score += 20;
-                else if (quizAnswers.approach === 'opportunistic') score += 15;
-                else if (quizAnswers.approach === 'selective') score += 10;
-                else if (quizAnswers.approach === 'reactive') score += 5;
-                
-                // Networking challenges
-                if (['finding', 'conversion'].includes(quizAnswers.challenge)) score += 15;
-                else score += 10;
-                
-                // Industry sectors
-                quizAnswers.sectors.forEach(() => {
-                    score += 5;
-                });
-                
-                // Cap score at 100
-                return Math.min(score, 100);
             }
             
             // Event Listeners
