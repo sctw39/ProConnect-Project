@@ -1124,3 +1124,61 @@
     </script>
 </body>
 </html>
+// Improved swipe handling - add to search.html
+function enhanceSwipeExperience() {
+  // Store swipe decisions for better recommendations
+  function recordSwipeDecision(userId, decision) {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) return;
+    
+    // Initialize swipe history if needed
+    if (!currentUser.swipeHistory) {
+      currentUser.swipeHistory = [];
+    }
+    
+    // Record this swipe
+    currentUser.swipeHistory.push({
+      userId: userId,
+      decision: decision, // 'left' or 'right'
+      timestamp: Date.now()
+    });
+    
+    // Keep only last 100 swipes
+    if (currentUser.swipeHistory.length > 100) {
+      currentUser.swipeHistory = currentUser.swipeHistory.slice(-100);
+    }
+    
+    // Update user data
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }
+  
+  // Enhance existing swipe functions
+  const originalSwipeLeft = window.swipeLeft;
+  const originalSwipeRight = window.swipeRight;
+  
+  // Override with enhanced versions if they exist
+  if (typeof originalSwipeLeft === 'function') {
+    window.swipeLeft = function(card) {
+      // Record the decision
+      const userId = filteredUsers[currentCardIndex].id;
+      recordSwipeDecision(userId, 'left');
+      
+      // Call original function
+      return originalSwipeLeft.apply(this, arguments);
+    };
+  }
+  
+  if (typeof originalSwipeRight === 'function') {
+    window.swipeRight = function(card) {
+      // Record the decision
+      const userId = filteredUsers[currentCardIndex].id;
+      recordSwipeDecision(userId, 'right');
+      
+      // Call original function
+      return originalSwipeRight.apply(this, arguments);
+    };
+  }
+}
+
+// Run enhancement when page loads
+document.addEventListener('DOMContentLoaded', enhanceSwipeExperience);
