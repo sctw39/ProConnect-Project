@@ -155,7 +155,7 @@
             color: #CED4DA !important;
         }
         
-        .dark .border-gray-200 {
+        .dark .border-gray-200, .dark .border-gray-300 {
             border-color: #2A2A2A !important;
         }
         
@@ -199,12 +199,12 @@
             <p class="text-textMedium mt-1">Your Professional Network</p>
         </div>
         
-        <!-- Tab Buttons -->
-        <div class="flex border-b border-gray-200 dark:border-darkTertiary mb-6">
-            <button id="signInTabBtn" class="flex-1 py-3 text-primary font-medium border-b-2 border-primary">
+        <!-- Authentication Buttons -->
+        <div class="flex space-x-4 mb-8">
+            <button id="showSignInBtn" class="flex-1 py-3 bg-primary text-white rounded-lg font-medium">
                 Sign In
             </button>
-            <button id="signUpTabBtn" class="flex-1 py-3 text-textMedium font-medium border-b-2 border-transparent">
+            <button id="showSignUpBtn" class="flex-1 py-3 bg-white dark:bg-darkSecondary text-primary border border-primary rounded-lg font-medium">
                 Sign Up
             </button>
         </div>
@@ -262,25 +262,70 @@
         <!-- Sign Up Form (Hidden initially) -->
         <div id="signUpForm" class="auth-form hidden">
             <form class="space-y-4">
+                <h2 class="text-lg font-bold">Create Your Account</h2>
+                <p class="text-textMedium text-sm mb-4">Fill out your profile information to get started</p>
+                
                 <div>
-                    <label for="registerFullName" class="block text-sm font-medium mb-1">Full Name</label>
+                    <label for="registerFullName" class="block text-sm font-medium mb-1">Full Name*</label>
                     <input type="text" id="registerFullName" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your full name" required>
                 </div>
                 
                 <div>
-                    <label for="registerEmail" class="block text-sm font-medium mb-1">Email</label>
+                    <label for="registerEmail" class="block text-sm font-medium mb-1">Email*</label>
                     <input type="email" id="registerEmail" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Enter your email" required>
                 </div>
                 
                 <div>
-                    <label for="registerPassword" class="block text-sm font-medium mb-1">Password</label>
+                    <label for="registerPassword" class="block text-sm font-medium mb-1">Password*</label>
                     <input type="password" id="registerPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Create a password" required>
-                    <p class="text-xs text-textMedium mt-1">Password must be at least a 8 characters long</p>
+                    <p class="text-xs text-textMedium mt-1">Password must be at least 8 characters long</p>
                 </div>
                 
                 <div>
-                    <label for="registerConfirmPassword" class="block text-sm font-medium mb-1">Confirm Password</label>
+                    <label for="registerConfirmPassword" class="block text-sm font-medium mb-1">Confirm Password*</label>
                     <input type="password" id="registerConfirmPassword" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="Confirm your password" required>
+                </div>
+                
+                <div>
+                    <label for="registerTitle" class="block text-sm font-medium mb-1">Professional Title*</label>
+                    <input type="text" id="registerTitle" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Product Manager" required>
+                </div>
+                
+                <div>
+                    <label for="registerCompany" class="block text-sm font-medium mb-1">Company</label>
+                    <input type="text" id="registerCompany" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. TechCorp">
+                </div>
+                
+                <div>
+                    <label for="registerIndustry" class="block text-sm font-medium mb-1">Industry</label>
+                    <select id="registerIndustry" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary">
+                        <option value="">Select your industry</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Education">Education</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Consulting">Consulting</option>
+                        <option value="Retail">Retail</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="registerLocation" class="block text-sm font-medium mb-1">Location</label>
+                    <input type="text" id="registerLocation" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. New York, NY">
+                </div>
+                
+                <div>
+                    <label for="registerSkills" class="block text-sm font-medium mb-1">Skills</label>
+                    <input type="text" id="registerSkills" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary" placeholder="e.g. Marketing, SEO, Analytics (comma separated)">
+                    <p class="text-xs text-textMedium mt-1">Enter skills separated by commas</p>
+                </div>
+                
+                <div>
+                    <label for="registerAbout" class="block text-sm font-medium mb-1">About</label>
+                    <textarea id="registerAbout" class="w-full p-3 border rounded-lg form-input focus:outline-none dark:bg-darkTertiary dark:border-darkTertiary resize-none" rows="3" placeholder="Tell us about yourself"></textarea>
                 </div>
                 
                 <div class="flex items-center">
@@ -289,39 +334,18 @@
                 </div>
                 
                 <button type="button" id="continueToQuizBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium">
-                    Continue
+                    Continue to Networking Quiz
                 </button>
-            </form>
-            
-            <div class="mt-6">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300 dark:border-darkTertiary"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-lightBg text-textMedium dark:bg-darkBg">Or sign up with</span>
-                    </div>
-                </div>
                 
-                <div class="mt-6 grid grid-cols-3 gap-3">
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary">
-                        <i class="fab fa-google text-red-500"></i>
-                    </button>
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary">
-                        <i class="fab fa-linkedin text-blue-600"></i>
-                    </button>
-                    <button class="py-2 px-4 border border-gray-300 rounded-lg flex justify-center items-center dark:border-darkTertiary">
-                        <i class="fab fa-github text-gray-700 dark:text-gray-300"></i>
-                    </button>
-                </div>
-            </div>
+                <p class="text-xs text-textLight text-center">Fields marked with * are required</p>
+            </form>
         </div>
         
         <!-- Networking Quiz (Hidden initially) -->
         <div id="networkingQuiz" class="auth-form hidden">
             <div class="mb-4">
-                <h2 class="text-lg font-bold mb-2">Professional Networking Quiz</h2>
-                <p class="text-textMedium text-sm mb-4">Tell us about your networking needs so we can tailor your experience</p>
+                <h2 class="text-lg font-bold mb-2">Business Networking Quiz</h2>
+                <p class="text-textMedium text-sm mb-4">Answer these 5 questions to help us understand how ProConnect can best support your business networking goals</p>
                 
                 <!-- Progress Bar -->
                 <div class="w-full bg-gray-200 rounded-full h-2 mb-6 dark:bg-darkTertiary">
@@ -332,22 +356,22 @@
                     <!-- Quiz Question 1 -->
                     <div id="question1" class="quiz-slide">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">What best describes your current career stage?</h3>
+                            <h3 class="font-medium mb-1">How important is expanding your business network to your career goals?</h3>
                             <div class="space-y-2 mt-3">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="student">
-                                    <span>Student or recent graduate</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="critical">
+                                    <span>Critical - it's my top priority</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="early">
-                                    <span>Early career professional (0-3 years)</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="very">
+                                    <span>Very important - it's one of my main goals</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="mid">
-                                    <span>Mid-level professional (4-10 years)</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="somewhat">
+                                    <span>Somewhat important - it would be helpful</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="senior">
-                                    <span>Senior professional (10+ years)</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="not">
+                                    <span>Not very important right now</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="executive">
-                                    <span>Executive or leader</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="unsure">
+                                    <span>Unsure - I haven't thought about it much</span>
                                 </div>
                             </div>
                         </div>
@@ -361,23 +385,26 @@
                     <!-- Quiz Question 2 (Hidden initially) -->
                     <div id="question2" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">What are your main professional networking goals?</h3>
+                            <h3 class="font-medium mb-1">What are your primary business networking goals?</h3>
                             <p class="text-textMedium text-sm mb-3">Select all that apply</p>
                             <div class="space-y-2">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="job">
-                                    <span>Finding new job opportunities</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="clients">
+                                    <span>Finding new clients or customers</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="mentorship">
-                                    <span>Finding mentors or mentees</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="partners">
+                                    <span>Identifying strategic business partners</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="knowledge">
-                                    <span>Knowledge sharing and learning</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="investors">
+                                    <span>Connecting with potential investors</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="business">
-                                    <span>Business development and sales</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="mentors">
+                                    <span>Finding mentors or advisors</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="visibility">
-                                    <span>Building industry visibility</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="talent">
+                                    <span>Recruiting talent for my business</span>
+                                </div>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="learning">
+                                    <span>Learning from industry peers</span>
                                 </div>
                             </div>
                         </div>
@@ -394,22 +421,22 @@
                     <!-- Quiz Question 3 (Hidden initially) -->
                     <div id="question3" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">How often do you actively network?</h3>
+                            <h3 class="font-medium mb-1">How do you typically approach business networking?</h3>
                             <div class="space-y-2 mt-3">
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="rarely">
-                                    <span>Rarely or almost never</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="proactive">
+                                    <span>Proactively - I regularly seek out new connections</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="occasionally">
-                                    <span>Occasionally (a few times a year)</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="opportunistic">
+                                    <span>Opportunistically - I connect when opportunities arise</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="monthly">
-                                    <span>Monthly</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="selective">
+                                    <span>Selectively - I'm careful about who I connect with</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="weekly">
-                                    <span>Weekly</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="reactive">
+                                    <span>Reactively - I mostly respond to requests from others</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="daily">
-                                    <span>Daily or almost daily</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="avoid">
+                                    <span>I tend to avoid networking when possible</span>
                                 </div>
                             </div>
                         </div>
@@ -426,22 +453,22 @@
                     <!-- Quiz Question 4 (Hidden initially) -->
                     <div id="question4" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">What's your biggest networking challenge?</h3>
+                            <h3 class="font-medium mb-1">What's your biggest business networking challenge?</h3>
                             <div class="space-y-2 mt-3">
                                 <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="finding">
-                                    <span>Finding the right people to connect with</span>
+                                    <span>Finding the right people for my specific needs</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="initiate">
-                                    <span>Initiating conversations</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="approaching">
+                                    <span>Approaching new contacts confidently</span>
                                 </div>
                                 <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="time">
-                                    <span>Making time for networking</span>
+                                    <span>Finding time for networking activities</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="meaningful">
-                                    <span>Building meaningful relationships</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="conversion">
+                                    <span>Converting connections into business opportunities</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="follow">
-                                    <span>Following up after initial connection</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="maintenance">
+                                    <span>Maintaining relationships over time</span>
                                 </div>
                             </div>
                         </div>
@@ -458,26 +485,32 @@
                     <!-- Quiz Question 5 (Hidden initially) -->
                     <div id="question5" class="quiz-slide hidden">
                         <div class="mb-4">
-                            <h3 class="font-medium mb-1">Which industries are you most interested in connecting with?</h3>
+                            <h3 class="font-medium mb-1">Which business sectors would you most like to connect with?</h3>
                             <p class="text-textMedium text-sm mb-3">Select all that apply</p>
                             <div class="space-y-2">
                                 <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="tech">
-                                    <span>Technology & Software</span>
+                                    <span>Technology & SaaS</span>
                                 </div>
                                 <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="finance">
-                                    <span>Finance & Banking</span>
+                                    <span>Finance & Investment</span>
                                 </div>
                                 <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="healthcare">
                                     <span>Healthcare & Biotech</span>
                                 </div>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="ecommerce">
+                                    <span>E-commerce & Retail</span>
+                                </div>
                                 <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="marketing">
-                                    <span>Marketing & Creative</span>
+                                    <span>Marketing & Advertising</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="education">
-                                    <span>Education & Research</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="manufacturing">
+                                    <span>Manufacturing & Supply Chain</span>
                                 </div>
-                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="other">
-                                    <span>Other Industries</span>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="professional">
+                                    <span>Professional Services (Legal, Consulting)</span>
+                                </div>
+                                <div class="quiz-option p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-darkTertiary" data-value="real-estate">
+                                    <span>Real Estate & Construction</span>
                                 </div>
                             </div>
                         </div>
@@ -500,8 +533,8 @@
                 <div class="w-16 h-16 bg-primary/10 rounded-full mx-auto flex items-center justify-center mb-4">
                     <i class="fas fa-chart-line text-primary text-2xl"></i>
                 </div>
-                <h2 class="text-xl font-bold mb-2">Your Networking Score</h2>
-                <p class="text-textMedium mb-4">Based on your responses, here's how we can help you connect</p>
+                <h2 class="text-xl font-bold mb-2">Your Business Networking Score</h2>
+                <p class="text-textMedium mb-4">Based on your responses, here's how ProConnect can help grow your business network</p>
                 
                 <!-- Networking Score Meter -->
                 <div class="max-w-xs mx-auto mb-6">
@@ -509,20 +542,32 @@
                         <div id="networkingScoreMeter" class="meter-bar bg-primary" style="width: 0%"></div>
                     </div>
                     <div class="flex justify-between text-xs text-textMedium">
-                        <span>Beginner</span>
-                        <span>Intermediate</span>
-                        <span>Advanced</span>
+                        <span>Emerging</span>
+                        <span>Building</span>
+                        <span>Expanding</span>
+                    </div>
+                </div>
+                
+                <!-- Business Potential -->
+                <div class="mb-4">
+                    <h3 class="font-medium text-primary">Business Growth Potential</h3>
+                    <div class="flex items-center justify-center space-x-1 mt-2">
+                        <i id="potentialStar1" class="fas fa-star text-gray-300 text-xl"></i>
+                        <i id="potentialStar2" class="fas fa-star text-gray-300 text-xl"></i>
+                        <i id="potentialStar3" class="fas fa-star text-gray-300 text-xl"></i>
+                        <i id="potentialStar4" class="fas fa-star text-gray-300 text-xl"></i>
+                        <i id="potentialStar5" class="fas fa-star text-gray-300 text-xl"></i>
                     </div>
                 </div>
                 
                 <!-- Personalized Recommendation -->
-                <div class="bg-primary/10 rounded-lg p-4 mb-4 text-left">
-                    <h3 class="font-medium mb-2 text-primary">Your Personalized Networking Recommendation</h3>
-                    <p id="networkingRecommendation" class="text-sm">Based on your profile, we recommend focusing on building more meaningful connections in your industry. ProConnect can help you connect with professionals in similar roles.</p>
+                <div class="bg-primary/10 rounded-lg p-4 mb-6 text-left">
+                    <h3 class="font-medium mb-2 text-primary">Your Business Networking Recommendation</h3>
+                    <p id="networkingRecommendation" class="text-sm">Based on your profile, we recommend focusing on expanding your business connections in the technology sector. ProConnect can help you find potential partners, clients, and mentors to accelerate your business growth.</p>
                 </div>
                 
                 <button id="completeSignUpBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium">
-                    Complete Sign Up
+                    Complete Sign Up & Start Networking
                 </button>
             </div>
         </div>
@@ -546,8 +591,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements - Auth Forms
-            const signInTabBtn = document.getElementById('signInTabBtn');
-            const signUpTabBtn = document.getElementById('signUpTabBtn');
+            const showSignInBtn = document.getElementById('showSignInBtn');
+            const showSignUpBtn = document.getElementById('showSignUpBtn');
             const signInForm = document.getElementById('signInForm');
             const signUpForm = document.getElementById('signUpForm');
             const signInBtn = document.getElementById('signInBtn');
@@ -572,23 +617,38 @@
             const networkingScoreMeter = document.getElementById('networkingScoreMeter');
             const networkingRecommendation = document.getElementById('networkingRecommendation');
             
-            // Form inputs
+            // Potential stars
+            const potentialStar1 = document.getElementById('potentialStar1');
+            const potentialStar2 = document.getElementById('potentialStar2');
+            const potentialStar3 = document.getElementById('potentialStar3');
+            const potentialStar4 = document.getElementById('potentialStar4');
+            const potentialStar5 = document.getElementById('potentialStar5');
+            
+            // Sign In Form inputs
             const loginEmail = document.getElementById('loginEmail');
             const loginPassword = document.getElementById('loginPassword');
+            
+            // Sign Up Form inputs
             const registerFullName = document.getElementById('registerFullName');
             const registerEmail = document.getElementById('registerEmail');
             const registerPassword = document.getElementById('registerPassword');
             const registerConfirmPassword = document.getElementById('registerConfirmPassword');
+            const registerTitle = document.getElementById('registerTitle');
+            const registerCompany = document.getElementById('registerCompany');
+            const registerIndustry = document.getElementById('registerIndustry');
+            const registerLocation = document.getElementById('registerLocation');
+            const registerSkills = document.getElementById('registerSkills');
+            const registerAbout = document.getElementById('registerAbout');
             const termsAgreement = document.getElementById('termsAgreement');
             
             // Quiz state variables
             let currentQuestion = 1;
             let quizAnswers = {
-                careerStage: '',
-                networkingGoals: [],
-                networkingFrequency: '',
-                networkingChallenge: '',
-                industries: []
+                importance: '',
+                goals: [],
+                approach: '',
+                challenge: '',
+                sectors: []
             };
             
             // Initialize quiz option selection
@@ -604,13 +664,13 @@
                 }, 3000);
             }
             
-            // Switch to sign in tab
-            function showSignInTab() {
-                signInTabBtn.classList.add('text-primary', 'border-primary');
-                signInTabBtn.classList.remove('text-textMedium', 'border-transparent');
+            // Switch to sign in form
+            function showSignInForm() {
+                showSignInBtn.classList.add('bg-primary', 'text-white');
+                showSignInBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
                 
-                signUpTabBtn.classList.remove('text-primary', 'border-primary');
-                signUpTabBtn.classList.add('text-textMedium', 'border-transparent');
+                showSignUpBtn.classList.remove('bg-primary', 'text-white');
+                showSignUpBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
                 
                 signUpForm.classList.add('hidden');
                 networkingQuiz.classList.add('hidden');
@@ -618,13 +678,13 @@
                 signInForm.classList.remove('hidden');
             }
             
-            // Switch to sign up tab
-            function showSignUpTab() {
-                signUpTabBtn.classList.add('text-primary', 'border-primary');
-                signUpTabBtn.classList.remove('text-textMedium', 'border-transparent');
+            // Switch to sign up form
+            function showSignUpForm() {
+                showSignUpBtn.classList.add('bg-primary', 'text-white');
+                showSignUpBtn.classList.remove('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
                 
-                signInTabBtn.classList.remove('text-primary', 'border-primary');
-                signInTabBtn.classList.add('text-textMedium', 'border-transparent');
+                showSignInBtn.classList.remove('bg-primary', 'text-white');
+                showSignInBtn.classList.add('bg-white', 'dark:bg-darkSecondary', 'text-primary', 'border', 'border-primary');
                 
                 signInForm.classList.add('hidden');
                 networkingQuiz.classList.add('hidden');
@@ -675,7 +735,7 @@
                     if (seconds <= 0) {
                         clearInterval(timer);
                         // Redirect to home page
-                        window.location.href = 'index.html';
+                        window.location.href = 'profile.html';
                     }
                 }, 1000);
             }
@@ -712,9 +772,9 @@
                             this.classList.add('selected', 'bg-primary/10', 'border-primary');
                             
                             // Store answer
-                            if (questionId === 'question1') quizAnswers.careerStage = value;
-                            if (questionId === 'question3') quizAnswers.networkingFrequency = value;
-                            if (questionId === 'question4') quizAnswers.networkingChallenge = value;
+                            if (questionId === 'question1') quizAnswers.importance = value;
+                            if (questionId === 'question3') quizAnswers.approach = value;
+                            if (questionId === 'question4') quizAnswers.challenge = value;
                             
                         } else {
                             // For multi-select questions (toggle selection)
@@ -723,18 +783,18 @@
                                 
                                 // Remove from arrays
                                 if (questionId === 'question2') {
-                                    quizAnswers.networkingGoals = quizAnswers.networkingGoals.filter(item => item !== value);
+                                    quizAnswers.goals = quizAnswers.goals.filter(item => item !== value);
                                 } else if (questionId === 'question5') {
-                                    quizAnswers.industries = quizAnswers.industries.filter(item => item !== value);
+                                    quizAnswers.sectors = quizAnswers.sectors.filter(item => item !== value);
                                 }
                             } else {
                                 this.classList.add('selected', 'bg-primary/10', 'border-primary');
                                 
                                 // Add to arrays
                                 if (questionId === 'question2') {
-                                    quizAnswers.networkingGoals.push(value);
+                                    quizAnswers.goals.push(value);
                                 } else if (questionId === 'question5') {
-                                    quizAnswers.industries.push(value);
+                                    quizAnswers.sectors.push(value);
                                 }
                             }
                         }
@@ -750,16 +810,16 @@
                         const nextQuestionNum = currentQuestionNum + 1;
                         
                         // Validate selection for single-select questions
-                        if ((currentQuestionNum === 1 && !quizAnswers.careerStage) ||
-                            (currentQuestionNum === 3 && !quizAnswers.networkingFrequency) ||
-                            (currentQuestionNum === 4 && !quizAnswers.networkingChallenge)) {
+                        if ((currentQuestionNum === 1 && !quizAnswers.importance) ||
+                            (currentQuestionNum === 3 && !quizAnswers.approach) ||
+                            (currentQuestionNum === 4 && !quizAnswers.challenge)) {
                             showToast('Please select an option to continue');
                             return;
                         }
                         
                         // Validate at least one selection for multi-select questions
-                        if ((currentQuestionNum === 2 && quizAnswers.networkingGoals.length === 0) ||
-                            (currentQuestionNum === 5 && quizAnswers.industries.length === 0)) {
+                        if ((currentQuestionNum === 2 && quizAnswers.goals.length === 0) ||
+                            (currentQuestionNum === 5 && quizAnswers.sectors.length === 0)) {
                             showToast('Please select at least one option');
                             return;
                         }
@@ -792,9 +852,9 @@
                 
                 // Calculate score button
                 calculateNetworkingScore.addEventListener('click', function() {
-                    // Validate at least one selection for industries
-                    if (quizAnswers.industries.length === 0) {
-                        showToast('Please select at least one industry');
+                    // Validate at least one selection for sectors
+                    if (quizAnswers.sectors.length === 0) {
+                        showToast('Please select at least one sector');
                         return;
                     }
                     
@@ -813,48 +873,97 @@
             function calculateAndDisplayNetworkingScore() {
                 // Calculate score based on quiz answers (simplified algorithm)
                 let score = 0;
+                let potentialStars = 0;
                 
-                // Career stage: higher score for more experienced professionals
-                if (quizAnswers.careerStage === 'executive') score += 20;
-                else if (quizAnswers.careerStage === 'senior') score += 15;
-                else if (quizAnswers.careerStage === 'mid') score += 10;
-                else if (quizAnswers.careerStage === 'early') score += 5;
-                
-                // Networking goals: more goals = more networking needs
-                score += quizAnswers.networkingGoals.length * 5;
-                
-                // Networking frequency: more frequent = higher score
-                if (quizAnswers.networkingFrequency === 'daily') score += 20;
-                else if (quizAnswers.networkingFrequency === 'weekly') score += 15;
-                else if (quizAnswers.networkingFrequency === 'monthly') score += 10;
-                else if (quizAnswers.networkingFrequency === 'occasionally') score += 5;
-                
-                // Challenges: different challenges indicate different networking needs
-                if (['finding', 'initiate', 'meaningful'].includes(quizAnswers.networkingChallenge)) {
-                    score += 10; // Higher need for networking tools
-                } else {
+                // Importance of networking
+                if (quizAnswers.importance === 'critical') {
+                    score += 25;
+                    potentialStars++;
+                } else if (quizAnswers.importance === 'very') {
+                    score += 20;
+                    potentialStars++;
+                } else if (quizAnswers.importance === 'somewhat') {
+                    score += 15;
+                } else if (quizAnswers.importance === 'not') {
                     score += 5;
                 }
                 
-                // Industries: more industries = broader networking needs
-                score += quizAnswers.industries.length * 5;
+                // Networking goals: more business-focused goals = higher score
+                quizAnswers.goals.forEach(goal => {
+                    if (['clients', 'partners', 'investors'].includes(goal)) {
+                        score += 10;
+                        potentialStars++;
+                    } else {
+                        score += 5;
+                    }
+                });
                 
-                // Cap at 100
+                // Approach to networking
+                if (quizAnswers.approach === 'proactive') {
+                    score += 20;
+                    potentialStars++;
+                } else if (quizAnswers.approach === 'opportunistic') {
+                    score += 15;
+                    potentialStars++;
+                } else if (quizAnswers.approach === 'selective') {
+                    score += 10;
+                } else if (quizAnswers.approach === 'reactive') {
+                    score += 5;
+                }
+                
+                // Networking challenges
+                if (['finding', 'conversion'].includes(quizAnswers.challenge)) {
+                    score += 15; // These challenges indicate business focus
+                    potentialStars++;
+                } else {
+                    score += 10;
+                }
+                
+                // Industry sectors
+                quizAnswers.sectors.forEach(() => {
+                    score += 5;
+                });
+                
+                // Cap scores
                 score = Math.min(score, 100);
+                potentialStars = Math.min(potentialStars, 5);
                 
                 // Animate score meter
                 setTimeout(() => {
                     networkingScoreMeter.style.width = `${score}%`;
+                    
+                    // Light up the stars
+                    const stars = [potentialStar1, potentialStar2, potentialStar3, potentialStar4, potentialStar5];
+                    for (let i = 0; i < potentialStars; i++) {
+                        stars[i].classList.remove('text-gray-300');
+                        stars[i].classList.add('text-accent');
+                    }
                 }, 200);
                 
-                // Set recommendation based on score
+                // Set recommendation based on score and selected sectors
                 let recommendation = "";
+                const selectedSectors = quizAnswers.sectors;
+                const topSector = selectedSectors[0] || 'business';
+                
+                const sectorNames = {
+                    'tech': 'technology',
+                    'finance': 'finance and investment',
+                    'healthcare': 'healthcare',
+                    'ecommerce': 'e-commerce',
+                    'marketing': 'marketing',
+                    'manufacturing': 'manufacturing',
+                    'professional': 'professional services',
+                    'real-estate': 'real estate'
+                };
+                
+                const sectorName = sectorNames[topSector] || topSector;
+                
                 if (score >= 80) {
-                    recommendation = "You're a power networker! ProConnect can help you expand your influence across industries and build strategic connections. We'll suggest executive networking opportunities and high-value connections.";
+                    recommendation = `You have excellent business networking potential! With your proactive approach, ProConnect can help you rapidly expand your connections in the ${sectorName} sector, connecting you with potential clients, partners, and investors to accelerate your business growth.`;
                 } else if (score >= 50) {
-                    recommendation = "You have solid networking skills but could benefit from more structure. ProConnect will help you strengthen your existing network and expand into new areas with targeted recommendations.";
+                    recommendation = `You have good business networking potential. ProConnect can help you develop a more strategic approach to building connections in the ${sectorName} sector, focusing on relationships that will directly support your business goals.`;
                 } else {
-                    recommendation = "You're early in your networking journey. ProConnect can help you build fundamental connections, learn networking strategies, and gradually expand your professional circle with guided recommendations.";
+                    recommendation = `You're at the beginning of your business networking journey. ProConnect can help you build fundamental connections in the ${sectorName} sector, starting with low-pressure networking opportunities that match your comfort level while gradually expanding your professional circle.`;
                 }
                 
                 networkingRecommendation.textContent = recommendation;
@@ -887,6 +996,12 @@
                     id: 'user_' + Date.now(),
                     fullName: 'Demo User',
                     email: loginEmail.value,
+                    currentRole: 'Professional',
+                    company: 'Demo Company',
+                    industry: 'Technology',
+                    location: 'San Francisco, CA',
+                    skills: ['Marketing', 'Management', 'Strategy'],
+                    about: 'Experienced professional with a passion for innovation.',
                     profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80"
                 };
                 
@@ -936,11 +1051,30 @@
                     return;
                 }
                 
+                if (!registerTitle.value.trim()) {
+                    showToast('Please enter your professional title');
+                    registerTitle.focus();
+                    return;
+                }
+                
                 if (!termsAgreement.checked) {
                     showToast('Please agree to the Terms of Service');
                     termsAgreement.focus();
                     return;
                 }
+                
+                // Store registration data temporarily
+                localStorage.setItem('tempRegistration', JSON.stringify({
+                    fullName: registerFullName.value.trim(),
+                    email: registerEmail.value.trim(),
+                    password: registerPassword.value, // In a real app, never store raw passwords
+                    currentRole: registerTitle.value.trim(),
+                    company: registerCompany.value.trim(),
+                    industry: registerIndustry.value,
+                    location: registerLocation.value.trim(),
+                    skills: registerSkills.value.trim() ? registerSkills.value.split(',').map(s => s.trim()) : [],
+                    about: registerAbout.value.trim()
+                }));
                 
                 // Show networking quiz
                 showNetworkingQuiz();
@@ -948,11 +1082,20 @@
             
             // Handle complete sign up
             function handleCompleteSignUp() {
+                // Get registration data
+                const registrationData = JSON.parse(localStorage.getItem('tempRegistration') || '{}');
+                
                 // Create user object with quiz data
                 const user = {
                     id: 'user_' + Date.now(),
-                    fullName: registerFullName.value.trim(),
-                    email: registerEmail.value.trim(),
+                    fullName: registrationData.fullName,
+                    email: registrationData.email,
+                    currentRole: registrationData.currentRole,
+                    company: registrationData.company,
+                    industry: registrationData.industry,
+                    location: registrationData.location,
+                    skills: registrationData.skills,
+                    about: registrationData.about,
                     profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80",
                     networkingProfile: {
                         ...quizAnswers,
@@ -960,18 +1103,21 @@
                     }
                 };
                 
+                // Clean up temporary storage
+                localStorage.removeItem('tempRegistration');
+                
                 // Save to localStorage
                 localStorage.setItem('currentUser', JSON.stringify(user));
                 
                 // Show success message
-                showSuccess('Your account has been created successfully!');
+                showSuccess('Your account has been created! Let\'s start networking.');
             }
             
             // Event Listeners
             
-            // Tab buttons
-            signInTabBtn.addEventListener('click', showSignInTab);
-            signUpTabBtn.addEventListener('click', showSignUpTab);
+            // Auth buttons
+            showSignInBtn.addEventListener('click', showSignInForm);
+            showSignUpBtn.addEventListener('click', showSignUpForm);
             
             // Sign in button
             signInBtn.addEventListener('click', handleSignIn);
@@ -999,8 +1145,8 @@
             // Check if user is already logged in
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
-                // Redirect to home page
-                window.location.href = 'index.html';
+                // Redirect to profile page
+                window.location.href = 'profile.html';
             }
         });
     </script>
