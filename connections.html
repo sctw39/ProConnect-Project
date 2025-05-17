@@ -384,9 +384,9 @@
                 <i class="fas fa-bell text-xl text-primary nav-icon active"></i>
                 <span class="text-xs mt-1 text-primary">Requests</span>
             </a>
-            <a href="messages.html" class="flex flex-col items-center">
+            <a href="chat.html" class="flex flex-col items-center">
                 <i class="fas fa-comment-alt text-xl text-gray-500 nav-icon"></i>
-                <span class="text-xs mt-1 text-gray-500">Messages</span>
+                <span class="text-xs mt-1 text-gray-500">Chat</span>
             </a>
             <a href="profile.html" class="flex flex-col items-center">
                 <i class="fas fa-user text-xl text-gray-500 nav-icon"></i>
@@ -539,8 +539,8 @@
                 } else if (buttonId === 'modalCancelBtn') {
                     cancelRequest(selectedUserId);
                 } else if (buttonId === 'modalMessageBtn') {
-                    showToast('Messaging feature coming soon');
-                    userProfileModal.classList.add('hidden');
+                    // Redirect to chat with this user
+                    window.location.href = 'chat.html';
                 }
             }
             
@@ -622,81 +622,3 @@
                     }
                     
                     // Close modal
-                    userProfileModal.classList.add('hidden');
-                }, 500);
-            }
-            
-            // Cancel request
-            function cancelRequest(userId) {
-                const requestCard = document.querySelector(`.request-card [data-id="${userId}"]`).closest('.request-card');
-                
-                // Show toast notification
-                showToast('Connection request canceled');
-                
-                // Animate card removal
-                requestCard.classList.add('fade-out');
-                
-                // Process after animation
-                setTimeout(() => {
-                    requestCard.remove();
-                    
-                    // Update counter
-                    const currentCount = parseInt(sentCount.textContent);
-                    if (currentCount > 1) {
-                        sentCount.textContent = currentCount - 1;
-                    } else {
-                        sentCount.textContent = '0';
-                        sentCount.classList.add('hidden');
-                        
-                        // Show empty state
-                        sentTabContent.innerHTML = `
-                            <div class="flex items-center justify-center py-16">
-                                <div class="text-center">
-                                    <div class="w-16 h-16 bg-darkTertiary rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-paper-plane text-gray-400 text-xl"></i>
-                                    </div>
-                                    <p class="text-gray-400">No sent requests</p>
-                                    <a href="search.html" class="text-primary mt-2 inline-block">Find people to connect with</a>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    // Close modal
-                    userProfileModal.classList.add('hidden');
-                }, 500);
-            }
-            
-            // Accept/Ignore/Cancel buttons in cards
-            document.querySelectorAll('.accept-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-id');
-                    acceptConnection(userId);
-                });
-            });
-            
-            document.querySelectorAll('.ignore-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-id');
-                    ignoreConnection(userId);
-                });
-            });
-            
-            document.querySelectorAll('.cancel-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-id');
-                    cancelRequest(userId);
-                });
-            });
-            
-            // Message buttons
-            document.querySelectorAll('.message-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Now redirect to the messages page
-                    window.location.href = 'messages.html';
-                });
-            });
-        });
-    </script>
-</body>
-</html>
