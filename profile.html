@@ -216,6 +216,28 @@
             cursor: pointer;
         }
         
+        /* Sign out modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            max-width: 400px;
+            width: 90%;
+        }
+        
         /* Dark mode support */
         .dark .bg-lightBg {
             background-color: #181818 !important;
@@ -263,6 +285,10 @@
             border-color: #3A3A3A;
         }
         
+        .dark .modal-content {
+            background-color: #202020;
+        }
+        
         /* Bottom navigation - dark mode */
         .dark .bottom-nav {
             background-color: #202020 !important;
@@ -304,7 +330,7 @@
                 <a href="login.html" class="bg-primary text-white px-6 py-2 rounded-lg">
                     Sign In
                 </a>
-                <a href="register.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200">
+                <a href="login.html" class="bg-lightTertiary text-textDark px-6 py-2 rounded-lg dark:bg-darkTertiary dark:text-gray-200">
                     Sign Up
                 </a>
             </div>
@@ -547,6 +573,11 @@
                     <a href="search.html" class="text-primary text-sm font-medium">Find professionals to connect with</a>
                 </div>
             </div>
+
+            <!-- Sign Out Button -->
+            <button id="signOutButton" class="w-full py-3 bg-white dark:bg-darkSecondary text-danger rounded-lg shadow-sm flex justify-center items-center mb-6">
+                <i class="fas fa-sign-out-alt mr-2"></i> Sign Out
+            </button>
         </div>
         
         <!-- Edit Profile Panel (Hidden initially) -->
@@ -648,86 +679,23 @@
             </div>
         </div>
 
-        <!-- View Profile State (Hidden initially) -->
-        <div id="viewProfileState" class="hidden">
-            <!-- Profile Header -->
-            <div class="flex flex-col items-center mb-6">
-                <div class="profile-image-container mb-3">
-                    <img id="viewProfileImage" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200&q=80" alt="Profile photo" class="profile-image">
-                </div>
-                <h2 id="viewProfileName" class="text-xl font-bold mb-1">Sarah Chen</h2>
-                <p id="viewProfileTitle" class="text-textMedium mb-2">Senior Developer at CodeLabs</p>
-                <p id="viewProfileLocation" class="text-textMedium text-sm mb-4"><i class="fas fa-map-marker-alt mr-1"></i>San Francisco, CA</p>
-                
-                <!-- Connection Status -->
-                <div id="connectionStatus" class="mb-3">
-                    <div id="notConnectedState" class="hidden">
-                        <button id="connectBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-user-plus mr-2"></i> Connect
+        <!-- Sign Out Confirmation Modal -->
+        <div id="signOutModal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center">
+            <div class="bg-white dark:bg-darkSecondary rounded-lg p-6 max-w-xs w-full relative z-10 fade-in">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-danger/10 rounded-full mx-auto flex items-center justify-center mb-4">
+                        <i class="fas fa-sign-out-alt text-danger text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold mb-2">Sign Out</h2>
+                    <p class="text-textMedium mb-6">Are you sure you want to sign out of your account?</p>
+                    
+                    <div class="flex justify-center space-x-4">
+                        <button id="cancelSignOutBtn" class="px-6 py-2 border rounded-lg text-textMedium dark:border-darkTertiary">
+                            Cancel
                         </button>
-                    </div>
-                    <div id="connectionPendingState" class="hidden">
-                        <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-sm">Connection Pending</span>
-                    </div>
-                    <div id="connectedState" class="hidden">
-                        <span class="bg-success/10 text-success px-3 py-1 rounded-full text-sm mr-2">Connected</span>
-                        <button id="messageBtn" class="bg-primary text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-comment mr-2"></i> Message
+                        <button id="confirmSignOutBtn" class="bg-danger text-white px-6 py-2 rounded-lg">
+                            Sign Out
                         </button>
-                    </div>
-                </div>
-                
-                <!-- Match Score -->
-                <div class="bg-primary/10 rounded-lg p-3 mb-4 w-full max-w-xs">
-                    <div class="flex justify-between items-center">
-                        <span class="text-primary font-medium">Match Score</span>
-                        <span id="matchScore" class="text-primary font-bold text-lg">78%</span>
-                    </div>
-                    <div class="profile-progress-track mt-1">
-                        <div id="matchScoreBar" class="profile-progress-bar" style="width: 78%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- About Section -->
-            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
-                <h3 class="font-medium mb-3">About</h3>
-                <p id="viewAboutContent" class="text-textMedium text-sm">Full-stack developer with 7+ years of experience building scalable web applications. Passionate about clean code, performance optimization, and mentoring junior developers.</p>
-            </div>
-            
-            <!-- Experience Section -->
-            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
-                <h3 class="font-medium mb-3">Experience</h3>
-                <div id="viewExperienceList">
-                    <div class="mb-3 pb-3 border-b dark:border-darkTertiary">
-                        <h4 class="font-medium">Senior Developer</h4>
-                        <p class="text-textMedium text-sm">CodeLabs</p>
-                        <p class="text-textLight text-xs">Mar 2020 - Present</p>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">Full-Stack Developer</h4>
-                        <p class="text-textMedium text-sm">WebTech Solutions</p>
-                        <p class="text-textLight text-xs">Jun 2016 - Feb 2020</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Skills Section -->
-            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
-                <h3 class="font-medium mb-3">Skills</h3>
-                <div id="viewSkillsList" class="flex flex-wrap">
-                    <!-- Skills with highlighting of matches -->
-                </div>
-            </div>
-            
-            <!-- Education Section -->
-            <div class="bg-white dark:bg-darkSecondary rounded-lg p-4 mb-4 shadow-sm">
-                <h3 class="font-medium mb-3">Education</h3>
-                <div id="viewEducationList">
-                    <div>
-                        <h4 class="font-medium">Master of Computer Science</h4>
-                        <p class="text-textMedium text-sm">Stanford University</p>
-                        <p class="text-textLight text-xs">2014 - 2016</p>
                     </div>
                 </div>
             </div>
@@ -765,7 +733,6 @@
             const authCheck = document.getElementById('authCheck');
             const loadingState = document.getElementById('loadingState');
             const profileContent = document.getElementById('profileContent');
-            const viewProfileState = document.getElementById('viewProfileState');
             const editProfileBtn = document.getElementById('editProfileBtn');
             const viewAnalyticsBtn = document.getElementById('viewAnalyticsBtn');
             const settingsBtn = document.getElementById('settingsBtn');
@@ -778,11 +745,10 @@
             const viewAllConnectionsBtn = document.getElementById('viewAllConnectionsBtn');
             const connectionsList = document.getElementById('connectionsList');
             const emptyConnectionsState = document.getElementById('emptyConnectionsState');
-            const connectBtn = document.getElementById('connectBtn');
-            const messageBtn = document.getElementById('messageBtn');
-            const notConnectedState = document.getElementById('notConnectedState');
-            const connectionPendingState = document.getElementById('connectionPendingState');
-            const connectedState = document.getElementById('connectedState');
+            const signOutButton = document.getElementById('signOutButton');
+            const signOutModal = document.getElementById('signOutModal');
+            const cancelSignOutBtn = document.getElementById('cancelSignOutBtn');
+            const confirmSignOutBtn = document.getElementById('confirmSignOutBtn');
             
             // Edit Profile Panel Elements
             const editProfilePanel = document.getElementById('editProfilePanel');
@@ -805,8 +771,6 @@
             
             // Current state variables
             let currentUser = JSON.parse(localStorage.getItem('currentUser')) || createDefaultUser();
-            let isViewMode = false;
-            let viewUserId = null;
             let tempImageDataUrl = null;
             
             // Create a default user if none exists
@@ -823,23 +787,11 @@
                 return defaultUser;
             }
             
-            // Check URL for view parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('view')) {
-                viewUserId = urlParams.get('view');
-                isViewMode = true;
-            } else if (localStorage.getItem('viewProfileId')) {
-                viewUserId = localStorage.getItem('viewProfileId');
-                localStorage.removeItem('viewProfileId'); // Clear after use
-                isViewMode = true;
-            }
-            
             // Initialize UI
             if (!currentUser) {
                 // Show auth check message and hide profile content
                 authCheck.classList.remove('hidden');
                 profileContent.classList.add('hidden');
-                viewProfileState.classList.add('hidden');
                 loadingState.classList.add('hidden');
                 return;
             } else {
@@ -847,20 +799,12 @@
                 authCheck.classList.add('hidden');
                 loadingState.classList.remove('hidden');
                 profileContent.classList.add('hidden');
-                viewProfileState.classList.add('hidden');
                 
                 // Simulate loading delay
                 setTimeout(() => {
                     loadingState.classList.add('hidden');
-                    
-                    if (isViewMode) {
-                        // Load and show other user's profile
-                        loadUserProfile(viewUserId);
-                    } else {
-                        // Load and show current user's profile
-                        loadProfile();
-                        profileContent.classList.remove('hidden');
-                    }
+                    loadProfile();
+                    profileContent.classList.remove('hidden');
                 }, 800);
             }
             
@@ -998,229 +942,6 @@
                 connectionsList.innerHTML = connectionsHtml;
             }
             
-            // Load user profile
-            function loadUserProfile(userId) {
-                // Get user data
-                let userData;
-                
-                try {
-                    // Try different possible storage keys
-                    userData = JSON.parse(localStorage.getItem(`user_${userId}`));
-                    
-                    if (!userData) {
-                        userData = JSON.parse(localStorage.getItem(userId));
-                    }
-                    
-                    if (!userData) {
-                        // Try to find in sample users
-                        const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
-                        userData = sampleUsers.find(u => u.id === userId);
-                    }
-                    
-                    if (!userData) {
-                        // Check if it's in the current user's connections
-                        const connection = currentUser.connections?.find(c => c.id === userId);
-                        if (connection) {
-                            userData = {
-                                id: connection.id,
-                                fullName: connection.name,
-                                profileImage: connection.profileImage
-                            };
-                        }
-                    }
-                } catch (e) {
-                    console.error("Error loading user data:", e);
-                }
-                
-                if (!userData) {
-                    // User not found, show error
-                    showToast("User not found");
-                    setTimeout(() => {
-                        window.location.href = "profile.html";
-                    }, 2000);
-                    return;
-                }
-                
-                // Set basic profile info
-                document.getElementById('viewProfileName').textContent = userData.fullName || userData.name || "User";
-                
-                // Set profile title
-                let title = "";
-                if (userData.currentRole) {
-                    title = userData.currentRole;
-                    if (userData.company) {
-                        title += " at " + userData.company;
-                    }
-                }
-                document.getElementById('viewProfileTitle').textContent = title;
-                
-                // Set profile location
-                if (!userData.location) {
-                    document.getElementById('viewProfileLocation').classList.add('hidden');
-                } else {
-                    document.getElementById('viewProfileLocation').innerHTML = `<i class="fas fa-map-marker-alt mr-1"></i>${userData.location}`;
-                }
-                
-                // Set profile image
-                if (userData.profileImage) {
-                    document.getElementById('viewProfileImage').src = userData.profileImage;
-                }
-                
-                // Set about content
-                document.getElementById('viewAboutContent').textContent = userData.about || "No information provided";
-                
-                // Set skills with highlighting of matches
-                let skillsHtml = "";
-                if (userData.skills && userData.skills.length > 0) {
-                    let userSkillsArray = userData.skills;
-                    if (typeof userSkillsArray === 'string') {
-                        userSkillsArray = userSkillsArray.split(',').map(s => s.trim());
-                    }
-                    
-                    // Get current user skills for comparison
-                    let currentUserSkillsArray = [];
-                    if (currentUser.skills) {
-                        if (typeof currentUser.skills === 'string') {
-                            currentUserSkillsArray = currentUser.skills.split(',').map(s => s.trim().toLowerCase());
-                        } else if (Array.isArray(currentUser.skills)) {
-                            currentUserSkillsArray = currentUser.skills.map(s => s.toLowerCase());
-                        }
-                    }
-                    
-                    skillsHtml = userSkillsArray.map(skill => {
-                        const isMatch = currentUserSkillsArray.includes(skill.toLowerCase());
-                        return `<span class="skill-badge ${isMatch ? 'bg-success/10 text-success' : ''}">${skill}${isMatch ? ' <i class="fas fa-check-circle text-xs"></i>' : ''}</span>`;
-                    }).join('');
-                }
-                document.getElementById('viewSkillsList').innerHTML = skillsHtml || '<span class="text-textLight text-sm">No skills listed</span>';
-                
-                // Set experience
-                let experienceHtml = "";
-                if (userData.experience && userData.experience.length > 0) {
-                    experienceHtml = userData.experience.map((exp, index) => {
-                        const isLast = index === userData.experience.length - 1;
-                        return `
-                            <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
-                                <h4 class="font-medium">${exp.title}</h4>
-                                <p class="text-textMedium text-sm">${exp.company}</p>
-                                <p class="text-textLight text-xs">${exp.startDate} - ${exp.endDate || 'Present'}</p>
-                                ${exp.description ? `<p class="text-textMedium text-sm mt-1">${exp.description}</p>` : ''}
-                            </div>
-                        `;
-                    }).join('');
-                }
-                document.getElementById('viewExperienceList').innerHTML = experienceHtml || '<span class="text-textLight text-sm">No experience listed</span>';
-                
-                // Set education
-                let educationHtml = "";
-                if (userData.education && userData.education.length > 0) {
-                    educationHtml = userData.education.map((edu, index) => {
-                        const isLast = index === userData.education.length - 1;
-                        const degree = edu.degree + (edu.fieldOfStudy ? ' in ' + edu.fieldOfStudy : '');
-                        return `
-                            <div class="${!isLast ? 'mb-3 pb-3 border-b dark:border-darkTertiary' : ''}">
-                                <h4 class="font-medium">${degree}</h4>
-                                <p class="text-textMedium text-sm">${edu.school}</p>
-                                <p class="text-textLight text-xs">${edu.startYear} - ${edu.endYear || 'Present'}</p>
-                            </div>
-                        `;
-                    }).join('');
-                }
-                document.getElementById('viewEducationList').innerHTML = educationHtml || '<span class="text-textLight text-sm">No education listed</span>';
-                
-                // Calculate and display match score
-                calculateMatchScore(userData);
-                
-                // Check connection status and update UI
-                updateConnectionStatus(userId);
-                
-                // Show view profile state
-                viewProfileState.classList.remove('hidden');
-            }
-            
-            // Calculate match score between current user and viewed user
-            function calculateMatchScore(userData) {
-                // Simple match algorithm (for demo purposes)
-                let score = 50; // Base score
-                
-                // 1. Skills match (up to 25 points)
-                const currentUserSkills = currentUser.skills || [];
-                const viewedUserSkills = userData.skills || [];
-                
-                let currentUserSkillsArray = [];
-                if (typeof currentUserSkills === 'string') {
-                    currentUserSkillsArray = currentUserSkills.split(',').map(s => s.trim().toLowerCase());
-                } else if (Array.isArray(currentUserSkills)) {
-                    currentUserSkillsArray = currentUserSkills.map(s => s.toLowerCase());
-                }
-                
-                let viewedUserSkillsArray = [];
-                if (typeof viewedUserSkills === 'string') {
-                    viewedUserSkillsArray = viewedUserSkills.split(',').map(s => s.trim().toLowerCase());
-                } else if (Array.isArray(viewedUserSkills)) {
-                    viewedUserSkillsArray = viewedUserSkills.map(s => s.toLowerCase());
-                }
-                
-                if (currentUserSkillsArray.length > 0 && viewedUserSkillsArray.length > 0) {
-                    const commonSkills = currentUserSkillsArray.filter(skill => viewedUserSkillsArray.includes(skill));
-                    const skillMatchRatio = commonSkills.length / Math.max(currentUserSkillsArray.length, viewedUserSkillsArray.length);
-                    
-                    score += skillMatchRatio * 25;
-                }
-                
-                // 2. Industry match (up to 15 points)
-                if (currentUser.industry && userData.industry && 
-                    currentUser.industry.toLowerCase() === userData.industry.toLowerCase()) {
-                    score += 15;
-                }
-                
-                // 3. Location match (up to 10 points)
-                if (currentUser.location && userData.location) {
-                    if (currentUser.location.toLowerCase() === userData.location.toLowerCase()) {
-                        score += 10;
-                    } else if (currentUser.location.toLowerCase().includes(userData.location.toLowerCase()) ||
-                              userData.location.toLowerCase().includes(currentUser.location.toLowerCase())) {
-                        score += 5;
-                    }
-                }
-                
-                // Update UI
-                const matchScore = Math.round(score);
-                document.getElementById('matchScore').textContent = matchScore + '%';
-                document.getElementById('matchScoreBar').style.width = matchScore + '%';
-            }
-            
-            // Update connection status
-            function updateConnectionStatus(userId) {
-                let isConnected = false;
-                let isPending = false;
-                
-                // Check if they're already connected
-                if (currentUser.connections) {
-                    isConnected = currentUser.connections.some(conn => conn.id === userId);
-                }
-                
-                // Check if connection is pending (in a real app, this would check a pending connections list)
-                if (currentUser.pendingConnections) {
-                    isPending = currentUser.pendingConnections.some(conn => conn.id === userId);
-                }
-                
-                // Update UI based on connection status
-                if (isConnected) {
-                    notConnectedState.classList.add('hidden');
-                    connectionPendingState.classList.add('hidden');
-                    connectedState.classList.remove('hidden');
-                } else if (isPending) {
-                    notConnectedState.classList.add('hidden');
-                    connectionPendingState.classList.remove('hidden');
-                    connectedState.classList.add('hidden');
-                } else {
-                    notConnectedState.classList.remove('hidden');
-                    connectionPendingState.classList.add('hidden');
-                    connectedState.classList.add('hidden');
-                }
-            }
-            
             // Calculate profile completion percentage
             function updateProfileCompletion() {
                 let totalScore = 0;
@@ -1335,6 +1056,33 @@
             }
             
             // Event Listeners
+            
+            // Settings Button - Navigate to settings page
+            settingsBtn.addEventListener('click', function() {
+                window.location.href = "settings.html";
+            });
+            
+            // Sign Out Button - Show confirmation modal
+            signOutButton.addEventListener('click', function() {
+                signOutModal.classList.remove('hidden');
+            });
+            
+            // Cancel Sign Out
+            cancelSignOutBtn.addEventListener('click', function() {
+                signOutModal.classList.add('hidden');
+            });
+            
+            // Confirm Sign Out
+            confirmSignOutBtn.addEventListener('click', function() {
+                // Sign out user
+                localStorage.removeItem('currentUser');
+                showToast('Signing out...');
+                
+                // Redirect to login page after a brief delay
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            });
             
             // Edit Profile Button
             editProfileBtn.addEventListener('click', function() {
@@ -1677,61 +1425,6 @@
                 });
             });
             
-            // Connect button
-            if (connectBtn) {
-                connectBtn.addEventListener('click', function() {
-                    // Add to connections (in a real app this would be a connection request)
-                    if (!currentUser.connections) {
-                        currentUser.connections = [];
-                    }
-                    
-                    // Get user data
-                    let userData;
-                    
-                    try {
-                        userData = JSON.parse(localStorage.getItem(`user_${viewUserId}`));
-                        
-                        if (!userData) {
-                            userData = JSON.parse(localStorage.getItem(viewUserId));
-                        }
-                        
-                        if (!userData) {
-                            const sampleUsers = JSON.parse(localStorage.getItem('sampleUsers')) || [];
-                            userData = sampleUsers.find(u => u.id === viewUserId);
-                        }
-                    } catch (e) {
-                        console.error("Error loading user data:", e);
-                    }
-                    
-                    if (!userData) return;
-                    
-                    // Add to connections
-                    currentUser.connections.push({
-                        id: viewUserId,
-                        name: userData.fullName || userData.name,
-                        timestamp: Date.now(),
-                        profileImage: userData.profileImage
-                    });
-                    
-                    // Save to localStorage
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
-                    // Update UI
-                    updateConnectionStatus(viewUserId);
-                    
-                    // Show success message
-                    showToast("Connection added");
-                });
-            }
-            
-            // Message button
-            if (messageBtn) {
-                messageBtn.addEventListener('click', function() {
-                    // Redirect to chat page
-                    window.location.href = "chat.html";
-                });
-            }
-            
             // View analytics button
             viewAnalyticsBtn.addEventListener('click', function() {
                 window.location.href = "index.html";
@@ -1740,11 +1433,6 @@
             // View all connections button
             viewAllConnectionsBtn.addEventListener('click', function() {
                 showToast("Coming soon: Connections page");
-            });
-            
-            // Settings button
-            settingsBtn.addEventListener('click', function() {
-                showToast("Coming soon: Settings page");
             });
             
             // Share profile button
